@@ -17,7 +17,7 @@ remake: clean $(OUT)
 $(OUT): $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) $(LIBS)
 
-$(ODIR)/%.o: $(SDIR)/%.c:
+$(ODIR)/%.o: $(SDIR)/%.c
 	$(CC) -c -o $@ $< -I $(HDIR) -I $(LDIR)
 
 clean:

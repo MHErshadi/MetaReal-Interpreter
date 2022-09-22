@@ -9,7 +9,7 @@
 
 #include <memory.h>
 
-void stack_free(stack_t stack, const void* block)
+void stack_free(stack_t stack, void* block)
 {
     if (stack->data <= (char*)block && stack->sp >= (char*)block)
     {

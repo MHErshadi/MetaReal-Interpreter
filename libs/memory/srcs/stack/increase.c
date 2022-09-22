@@ -58,10 +58,9 @@ void* stack_increase(stack_t stack, void* block, unsigned long long add)
 
                 temp->temp = NULL;
 
-                char* cast = block;
                 unsigned long long i;
                 for (i = 0; i < osize; i++)
-                    temp->data[i] = cast[i];
+                    temp->data[i] = ((char*)block)[i];
 
                 storage->temp = temp;
                 return temp->data;
@@ -69,10 +68,9 @@ void* stack_increase(stack_t stack, void* block, unsigned long long add)
 
             void* block = storage->sp;
 
-            char* cast = block;
             unsigned long long i;
             for (i = 0; i < osize; i++)
-                storage->sp[i] = cast[i];
+                storage->sp[i] = ((char*)block)[i];
 
             storage->sp += size;
 
@@ -98,10 +96,9 @@ void* stack_increase(stack_t stack, void* block, unsigned long long add)
 
         temp->temp = NULL;
 
-        char* cast = block;
         unsigned long long i;
         for (i = 0; i < osize; i++)
-            temp->data[i] = cast[i];
+            temp->data[i] = ((char*)block)[i];
 
         stack->temp = temp;
         return temp->data;

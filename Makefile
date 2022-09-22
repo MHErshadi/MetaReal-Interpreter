@@ -1,4 +1,5 @@
 CC = gcc
+CFLAGS = -Wall
 
 SDIR = srcs
 ODIR = objs
@@ -18,7 +19,7 @@ $(OUT): $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) $(LIBS)
 
 $(ODIR)/%.o: $(SDIR)/%.c
-	$(CC) -c -o $@ $< -I $(HDIR) -I $(LDIR)
+	$(CC) $(CFLAGS) -c -o $@ $< -I $(HDIR) -I $(LDIR)
 
 clean:
 	@rm -f $(shell find $(ODIR) -name "*.o")

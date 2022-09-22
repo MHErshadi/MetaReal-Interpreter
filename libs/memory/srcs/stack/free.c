@@ -11,16 +11,15 @@
 
 void stack_free(stack_t stack, const void* block)
 {
-    const char* cast = block;
-    if (stack->data < block && stack->sp > block)
+    if (stack->data <= (char*)block && stack->sp >= (char*)block)
     {
-        stack->sp = block;
+        stack->sp = (char*)block;
         return;
     }
 
     stack_p temp = stack->temp;
-    while (temp->data < block && temp->sp > block)
+    while (temp->data <= (char*)block && temp->sp >= (char*)block)
         temp = temp->temp;
 
-    temp->sp = block;
+    temp->sp = (char*)block;
 }

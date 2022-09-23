@@ -17,8 +17,10 @@ void stack_reset(stack_t stack)
     stack->sp = stack->data;
 
     if (stack->temp)
+    {
         temp_reset(stack->temp);
-    stack->temp = NULL;
+        stack->temp = NULL;
+    }
 }
 
 void temp_reset(stack_p temp)

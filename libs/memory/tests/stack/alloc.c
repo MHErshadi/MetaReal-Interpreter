@@ -28,18 +28,18 @@ int main()
     stack_t stack;
     stack_init(stack, STACK_SIZE);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     char* text = stack_alloc(stack, 12);
     strncpy(text, "Hello World", 12);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     struct vector* vec = stack_alloc(stack, sizeof(struct vector));
     vec->x = 10;
     vec->y = 20;
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     int* age = stack_alloc(stack, sizeof(int));
     *age = 57;

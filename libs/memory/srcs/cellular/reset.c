@@ -26,7 +26,10 @@ void cellular_reset(cellular_t cellular)
     *cellular->free = (cell_t){cellular->data, cellular->size * cellular->unit, NULL};
 
     if (cellular->temp)
+    {
         temp_reset(cellular->temp);
+        cellular->temp = NULL;
+    }
 }
 
 void cell_reset(cell_p cell)

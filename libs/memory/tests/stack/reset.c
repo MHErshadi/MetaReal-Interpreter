@@ -24,7 +24,7 @@ int main()
     stack_alloc(stack, STACK_SIZE);
     stack_alloc(stack, STACK_SIZE);
 
-    printf("stack before reset: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack before reset: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     stack_reset(stack);
 

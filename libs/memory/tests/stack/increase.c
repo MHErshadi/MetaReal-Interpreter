@@ -22,11 +22,11 @@ int main()
     stack_t stack;
     stack_init(stack, STACK_SIZE);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     void* ptr = stack_alloc(stack, 20);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     ptr = stack_increase(stack, ptr, 58);
 

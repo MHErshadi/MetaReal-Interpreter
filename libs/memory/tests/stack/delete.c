@@ -21,7 +21,7 @@ int main()
     stack_t stack;
     stack_init(stack, STACK_SIZE);
 
-    printf("stack before delete: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack before delete: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
 
     stack_delete(stack);
 

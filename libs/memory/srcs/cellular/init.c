@@ -10,7 +10,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void cellular_init(cellular_t cellular, unsigned long long size, unsigned long long unit)
+void cellular_init(cellular_p cellular, unsigned long long size, unsigned long long unit)
 {
     unsigned long long alloc = size * unit;
 
@@ -19,8 +19,8 @@ void cellular_init(cellular_t cellular, unsigned long long size, unsigned long l
     cellular->unit = unit;
 
     cellular->end = cellular->data + alloc;
-    cellular->free = malloc(sizeof(cell_t));
-    *cellular->free = (cell_t){cellular->data, alloc, NULL};
+    cellular->free = malloc(sizeof(free_cell_t));
+    *cellular->free = (free_cell_t){cellular->data, alloc, NULL};
 
     cellular->temp = NULL;
 }

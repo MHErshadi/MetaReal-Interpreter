@@ -20,12 +20,12 @@ int main()
 
     stack_t stack;
 
-    printf("stack before init: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack before init: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    stack_init(stack, STACK_SIZE);
+    stack_init(&stack, STACK_SIZE);
 
-    printf("stack after init: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack after init: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    stack_delete(stack);
+    stack_delete(&stack);
     return 0;
 }

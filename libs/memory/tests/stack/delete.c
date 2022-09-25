@@ -19,13 +19,13 @@ int main()
     puts("Testing delete function\n");
 
     stack_t stack;
-    stack_init(stack, STACK_SIZE);
+    stack_init(&stack, STACK_SIZE);
 
-    printf("stack before delete: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack before delete: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    stack_delete(stack);
+    stack_delete(&stack);
 
-    printf("stack after delete: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack after delete: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack.data, stack.size, stack.sp, stack.temp);
 
     return 0;
 }

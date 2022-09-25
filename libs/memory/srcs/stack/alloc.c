@@ -10,7 +10,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void* stack_alloc(stack_t stack, unsigned long long size)
+void* stack_alloc(stack_p stack, unsigned long long size)
 {
     unsigned long long fsize = stack->size - (stack->sp - stack->data);
 
@@ -18,75 +18,53 @@ void* stack_alloc(stack_t stack, unsigned long long size)
     {
         if (stack->temp)
         {
-            stack_p storage = stack->temp;
-            fsize = storage->size - (storage->sp - storage->data);
+            stack = stack->temp;
+            fsize = stack->size - (stack->sp - stack->data);
 
             char new = 0;
             while (fsize < size)
             {
-                if (!storage->temp)
+                if (!stack->temp)
                 {
                     new = 1;
                     break;
                 }
 
-                storage = storage->temp;
-                fsize = storage->size - (storage->sp - storage->data);
+                stack = stack->temp;
+                fsize = stack->size - (stack->sp - stack->data);
             }
 
             if (new)
             {
-                stack_p temp = malloc(sizeof(struct __stack__));
+                stack->temp = malloc(sizeof(stack_t));
 
-                if (stack->size < size)
-                {
-                    temp->data = malloc(size);
-                    temp->size = size;
+                stack->temp->size = stack->size < size ? size : stack->size;
+                stack->temp->data = malloc(stack->temp->size);
 
-                    temp->sp = stack->data + size;
-                }
-                else
-                {
-                    temp->data = malloc(stack->size);
-                    temp->size = stack->size;
+                stack->temp->sp = stack->data + stack->temp->size;
 
-                    temp->sp = stack->data + stack->size;
-                }
+                stack->temp->temp = NULL;
 
-                temp->temp = NULL;
-
-                storage->temp = temp;
-                return temp->data;
+                return stack->temp->data;
             }
 
-            void* block = storage->sp;
+            void* block = stack->sp;
 
-            storage->sp += size;
+            stack->sp += size;
 
             return block;
         }
 
-        stack_p temp = malloc(sizeof(struct __stack__));
+        stack->temp = malloc(sizeof(stack_t));
 
-        if (stack->size < size)
-        {
-            temp->data = malloc(size);
-            temp->size = size;
+        stack->temp->size = stack->size < size ? size : stack->size;
+        stack->temp->data = malloc(stack->temp->size);
 
-            temp->sp = stack->data + size;
-        }
-        else
-        {
-            temp->data = malloc(stack->size);
-            temp->size = stack->size;
+        stack->temp->sp = stack->data + stack->temp->size;
 
-            temp->sp = stack->data + stack->size;
-        }
+        stack->temp->temp = NULL;
 
-        temp->temp = NULL;
-
-        stack->temp = temp;
-        return temp->data;
+        return stack->temp->data;
     }
 
     void* block = stack->sp;

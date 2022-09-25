@@ -12,7 +12,7 @@
 
 void temp_reset(stack_p temp);
 
-void stack_reset(stack_t stack)
+void stack_reset(stack_p stack)
 {
     stack->sp = stack->data;
 

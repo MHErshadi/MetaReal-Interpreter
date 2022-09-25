@@ -9,17 +9,10 @@
 
 #include <memory.h>
 
-void stack_free(stack_t stack, void* block)
+void stack_free(stack_p stack, void* block)
 {
-    if (stack->data <= (char*)block && stack->sp >= (char*)block)
-    {
-        stack->sp = (char*)block;
-        return;
-    }
+    while (stack->data > (char*)block || stack->sp <= (char*)block)
+        stack = stack->temp;
 
-    stack_p temp = stack->temp;
-    while (temp->data <= (char*)block && temp->sp >= (char*)block)
-        temp = temp->temp;
-
-    temp->sp = (char*)block;
+    stack->sp = (char*)block;
 }

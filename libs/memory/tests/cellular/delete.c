@@ -20,14 +20,14 @@ int main()
     puts("Testing delete function\n");
 
     cellular_t cellular;
-    cellular_init(cellular, CELLULAR_SIZE, CELLULAR_UNIT);
+    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    printf("cellular before delete: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    printf("free-cell before delete: {start=%p, size=%llu, next=%p}\n\n", cellular->free->start, cellular->free->size, cellular->free->next);
+    printf("cellular before delete: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    printf("free-cell before delete: {start=%p, size=%llu, next=%p}\n\n", cellular.free->start, cellular.free->size, cellular.free->next);
 
-    cellular_delete(cellular);
+    cellular_delete(&cellular);
 
-    printf("cellular after delete: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
+    printf("cellular after delete: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
 
     return 0;
 }

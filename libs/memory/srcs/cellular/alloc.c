@@ -10,29 +10,29 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void* cellular_alloc(cellular_t cellular)
+void* cellular_alloc(cellular_p cellular)
 {
     if (!cellular->free)
     {
         if (cellular->temp)
         {
-            cellular_p storage = cellular->temp;
+            cellular = cellular->temp;
 
             char new = 0;
-            while (!storage->free)
+            while (!cellular->free)
             {
-                if (!storage->temp)
+                if (!cellular->temp)
                 {
                     new = 1;
                     break;
                 }
 
-                storage = storage->temp;
+                cellular = cellular->temp;
             }
 
             if (new)
             {
-                cellular_p temp = malloc(sizeof(struct __cellular__));
+                cellular_p temp = malloc(sizeof(cellular_t));
 
                 unsigned long long alloc = cellular->size * cellular->unit;
 
@@ -41,34 +41,34 @@ void* cellular_alloc(cellular_t cellular)
                 temp->unit = cellular->unit;
 
                 temp->end = temp->data + alloc;
-                temp->free = malloc(sizeof(cell_t));
-                *temp->free = (cell_t){temp->data + cellular->unit, alloc - cellular->unit, NULL};
+                temp->free = malloc(sizeof(free_cell_t));
+                *temp->free = (free_cell_t){temp->data + cellular->unit, alloc - cellular->unit, NULL};
 
                 temp->temp = NULL;
 
-                storage->temp = temp;
+                cellular->temp = temp;
                 return temp->data;
             }
 
-            void* block = storage->free->start;
+            void* block = cellular->free->start;
 
-            if (storage->free->size == cellular->unit)
+            if (cellular->free->size == cellular->unit)
             {
-                cell_p new = storage->free->next;
+                free_cell_p new = cellular->free->next;
 
-                free(storage->free);
-                storage->free = new;
+                free(cellular->free);
+                cellular->free = new;
             }
             else
             {
-                storage->free->start += cellular->unit;
-                storage->free->size -= cellular->unit;
+                cellular->free->start += cellular->unit;
+                cellular->free->size -= cellular->unit;
             }
 
             return block;
         }
 
-        cellular_p temp = malloc(sizeof(struct __cellular__));
+        cellular_p temp = malloc(sizeof(cellular_t));
 
         unsigned long long alloc = cellular->size * cellular->unit;
 
@@ -77,8 +77,8 @@ void* cellular_alloc(cellular_t cellular)
         temp->unit = cellular->unit;
 
         temp->end = temp->data + alloc;
-        temp->free = malloc(sizeof(cell_t));
-        *temp->free = (cell_t){temp->data + cellular->unit, alloc - cellular->unit, NULL};
+        temp->free = malloc(sizeof(free_cell_t));
+        *temp->free = (free_cell_t){temp->data + cellular->unit, alloc - cellular->unit, NULL};
 
         temp->temp = NULL;
 
@@ -90,7 +90,7 @@ void* cellular_alloc(cellular_t cellular)
 
     if (cellular->free->size == cellular->unit)
     {
-        cell_p new = cellular->free->next;
+        free_cell_p new = cellular->free->next;
 
         free(cellular->free);
         cellular->free = new;

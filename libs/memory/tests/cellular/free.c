@@ -13,7 +13,7 @@
 #define CELLULAR_SIZE 1024 / sizeof(int)
 #define CELLULAR_UNIT sizeof(int)
 
-void cell_print(cell_p cell);
+void free_cell_print(free_cell_p cell);
 
 int main()
 {
@@ -22,41 +22,41 @@ int main()
     puts("Testing free function\n");
 
     cellular_t cellular;
-    cellular_init(cellular, CELLULAR_SIZE, CELLULAR_UNIT);
+    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    cell_print(cellular->free);
+    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    free_cell_print(cellular.free);
 
-    void* ptr1 = cellular_alloc(cellular);
-    void* ptr2 = cellular_alloc(cellular);
-    void* ptr3 = cellular_alloc(cellular);
+    void* ptr1 = cellular_alloc(&cellular);
+    void* ptr2 = cellular_alloc(&cellular);
+    void* ptr3 = cellular_alloc(&cellular);
 
-    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    cell_print(cellular->free);
+    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    free_cell_print(cellular.free);
 
-    cellular_free(cellular, ptr2);
+    cellular_free(&cellular, ptr2);
 
-    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    cell_print(cellular->free);
+    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    free_cell_print(cellular.free);
 
-    cellular_free(cellular, ptr1);
+    cellular_free(&cellular, ptr1);
 
-    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    cell_print(cellular->free);
+    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    free_cell_print(cellular.free);
 
-    cellular_free(cellular, ptr3);
+    cellular_free(&cellular, ptr3);
 
-    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    cell_print(cellular->free);
+    printf("\ncellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    free_cell_print(cellular.free);
 
-    cellular_delete(cellular);
+    cellular_delete(&cellular);
     return 0;
 }
 
-void cell_print(cell_p cell)
+void free_cell_print(free_cell_p cell)
 {
     printf("free-cell: {start=%p, size=%llu, next=%p}\n", cell->start, cell->size, cell->next);
 
     if (cell->next)
-        cell_print(cell->next);
+        free_cell_print(cell->next);
 }

@@ -10,7 +10,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void stack_init(stack_t stack, unsigned long long size)
+void stack_init(stack_p stack, unsigned long long size)
 {
     stack->data = malloc(size);
     stack->size = size;

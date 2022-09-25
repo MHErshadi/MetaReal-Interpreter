@@ -20,37 +20,37 @@ int main()
     puts("Testing alloc function\n");
 
     cellular_t cellular;
-    cellular_init(cellular, CELLULAR_SIZE, CELLULAR_UNIT);
+    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular->free->start, cellular->free->size, cellular->free->next);
+    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular.free->start, cellular.free->size, cellular.free->next);
 
-    int* int1 = cellular_alloc(cellular);
+    int* int1 = cellular_alloc(&cellular);
     *int1 = 100;
 
-    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular->free->start, cellular->free->size, cellular->free->next);
+    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular.free->start, cellular.free->size, cellular.free->next);
 
-    int* int2 = cellular_alloc(cellular);
+    int* int2 = cellular_alloc(&cellular);
     *int2 = 200;
 
-    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular->free->start, cellular->free->size, cellular->free->next);
+    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular.free->start, cellular.free->size, cellular.free->next);
 
-    cellular_free(cellular, int1);
+    cellular_free(&cellular, int1);
 
-    int* int3 = cellular_alloc(cellular);
+    int* int3 = cellular_alloc(&cellular);
     *int3 = 300;
 
-    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular->data, cellular->size, cellular->unit, cellular->end, cellular->free, cellular->temp);
-    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular->free->start, cellular->free->size, cellular->free->next);
+    printf("cellular: {data=%p, size=%llu, unit=%llu, end=%p, free=%p, temp=%p}\n", cellular.data, cellular.size, cellular.unit, cellular.end, cellular.free, cellular.temp);
+    printf("free-cell: {start=%p, size=%llu, next=%p}\n\n", cellular.free->start, cellular.free->size, cellular.free->next);
 
     printf("cellular data int form:\n");
     unsigned long long i;
     for (i = 0; i < CELLULAR_SIZE; i++)
-        printf("%d ", ((int*)cellular->data)[i]);
+        printf("%d ", ((int*)cellular.data)[i]);
     printf("\n");
 
-    cellular_delete(cellular);
+    cellular_delete(&cellular);
     return 0;
 }

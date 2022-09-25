@@ -10,23 +10,23 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void cell_delete(cell_p cell);
+void free_cell_delete(free_cell_p cell);
 void temp_delete(cellular_p temp);
 
-void cellular_delete(cellular_t cellular)
+void cellular_delete(cellular_p cellular)
 {
     free(cellular->data);
     if (cellular->free)
-        cell_delete(cellular->free);
+        free_cell_delete(cellular->free);
 
     if (cellular->temp)
         temp_delete(cellular->temp);
 }
 
-void cell_delete(cell_p cell)
+void free_cell_delete(free_cell_p cell)
 {
     if (cell->next)
-        cell_delete(cell->next);
+        free_cell_delete(cell->next);
 
     free(cell);
 }
@@ -38,6 +38,6 @@ void temp_delete(cellular_p temp)
 
     free(temp->data);
     if (temp->free)
-        cell_delete(temp->free);
+        free_cell_delete(temp->free);
     free(temp);
 }

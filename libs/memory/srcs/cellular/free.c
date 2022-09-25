@@ -10,95 +10,15 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void cellular_free(cellular_t cellular, void* block)
+void cellular_free(cellular_p cellular, void* block)
 {
-    if (cellular->data <= (char*)block && cellular->end > (char*)block)
+    while (cellular->data > (char*)block || cellular->end <= (char*)block)
+        cellular = cellular->temp;
+
+    if (cellular->free)
     {
-        if (cellular->free)
-        {
-            cell_p prev = NULL;
-            cell_p next = cellular->free;
-
-            char last = 0;
-            while (next->start < (char*)block)
-            {
-                if (!next->next)
-                {
-                    last = 1;
-                    break;
-                }
-
-                prev = next;
-                next = next->next;
-            }
-
-            if (last)
-            {
-                if (next->start + next->size == (char*)block)
-                {
-                    next->size += cellular->unit;
-                    return;
-                }
-
-                next->next = malloc(sizeof(cell_t));
-                *next->next = (cell_t){block, cellular->unit, NULL};
-                return;
-            }
-
-            if (!prev)
-            {
-                if ((char*)block + cellular->unit == next->start)
-                {
-                    next->start -= cellular->unit;
-                    next->size += cellular->unit;
-                    return;
-                }
-
-                cellular->free = malloc(sizeof(cell_t));
-                *cellular->free = (cell_t){block, cellular->unit, next};
-                return;
-            }
-
-            if (prev->start + prev->size == (char*)block)
-            {
-                if ((char*)block + cellular->unit == next->start)
-                {
-                    prev->size += next->size + cellular->unit;
-                    prev->next = next->next;
-
-                    free(next);
-                    return;
-                }
-
-                prev->size += cellular->unit;
-                return;
-            }
-
-            if ((char*)block + cellular->unit == next->start)
-            {
-                next->start -= cellular->unit;
-                next->size += cellular->unit;
-                return;
-            }
-
-            prev->next = malloc(sizeof(cell_t));
-            *prev->next = (cell_t){block, cellular->unit, next};
-            return;
-        }
-
-        cellular->free = malloc(sizeof(cell_t));
-        *cellular->free = (cell_t){block, 1, NULL};
-        return;
-    }
-
-    cellular_p temp = cellular->temp;
-    while (cellular->data <= (char*)block && cellular->end > (char*)block)
-        temp = temp->temp;
-
-    if (temp->free)
-    {
-        cell_p prev = NULL;
-        cell_p next = temp->free;
+        free_cell_p prev = NULL;
+        free_cell_p next = cellular->free;
 
         char last = 0;
         while (next->start < (char*)block)
@@ -117,56 +37,56 @@ void cellular_free(cellular_t cellular, void* block)
         {
             if (next->start + next->size == (char*)block)
             {
-                next->size += temp->unit;
+                next->size += cellular->unit;
                 return;
             }
 
-            next->next = malloc(sizeof(cell_t));
-            *next->next = (cell_t){block, temp->unit, NULL};
+            next->next = malloc(sizeof(free_cell_t));
+            *next->next = (free_cell_t){block, cellular->unit, NULL};
             return;
         }
 
         if (!prev)
         {
-            if ((char*)block + temp->unit == next->start)
+            if ((char*)block + cellular->unit == next->start)
             {
-                next->start -= temp->unit;
-                next->size += temp->unit;
+                next->start = block;
+                next->size += cellular->unit;
                 return;
             }
 
-            temp->free = malloc(sizeof(cell_t));
-            *temp->free = (cell_t){block, temp->unit, next};
+            cellular->free = malloc(sizeof(free_cell_t));
+            *cellular->free = (free_cell_t){block, cellular->unit, next};
             return;
         }
 
         if (prev->start + prev->size == (char*)block)
         {
-            if ((char*)block + temp->unit == next->start)
+            if ((char*)block + cellular->unit == next->start)
             {
-                prev->size += next->size + temp->unit;
+                prev->size += next->size + cellular->unit;
                 prev->next = next->next;
 
                 free(next);
                 return;
             }
 
-            prev->size += temp->unit;
+            prev->size += cellular->unit;
             return;
         }
 
-        if ((char*)block + temp->unit == next->start)
+        if ((char*)block + cellular->unit == next->start)
         {
-            next->start -= temp->unit;
-            next->size += temp->unit;
+            next->start = block;
+            next->size += cellular->unit;
             return;
         }
 
-        prev->next = malloc(sizeof(cell_t));
-        *prev->next = (cell_t){block, temp->unit, next};
+        prev->next = malloc(sizeof(free_cell_t));
+        *prev->next = (free_cell_t){block, cellular->unit, next};
         return;
     }
 
-    temp->free = malloc(sizeof(cell_t));
-    *temp->free = (cell_t){block, 1, NULL};
+    cellular->free = malloc(sizeof(free_cell_t));
+    *cellular->free = (free_cell_t){block, 1, NULL};
 }

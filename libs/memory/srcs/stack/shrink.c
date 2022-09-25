@@ -9,7 +9,10 @@
 
 #include <memory.h>
 
-void stack_shrink(stack_t stack, void* block, unsigned long long size)
+void stack_shrink(stack_p stack, void* block, unsigned long long size)
 {
+    while (stack->data > (char*)block || stack->sp <= (char*)block)
+        stack = stack->temp;
+
     stack->sp = (char*)block + size;
 }

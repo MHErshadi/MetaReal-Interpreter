@@ -20,18 +20,18 @@ int main()
     puts("Testing shrink function\n");
 
     stack_t stack;
-    stack_init(stack, STACK_SIZE);
+    stack_init(&stack, STACK_SIZE);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    void* ptr = stack_alloc(stack, 20);
+    void* ptr = stack_alloc(&stack, 20);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    stack_shrink(stack, ptr, 12);
+    stack_shrink(&stack, ptr, 12);
 
-    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack->data, stack->size, stack->sp, stack->temp);
+    printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    stack_delete(stack);
+    stack_delete(&stack);
     return 0;
 }

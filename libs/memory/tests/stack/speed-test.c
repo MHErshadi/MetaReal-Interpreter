@@ -22,18 +22,18 @@ int main()
     puts("Speed test\n");
 
     stack_t stack;
-    stack_init(stack, STACK_SIZE);
+    stack_init(&stack, STACK_SIZE);
 
     clock_t start = clock();
 
     unsigned long long i;
     for (i = 0; i < COUNT; i++)
-        stack_free(stack, stack_alloc(stack, 1));
+        stack_free(&stack, stack_alloc(&stack, 1));
 
     clock_t end = clock();
 
     printf("Time: %ld milliseconds\n", end - start);
 
-    stack_delete(stack);
+    stack_delete(&stack);
     return 0;
 }

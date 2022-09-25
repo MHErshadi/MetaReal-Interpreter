@@ -12,7 +12,7 @@
 
 void temp_delete(stack_p temp);
 
-void stack_delete(stack_t stack)
+void stack_delete(stack_p stack)
 {
     free(stack->data);
 

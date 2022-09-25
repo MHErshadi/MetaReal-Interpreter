@@ -23,18 +23,18 @@ int main()
     puts("Speed test\n");
 
     cellular_t cellular;
-    cellular_init(cellular, CELLULAR_SIZE, CELLULAR_UNIT);
+    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
     clock_t start = clock();
 
     unsigned long long i;
     for (i = 0; i < COUNT; i++)
-        cellular_alloc(cellular);
+        cellular_alloc(&cellular);
 
     clock_t end = clock();
 
     printf("Time: %ld milliseconds\n", end - start);
 
-    cellular_delete(cellular);
+    cellular_delete(&cellular);
     return 0;
 }

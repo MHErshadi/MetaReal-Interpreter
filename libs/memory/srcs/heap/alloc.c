@@ -41,8 +41,7 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
             heap->temp->size = alt;
 
             heap->temp->free = malloc(sizeof(free_block_t));
-            *heap->temp->free = (free_block_t){heap->temp->data + size, NULL};
-            BLOCK_SIZE(heap->temp->free->start) = alt - size;
+            *heap->temp->free = (free_block_t){heap->temp->data + size, alt - size, NULL};
         }
 
         BLOCK_SIZE(heap->temp->data) = size;
@@ -58,7 +57,7 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
     free_block_p fit = heap->free;
 
     char new = 0;
-    while (BLOCK_SIZE(fit->start) < size)
+    while (fit->size < size)
     {
         if (!fit->next)
         {
@@ -90,8 +89,7 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
             heap->temp->size = alt;
 
             heap->temp->free = malloc(sizeof(free_block_t));
-            *heap->temp->free = (free_block_t){heap->temp->data + size, NULL};
-            BLOCK_SIZE(heap->temp->free->start) = alt - size;
+            *heap->temp->free = (free_block_t){heap->temp->data + size, alt - size, NULL};
         }
 
         BLOCK_SIZE(heap->temp->data) = size;
@@ -103,9 +101,10 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
         return heap->temp->data + sizeof(unsigned long long);
     }
 
-    if (BLOCK_SIZE(fit->start) == size)
+    if (fit->size == size)
     {
         void* block = fit->start + sizeof(unsigned long long);
+        BLOCK_SIZE(fit->start) = size;
 
         if (!prev)
             heap->free = fit->next;
@@ -116,13 +115,11 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
         return block;
     }
 
-    unsigned long long fsize = BLOCK_SIZE(fit->start) - size;
-
-    BLOCK_SIZE(fit->start) = size;
     void* block = fit->start + sizeof(unsigned long long);
+    BLOCK_SIZE(fit->start) = size;
 
     fit->start += size;
-    BLOCK_SIZE(fit->start) = fsize;
+    fit->size -= size;
 
     return block;
 }

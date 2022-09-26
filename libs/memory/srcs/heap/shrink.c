@@ -21,8 +21,7 @@ void heap_shrink(heap_p heap, void* block, unsigned long long size)
     if (!heap->free)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){(char*)block + size, NULL};
-        BLOCK_SIZE(heap->free->start) = BLOCK_SIZE(block) - size;
+        *heap->free = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, NULL};
 
         BLOCK_SIZE(block) = size;
         return;
@@ -47,8 +46,7 @@ void heap_shrink(heap_p heap, void* block, unsigned long long size)
     if (last)
     {
         next->next = malloc(sizeof(free_block_t));
-        *next->next = (free_block_t){(char*)block + size, NULL};
-        BLOCK_SIZE(next->next->start) = BLOCK_SIZE(block) - size;
+        *next->next = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, NULL};
 
         BLOCK_SIZE(block) = size;
         return;
@@ -57,7 +55,7 @@ void heap_shrink(heap_p heap, void* block, unsigned long long size)
     if ((char*)block + BLOCK_SIZE(block) == next->start)
     {
         next->start = (char*)block + size;
-        BLOCK_SIZE(next->start) += BLOCK_SIZE(block) - size;
+        next->size += BLOCK_SIZE(block) - size;
 
         BLOCK_SIZE(block) = size;
         return;
@@ -66,14 +64,12 @@ void heap_shrink(heap_p heap, void* block, unsigned long long size)
     if (!prev)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){(char*)block + size, next};
-        BLOCK_SIZE(heap->free->start) = BLOCK_SIZE(block) - size;
+        *heap->free = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, next};
     }
     else
     {
         prev->next = malloc(sizeof(free_block_t));
-        *prev->next = (free_block_t){(char*)block + size, next};
-        BLOCK_SIZE(prev->next->start) = BLOCK_SIZE(block) - size;
+        *prev->next = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, next};
     }
 
     BLOCK_SIZE(block) = size;

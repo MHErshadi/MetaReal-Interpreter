@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS =
 
 SDIR = .
 ODIR = .
@@ -14,7 +14,7 @@ make: $(OUTS)
 remake: clean $(OUTS)
 
 $(ODIR)/%.exe: $(SDIR)/%.c
-	$(CC) $< $(LIB) -o $@ -I ..
+	$(CC) $(CFLAGS) $< $(LIB) -o $@ -I ..
 
 clean:
 	@rm -f $(shell find $(ODIR) -name "*.exe")

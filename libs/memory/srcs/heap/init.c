@@ -17,8 +17,7 @@ void heap_init(heap_p heap, unsigned long long size)
 
     heap->end = heap->data + size;
     heap->free = malloc(sizeof(free_block_t));
-    *heap->free = (free_block_t){heap->data, NULL};
-    BLOCK_SIZE(heap->data) = size;
+    *heap->free = (free_block_t){heap->data, size, NULL};
 
     heap->temp = NULL;
 }

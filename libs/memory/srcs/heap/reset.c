@@ -24,8 +24,7 @@ void heap_reset(heap_p heap)
     else
         heap->free = malloc(sizeof(free_block_t));
 
-    *heap->free = (free_block_t){heap->data, NULL};
-    BLOCK_SIZE(heap->data) = heap->size;
+    *heap->free = (free_block_t){heap->data, heap->size, NULL};
 
     if (heap->temp)
     {

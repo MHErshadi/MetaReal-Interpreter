@@ -20,7 +20,8 @@ void heap_free(heap_p heap, void* block)
     if (!heap->free)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){block, NULL};
+        *heap->free = (free_block_t){block, BLOCK_SIZE(block), NULL};
+        return;
     }
 
     free_block_p prev = NULL;
@@ -41,14 +42,14 @@ void heap_free(heap_p heap, void* block)
 
     if (last)
     {
-        if (next->start + BLOCK_SIZE(next->start) == (char*)block)
+        if (next->start + next->size == (char*)block)
         {
-            BLOCK_SIZE(next->start) += BLOCK_SIZE(block);
+            next->size += BLOCK_SIZE(block);
             return;
         }
 
         next->next = malloc(sizeof(free_block_t));
-        *next->next = (free_block_t){block, NULL};
+        *next->next = (free_block_t){block, BLOCK_SIZE(block), NULL};
         return;
     }
 
@@ -56,39 +57,39 @@ void heap_free(heap_p heap, void* block)
     {
         if ((char*)block + BLOCK_SIZE(block) == next->start)
         {
-            BLOCK_SIZE(block) += BLOCK_SIZE(next->start);
             next->start = block;
+            next->size += BLOCK_SIZE(block);
             return;
         }
 
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){block, next};
+        *heap->free = (free_block_t){block, BLOCK_SIZE(block), next};
         return;
     }
 
-    if (prev->start + BLOCK_SIZE(prev->start) == (char*)block)
+    if (prev->start + prev->size == (char*)block)
     {
         if ((char*)block + BLOCK_SIZE(block) == next->start)
         {
-            BLOCK_SIZE(prev->start) += BLOCK_SIZE(block) + BLOCK_SIZE(next->start);
             prev->next = next->next;
+            prev->size += BLOCK_SIZE(block) + next->size;
 
             free(next);
             return;
         }
 
-        BLOCK_SIZE(prev->start) += BLOCK_SIZE(block);
+        prev->size += BLOCK_SIZE(block);
         return;
     }
 
     if ((char*)block + BLOCK_SIZE(block) == next->start)
     {
-        BLOCK_SIZE(block) += BLOCK_SIZE(next->start);
         next->start = block;
+        next->size += BLOCK_SIZE(block);
         return;
     }
 
     prev->next = malloc(sizeof(free_block_t));
-    *prev->next = (free_block_t){block, next};
+    *prev->next = (free_block_t){block, BLOCK_SIZE(block), next};
     return;
 }

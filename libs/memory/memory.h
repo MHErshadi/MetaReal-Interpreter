@@ -72,6 +72,7 @@ void cellular_free(cellular_p cellular, void* block);
 struct __free_block__
 {
     char* start;
+    unsigned long long size;
 
     struct __free_block__* next;
 };

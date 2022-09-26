@@ -14,8 +14,6 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt);
 
 void* heap_alloc(heap_p heap, unsigned long long size)
 {
-    size += sizeof(unsigned long long);
-
     return temp_alloc(heap, size, heap->size);
 }
 
@@ -44,13 +42,11 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
             *heap->temp->free = (free_block_t){heap->temp->data + size, alt - size, NULL};
         }
 
-        BLOCK_SIZE(heap->temp->data) = size;
-
         heap->temp->end = heap->temp->data + heap->temp->size;
 
         heap->temp->temp = NULL;
 
-        return heap->temp->data + sizeof(unsigned long long);
+        return heap->temp->data;
     }
 
     free_block_p prev = NULL;
@@ -92,19 +88,16 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
             *heap->temp->free = (free_block_t){heap->temp->data + size, alt - size, NULL};
         }
 
-        BLOCK_SIZE(heap->temp->data) = size;
-
         heap->temp->end = heap->temp->data + heap->temp->size;
 
         heap->temp->temp = NULL;
 
-        return heap->temp->data + sizeof(unsigned long long);
+        return heap->temp->data;
     }
 
     if (fit->size == size)
     {
-        void* block = fit->start + sizeof(unsigned long long);
-        BLOCK_SIZE(fit->start) = size;
+        void* block = fit->start;
 
         if (!prev)
             heap->free = fit->next;
@@ -115,8 +108,7 @@ void* temp_alloc(heap_p heap, unsigned long long size, unsigned long long alt)
         return block;
     }
 
-    void* block = fit->start + sizeof(unsigned long long);
-    BLOCK_SIZE(fit->start) = size;
+    void* block = fit->start;
 
     fit->start += size;
     fit->size -= size;

@@ -10,17 +10,15 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void heap_free(heap_p heap, void* block)
+void heap_free(heap_p heap, void* block, unsigned long long bsize)
 {
-    block = (unsigned long long*)block - 1;
-
     while (heap->data > (char*)block || heap->end <= (char*)block)
         heap = heap->temp;
 
     if (!heap->free)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){block, BLOCK_SIZE(block), NULL};
+        *heap->free = (free_block_t){block, bsize, NULL};
         return;
     }
 
@@ -44,52 +42,52 @@ void heap_free(heap_p heap, void* block)
     {
         if (next->start + next->size == (char*)block)
         {
-            next->size += BLOCK_SIZE(block);
+            next->size += bsize;
             return;
         }
 
         next->next = malloc(sizeof(free_block_t));
-        *next->next = (free_block_t){block, BLOCK_SIZE(block), NULL};
+        *next->next = (free_block_t){block, bsize, NULL};
         return;
     }
 
     if (!prev)
     {
-        if ((char*)block + BLOCK_SIZE(block) == next->start)
+        if ((char*)block + bsize == next->start)
         {
             next->start = block;
-            next->size += BLOCK_SIZE(block);
+            next->size += bsize;
             return;
         }
 
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){block, BLOCK_SIZE(block), next};
+        *heap->free = (free_block_t){block, bsize, next};
         return;
     }
 
     if (prev->start + prev->size == (char*)block)
     {
-        if ((char*)block + BLOCK_SIZE(block) == next->start)
+        if ((char*)block + bsize == next->start)
         {
             prev->next = next->next;
-            prev->size += BLOCK_SIZE(block) + next->size;
+            prev->size += bsize + next->size;
 
             free(next);
             return;
         }
 
-        prev->size += BLOCK_SIZE(block);
+        prev->size += bsize;
         return;
     }
 
-    if ((char*)block + BLOCK_SIZE(block) == next->start)
+    if ((char*)block + bsize == next->start)
     {
         next->start = block;
-        next->size += BLOCK_SIZE(block);
+        next->size += bsize;
         return;
     }
 
     prev->next = malloc(sizeof(free_block_t));
-    *prev->next = (free_block_t){block, BLOCK_SIZE(block), next};
+    *prev->next = (free_block_t){block, bsize, next};
     return;
 }

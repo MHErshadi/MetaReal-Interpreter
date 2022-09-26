@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/libs/memory"
+                "${workspaceFolder}/libs/memory",
+                "${workspaceFolder}/libs/str"
             ],
             "defines": [
                 "_DEBUG",

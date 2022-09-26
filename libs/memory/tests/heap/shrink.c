@@ -32,7 +32,7 @@ int main()
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);
 
-    heap_shrink(&heap, ptr1, 30);
+    heap_shrink(&heap, ptr1, 37, 30);
 
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);

@@ -49,19 +49,13 @@ int main()
     printf("heap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     printf("free-block: {start=%p, next=%p, size=%llu}\n\n", heap.free->start, heap.free->next, heap.free->size);
 
-    heap_free(&heap, ptr);
+    heap_free(&heap, ptr, sizeof(int));
 
     int* age = heap_alloc(&heap, sizeof(int));
     *age = 100;
 
     printf("heap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     printf("free-block: {start=%p, next=%p, size=%llu}\n\n", heap.free->start, heap.free->next, heap.free->size);
-
-    printf("heap allocated sizes: %llu, %llu, %llu\n\n",
-        BLOCK_SIZE((str - sizeof(unsigned long long))),
-        BLOCK_SIZE(((unsigned long long*)vec - 1)),
-        BLOCK_SIZE(((unsigned long long*)age - 1))
-    );
 
     printf("heap data character form:\n");
     unsigned long long i;

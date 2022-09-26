@@ -67,8 +67,6 @@ void cellular_free(cellular_p cellular, void* block);
 
 /* heap */
 
-#define BLOCK_SIZE(x) *(unsigned long long*)x
-
 struct __free_block__
 {
     char* start;
@@ -97,9 +95,9 @@ void heap_delete(heap_p heap);
 void heap_reset(heap_p heap);
 
 void* heap_alloc(heap_p heap, unsigned long long size);
-void heap_free(heap_p heap, void* block);
+void heap_free(heap_p heap, void* block, unsigned long long bsize);
 
-void* heap_expand(heap_p heap, void* block, unsigned long long size);
-void heap_shrink(heap_p heap, void* block, unsigned long long size);
+void* heap_expand(heap_p heap, void* block, unsigned long long bsize, unsigned long long size);
+void heap_shrink(heap_p heap, void* block, unsigned long long bsize, unsigned long long size);
 
 #endif /* __M_MEMORY__ */

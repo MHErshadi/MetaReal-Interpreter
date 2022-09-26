@@ -33,17 +33,17 @@ int main()
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);
 
-    heap_free(&heap, ptr2);
+    heap_free(&heap, ptr2, 39);
 
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);
 
-    heap_free(&heap, ptr1);
+    heap_free(&heap, ptr1, 10);
 
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);
 
-    heap_free(&heap, ptr3);
+    heap_free(&heap, ptr3, 401);
 
     printf("\nheap: {data=%p, size=%llu, end=%p, free=%p, temp=%p}\n", heap.data, heap.size, heap.end, heap.free, heap.temp);
     free_block_print(heap.free);

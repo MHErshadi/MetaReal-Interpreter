@@ -28,7 +28,7 @@ int main()
 
     unsigned long long i;
     for (i = 0; i < COUNT; i++)
-        heap_free(&heap, heap_alloc(&heap, 10));
+        heap_free(&heap, heap_alloc(&heap, 10), 10);
 
     clock_t end = clock();
 

@@ -10,20 +10,15 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void heap_shrink(heap_p heap, void* block, unsigned long long size)
+void heap_shrink(heap_p heap, void* block, unsigned long long bsize, unsigned long long size)
 {
-    block = (unsigned long long*)block - 1;
-    size += sizeof(unsigned long long);
-
     while (heap->data > (char*)block || heap->end <= (char*)block)
         heap = heap->temp;
 
     if (!heap->free)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, NULL};
-
-        BLOCK_SIZE(block) = size;
+        *heap->free = (free_block_t){(char*)block + size, bsize - size, NULL};
         return;
     }
 
@@ -46,32 +41,24 @@ void heap_shrink(heap_p heap, void* block, unsigned long long size)
     if (last)
     {
         next->next = malloc(sizeof(free_block_t));
-        *next->next = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, NULL};
-
-        BLOCK_SIZE(block) = size;
+        *next->next = (free_block_t){(char*)block + size, bsize - size, NULL};
         return;
     }
 
-    if ((char*)block + BLOCK_SIZE(block) == next->start)
+    if ((char*)block + bsize == next->start)
     {
         next->start = (char*)block + size;
-        next->size += BLOCK_SIZE(block) - size;
-
-        BLOCK_SIZE(block) = size;
+        next->size += bsize - size;
         return;
     }
 
     if (!prev)
     {
         heap->free = malloc(sizeof(free_block_t));
-        *heap->free = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, next};
-    }
-    else
-    {
-        prev->next = malloc(sizeof(free_block_t));
-        *prev->next = (free_block_t){(char*)block + size, BLOCK_SIZE(block) - size, next};
+        *heap->free = (free_block_t){(char*)block + size, bsize - size, next};
+        return;
     }
 
-    BLOCK_SIZE(block) = size;
-    return;
+    prev->next = malloc(sizeof(free_block_t));
+    *prev->next = (free_block_t){(char*)block + size, bsize - size, next};
 }

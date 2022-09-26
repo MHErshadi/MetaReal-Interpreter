@@ -10,20 +10,17 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void* temp_expand(heap_p heap, void* block, unsigned long long size, unsigned long long alt);
+void* temp_expand(heap_p heap, void* block, unsigned long long bsize, unsigned long long size, unsigned long long alt);
 
-void* heap_expand(heap_p heap, void* block, unsigned long long size)
+void* heap_expand(heap_p heap, void* block, unsigned long long bsize, unsigned long long size)
 {
-    block = (unsigned long long*)block - 1;
-    size += sizeof(unsigned long long);
-
     unsigned long long alt = heap->size;
 
     while (heap->data > (char*)block || heap->end <= (char*)block)
         heap = heap->temp;
 
     if (!heap->free)
-        return temp_expand(heap, block, size, alt);
+        return temp_expand(heap, block, bsize, size, alt);
 
     free_block_p prev = NULL;
     free_block_p next = heap->free;
@@ -53,15 +50,14 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
     if (last)
     {
         if (!fit)
-            return temp_expand(heap, block, size, alt);
+            return temp_expand(heap, block, bsize, size, alt);
 
         next->next = malloc(sizeof(free_block_t));
-        *next->next = (free_block_t){block, BLOCK_SIZE(block), NULL};
+        *next->next = (free_block_t){block, bsize, NULL};
 
         if (fit->size == size)
         {
             char* res = fit->start;
-            BLOCK_SIZE(res) = size;
 
             if (!prev_fit)
                 heap->free = fit->next;
@@ -70,28 +66,27 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
             free(fit);
 
             unsigned long long i;
-            for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+            for (i = 0; i < bsize; i++)
                 res[i] = ((char*)block)[i];
 
-            return res + sizeof(unsigned long long);
+            return res;
         }
 
         char* res = fit->start;
-        BLOCK_SIZE(res) = size;
 
         fit->start += size;
         fit->size -= size;
 
         unsigned long long i;
-        for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+        for (i = 0; i < bsize; i++)
             res[i] = ((char*)block)[i];
 
-        return res + sizeof(unsigned long long);
+        return res;
     }
 
-    if ((char*)block + BLOCK_SIZE(block) == next->start)
+    if ((char*)block + bsize == next->start)
     {
-        unsigned long long asize = BLOCK_SIZE(block) + next->size;
+        unsigned long long asize = bsize + next->size;
 
         if (asize == size)
         {
@@ -101,21 +96,19 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
                 prev->next = next->next;
             free(next);
 
-            BLOCK_SIZE(block) = size;
-            return (char*)block + sizeof(unsigned long long);
+            return block;
         }
         if (asize > size)
         {
-            next->start += size - BLOCK_SIZE(block);
+            next->start += size - bsize;
             next->size = asize - size;
 
-            BLOCK_SIZE(block) = size;
-            return (char*)block + sizeof(unsigned long long);
+            return block;
         }
 
         if (prev && prev->start + prev->size == (char*)block)
         {
-            prev->size += BLOCK_SIZE(block) + next->size;
+            prev->size += bsize + next->size;
 
             if (!fit && size <= prev->size)
                 fit = prev;
@@ -123,7 +116,7 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
         else
         {
             next->start = block;
-            next->size += BLOCK_SIZE(block);
+            next->size += bsize;
         }
     }
     else
@@ -131,12 +124,12 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
         if (!prev)
         {
             heap->free = malloc(sizeof(free_block_t));
-            *heap->free = (free_block_t){block, BLOCK_SIZE(block), next};
+            *heap->free = (free_block_t){block, bsize, next};
         }
         else
         {
             prev->next = malloc(sizeof(free_block_t));
-            *prev->next = (free_block_t){block, BLOCK_SIZE(block), next};
+            *prev->next = (free_block_t){block, bsize, next};
         }
     }
 
@@ -145,32 +138,30 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
         if (fit->size == size)
         {
             unsigned long long i;
-            for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+            for (i = 0; i < bsize; i++)
                 fit->start[i] = ((char*)block)[i];
 
-            char* res = fit->start;
-            BLOCK_SIZE(res) = size;
+            void* res = fit->start;
 
             if (!prev_fit)
                 heap->free = fit->next;
             else
                 prev_fit->next = fit->next;
-            free(prev);
+            free(fit);
 
-            return res + sizeof(unsigned long long);
+            return res;
         }
 
         unsigned long long i;
-        for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+        for (i = 0; i < bsize; i++)
             fit->start[i] = ((char*)block)[i];
 
-        char* res = fit->start;
-        BLOCK_SIZE(res) = size;
+        void* res = fit->start;
 
         fit->start += size;
         fit->size -= size;
 
-        return res + sizeof(unsigned long long);
+        return res;
     }
 
     prev_fit = NULL;
@@ -189,16 +180,15 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
     }
 
     if (last)
-        return temp_expand(heap, block, size, alt);
+        return temp_expand(heap, block, bsize, size, alt);
 
     if (fit->size == size)
     {
         unsigned long long i;
-        for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+        for (i = 0; i < bsize; i++)
             fit->start[i] = ((char*)block)[i];
 
-        char* res = fit->start;
-        BLOCK_SIZE(res) = size;
+        void* res = fit->start;
 
         if (!prev_fit)
             heap->free = fit->next;
@@ -206,26 +196,25 @@ void* heap_expand(heap_p heap, void* block, unsigned long long size)
             prev_fit->next = fit->next;
         free(prev);
 
-        return res + sizeof(unsigned long long);
+        return res;
     }
 
     unsigned long long i;
-    for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+    for (i = 0; i < bsize; i++)
         fit->start[i] = ((char*)block)[i];
 
-    char* res = fit->start;
-    BLOCK_SIZE(res) = size;
+    void* res = fit->start;
 
     fit->start += size;
     fit->size -= size;
 
-    return res + sizeof(unsigned long long);
+    return res;
 }
 
-void* temp_expand(heap_p heap, void* block, unsigned long long size, unsigned long long alt)
+void* temp_expand(heap_p heap, void* block, unsigned long long bsize, unsigned long long size, unsigned long long alt)
 {
     heap->free = malloc(sizeof(free_block_t));
-    *heap->free = (free_block_t){block, BLOCK_SIZE(block), NULL};
+    *heap->free = (free_block_t){block, bsize, NULL};
 
     free_block_p prev = NULL;
     free_block_p fit = NULL;
@@ -269,22 +258,20 @@ void* temp_expand(heap_p heap, void* block, unsigned long long size, unsigned lo
             *heap->temp->free = (free_block_t){heap->temp->data + size, alt - size, NULL};
         }
 
-        BLOCK_SIZE(heap->temp->data) = size;
         unsigned long long i;
-        for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+        for (i = 0; i < bsize; i++)
             heap->temp->data[i] = ((char*)block)[i];
 
         heap->temp->end = heap->temp->data + heap->temp->size;
 
         heap->temp->temp = NULL;
 
-        return heap->temp->data + sizeof(unsigned long long);
+        return heap->temp->data;
     }
 
     if (fit->size == size)
     {
         char* res = fit->start;
-        BLOCK_SIZE(res) = size;
 
         if (!prev)
             heap->free = fit->next;
@@ -293,21 +280,20 @@ void* temp_expand(heap_p heap, void* block, unsigned long long size, unsigned lo
         free(fit);
 
         unsigned long long i;
-        for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+        for (i = 0; i < bsize; i++)
             res[i] = ((char*)block)[i];
 
-        return res + sizeof(unsigned long long);
+        return res;
     }
 
     char* res = fit->start;
-    BLOCK_SIZE(res) = size;
 
     unsigned long long i;
-    for (i = sizeof(unsigned long long); i < BLOCK_SIZE(block); i++)
+    for (i = 0; i < bsize; i++)
         res[i] = ((char*)block)[i];
 
     fit->start += size;
     fit->size -= size;
 
-    return res + sizeof(unsigned long long);
+    return res;
 }

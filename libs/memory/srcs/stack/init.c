@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Stack form
- * 
+ *
  * Initializes (stack) with (size) bytes of memory
 /*/
 

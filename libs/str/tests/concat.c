@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
+ *
  * Testing concat fuction
 /*/
 
@@ -28,8 +28,8 @@ int main()
     str_p str1 = str_set_str("Hello ", 6, &cellular, &heap);
     str_p str2 = str_set_str("World", 5, &cellular, &heap);
 
-    str_concat(str1, str2, &cellular, &heap);
-    str_print(stdout, str1, &cellular, &heap);
+    str_concat(str1, str2, &heap);
+    str_print(stdout, str1, "\n");
 
     heap_delete(&heap);
     cellular_delete(&cellular);

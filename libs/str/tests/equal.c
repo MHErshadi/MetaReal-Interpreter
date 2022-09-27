@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
+ *
  * Testing equal fuction
 /*/
 
@@ -28,12 +28,12 @@ int main()
     str_p str1 = str_set_str("Hello World", 11, &cellular, &heap);
     str_p str2 = str_set_str("Hello World", 11, &cellular, &heap);
 
-    printf("str1 == str2: %d\n", str_equal(str1, str2, &cellular, &heap));
+    printf("str1 == str2: %d\n", str_equal(str1, str2));
 
-    str1 = str_set_str("Hello World", 11, &cellular, &heap);
+    str_free(str2, &cellular, &heap);
     str2 = str_set_str("Hello Word!", 11, &cellular, &heap);
 
-    printf("str1 == str2: %d\n", str_equal(str1, str2, &cellular, &heap));
+    printf("str1 == str2: %d\n", str_equal(str1, str2));
 
     heap_delete(&heap);
     cellular_delete(&cellular);

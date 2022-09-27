@@ -23,17 +23,17 @@ str_p str_set_str(const char* src, unsigned long long size, cellular_p cellular,
 
 void str_free(str_p str, cellular_p cellular, heap_p heap);
 
-void str_print(FILE* stream, str_p str, cellular_p cellular, heap_p heap);
+void str_print(FILE* stream, str_p str, const char* end);
 
 /* */
 
-void str_concat(str_p str1, str_p str2, cellular_p cellular, heap_p heap);
+void str_concat(str_p str1, str_p str2, heap_p heap);
 void str_remove(str_p str, unsigned long long pos, heap_p heap);
 void str_repeat(str_p str, unsigned long long count, heap_p heap);
 
-char str_equal(str_p str1, str_p str2, cellular_p cellular, heap_p heap);
-char str_nequal(str_p str1, str_p str2, cellular_p cellular, heap_p heap);
+char str_equal(str_p str1, str_p str2);
+char str_nequal(str_p str1, str_p str2);
 
-char str_contains(str_p str, char chr, cellular_p cellular, heap_p heap);
+char str_contains(str_p str, char chr);
 
 #endif /* __M_STR__ */

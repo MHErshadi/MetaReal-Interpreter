@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Stack form
- * 
+ *
  * Allocates (size) bytes from (stack) if exist, allocates it in temporary stacks otherwise
 /*/
 

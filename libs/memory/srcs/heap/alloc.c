@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Heap form
- * 
+ *
  * Allocates (size) bytes from (heap) if exist, allocates it in temporary heaps otherwise
 /*/
 

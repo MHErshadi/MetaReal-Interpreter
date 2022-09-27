@@ -2,8 +2,8 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
- * Copies (src) into (dst) based on (size)
+ *
+ * Copies (src) based on (size)
 /*/
 
 #include <str.h>

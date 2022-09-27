@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Stack form
- * 
+ *
  * Deletes (stack) and all temporary stacks with it
 /*/
 

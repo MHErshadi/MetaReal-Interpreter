@@ -2,31 +2,20 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
- * Compares (str1) and (str2), returns 1 if they were not equal and 0 otherwise
+ *
+ * (str1) != (str2)
 /*/
 
 #include <str.h>
 
-char str_nequal(str_p str1, str_p str2, cellular_p cellular, heap_p heap)
+char str_nequal(str_p str1, str_p str2)
 {
-    char res = 1;
-
     if (str1->size != str2->size)
-        goto free;
+        return 1;
 
     unsigned long long i;
     for (i = 0; i < str1->size; i++)
         if (str1->str[i] != str2->str[i])
-            goto free;
-    res = 0;
-
-free:
-    heap_free(heap, str2->str, str2->size + 1);
-    cellular_free(cellular, str2);
-
-    heap_free(heap, str1->str, str1->size + 1);
-    cellular_free(cellular, str1);
-
-    return res;
+            return 1;
+    return 0;
 }

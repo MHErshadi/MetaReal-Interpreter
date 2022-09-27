@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Stack form
- * 
+ *
  * Increases (block) size by (add) bytes, stores it in temporary stacks if needed
 /*/
 

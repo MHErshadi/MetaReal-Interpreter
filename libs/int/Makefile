@@ -1,10 +1,12 @@
 CC = gcc
+CFLAGS = -Wall -std=c99
 
 SDIR = srcs
 ODIR = objs
 
 SRCS = $(shell find $(SDIR) -name "*.c")
 OBJS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(SRCS))
+
 HEAD = int.h
 LIB = ../libint.a
 
@@ -23,6 +25,6 @@ $(LIB): $(OBJS)
 	ar -r $(LIB) $(OBJS)
 
 $(ODIR)/%.o: $(SDIR)/%.c
-	$(CC) -c -o $@ $< -I . -I ..
+	$(CC) $(CFLAGS) -c -o $@ $< -I . -I ..
 
 .PHONY: make remake clean

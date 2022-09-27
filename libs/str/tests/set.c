@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
+ *
  * Testing set fuction
 /*/
 
@@ -29,7 +29,7 @@ int main()
     str_p str2 = str_set(str1, &cellular, &heap);
 
     printf("str2 = ");
-    str_print(stdout, str2, &cellular, &heap);
+    str_print(stdout, str2, "\n");
 
     heap_delete(&heap);
     cellular_delete(&cellular);

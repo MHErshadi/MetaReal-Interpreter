@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Heap form
- * 
+ *
  * Resets (heap) and deletes all temporary heaps
 /*/
 

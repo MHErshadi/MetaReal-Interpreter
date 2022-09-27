@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/libs/memory",
-                "${workspaceFolder}/libs/str"
+                "${workspaceFolder}/libs/str",
+                "${workspaceFolder}/libs/int"
             ],
             "defines": [
                 "_DEBUG",

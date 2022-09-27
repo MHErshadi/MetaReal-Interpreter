@@ -3,7 +3,7 @@
  *
  * Memory Library version 1.0.0
  * Memory Cellular form
- * 
+ *
  * Initializes (cellular) with (size * unit) bytes of memory
 /*/
 

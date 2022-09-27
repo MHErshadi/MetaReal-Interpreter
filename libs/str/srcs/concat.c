@@ -2,13 +2,13 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
- * Concatenates (str2) to (str1)
+ *
+ * (str1) + (str2)
 /*/
 
 #include <str.h>
 
-void str_concat(str_p str1, str_p str2, cellular_p cellular, heap_p heap)
+void str_concat(str_p str1, str_p str2, heap_p heap)
 {
     unsigned long long bsize = str1->size;
 
@@ -18,7 +18,4 @@ void str_concat(str_p str1, str_p str2, cellular_p cellular, heap_p heap)
     unsigned long long i, j;
     for (i = bsize, j = 0; j <= str2->size; i++, j++)
         str1->str[i] = str2->str[j];
-
-    heap_free(heap, str2->str, str2->size + 1);
-    cellular_free(cellular, str2);
 }

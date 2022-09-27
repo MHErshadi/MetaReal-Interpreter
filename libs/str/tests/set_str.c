@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
+ *
  * Testing set_str fuction
 /*/
 
@@ -28,7 +28,7 @@ int main()
     str_p str = str_set_str("Hello World", 11, &cellular, &heap);
 
     printf("str = ");
-    str_print(stdout, str, &cellular, &heap);
+    str_print(stdout, str, "\n");
 
     heap_delete(&heap);
     cellular_delete(&cellular);

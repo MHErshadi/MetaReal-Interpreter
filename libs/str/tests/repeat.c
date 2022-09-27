@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * String Library version 1.0.0
- * 
+ *
  * Testing repeat fuction
 /*/
 
@@ -28,7 +28,7 @@ int main()
     str_p str = str_set_str("Hello ", 6, &cellular, &heap);
 
     str_repeat(str, 10, &heap);
-    str_print(stdout, str, &cellular, &heap);
+    str_print(stdout, str, "\n");
 
     heap_delete(&heap);
     cellular_delete(&cellular);

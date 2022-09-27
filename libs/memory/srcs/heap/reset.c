@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 void free_block_reset(free_block_p block);
-void temp_reset(heap_p temp);
+void heap_temp_reset(heap_p temp);
 
 void heap_reset(heap_p heap)
 {
@@ -28,7 +28,7 @@ void heap_reset(heap_p heap)
 
     if (heap->temp)
     {
-        temp_reset(heap->temp);
+        heap_temp_reset(heap->temp);
         heap->temp = NULL;
     }
 }
@@ -41,10 +41,10 @@ void free_block_reset(free_block_p block)
     free(block);
 }
 
-void temp_reset(heap_p temp)
+void heap_temp_reset(heap_p temp)
 {
     if (temp->temp)
-        temp_reset(temp->temp);
+        heap_temp_reset(temp->temp);
 
     free(temp->data);
     if (temp->free)

@@ -10,6 +10,9 @@
 
 void str_repeat(str_p str, unsigned long long count, heap_p heap)
 {
+    if (count == 1)
+        return;
+
     unsigned long long bsize = str->size;
 
     str->size *= count;
@@ -17,6 +20,7 @@ void str_repeat(str_p str, unsigned long long count, heap_p heap)
 
     unsigned long long i, j;
     for (i = bsize; i < str->size;)
-        for (j = 0; j <= bsize; i++, j++)
+        for (j = 0; j < bsize; i++, j++)
             str->str[i] = str->str[j];
+    str->str[i] = '\0';
 }

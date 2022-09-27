@@ -10,7 +10,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-void temp_reset(stack_p temp);
+void stack_temp_reset(stack_p temp);
 
 void stack_reset(stack_p stack)
 {
@@ -18,15 +18,15 @@ void stack_reset(stack_p stack)
 
     if (stack->temp)
     {
-        temp_reset(stack->temp);
+        stack_temp_reset(stack->temp);
         stack->temp = NULL;
     }
 }
 
-void temp_reset(stack_p temp)
+void stack_temp_reset(stack_p temp)
 {
     if (temp->temp)
-        temp_reset(temp->temp);
+        stack_temp_reset(temp->temp);
 
     free(temp->data);
     free(temp);

@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 void free_block_delete(free_block_p block);
-void temp_delete(heap_p temp);
+void heap_temp_delete(heap_p temp);
 
 void heap_delete(heap_p heap)
 {
@@ -20,7 +20,7 @@ void heap_delete(heap_p heap)
         free_block_delete(heap->free);
 
     if (heap->temp)
-        temp_delete(heap->temp);
+        heap_temp_delete(heap->temp);
 }
 
 void free_block_delete(free_block_p block)
@@ -31,10 +31,10 @@ void free_block_delete(free_block_p block)
     free(block);
 }
 
-void temp_delete(heap_p temp)
+void heap_temp_delete(heap_p temp)
 {
     if (temp->temp)
-        temp_delete(temp->temp);
+        heap_temp_delete(temp->temp);
 
     free(temp->data);
     if (temp->free)

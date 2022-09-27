@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 void free_cell_delete(free_cell_p cell);
-void temp_delete(cellular_p temp);
+void cellular_temp_delete(cellular_p temp);
 
 void cellular_delete(cellular_p cellular)
 {
@@ -20,7 +20,7 @@ void cellular_delete(cellular_p cellular)
         free_cell_delete(cellular->free);
 
     if (cellular->temp)
-        temp_delete(cellular->temp);
+        cellular_temp_delete(cellular->temp);
 }
 
 void free_cell_delete(free_cell_p cell)
@@ -31,10 +31,10 @@ void free_cell_delete(free_cell_p cell)
     free(cell);
 }
 
-void temp_delete(cellular_p temp)
+void cellular_temp_delete(cellular_p temp)
 {
     if (temp->temp)
-        temp_delete(temp->temp);
+        cellular_temp_delete(temp->temp);
 
     free(temp->data);
     if (temp->free)

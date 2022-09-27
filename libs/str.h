@@ -8,6 +8,7 @@
 #define __M_STR__
 
 #include <memory.h>
+#include <stdio.h>
 
 struct __str__
 {
@@ -17,10 +18,12 @@ struct __str__
 typedef struct __str__ str_t;
 typedef struct __str__* str_p;
 
-void str_set(str_p dst, str_p src, cellular_p cellular, heap_p heap);
-void str_set_str(str_p dst, const char* src, unsigned long long size, cellular_p cellular, heap_p heap);
+str_p str_set(str_p src, cellular_p cellular, heap_p heap);
+str_p str_set_str(const char* src, unsigned long long size, cellular_p cellular, heap_p heap);
 
 void str_free(str_p str, cellular_p cellular, heap_p heap);
+
+void str_print(FILE* stream, str_p str, cellular_p cellular, heap_p heap);
 
 /* */
 

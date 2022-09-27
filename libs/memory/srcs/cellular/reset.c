@@ -11,7 +11,7 @@
 #include <stdlib.h>
 
 void free_cell_reset(free_cell_p cell);
-void temp_reset(cellular_p temp);
+void cellular_temp_reset(cellular_p temp);
 
 void cellular_reset(cellular_p cellular)
 {
@@ -27,7 +27,7 @@ void cellular_reset(cellular_p cellular)
 
     if (cellular->temp)
     {
-        temp_reset(cellular->temp);
+        cellular_temp_reset(cellular->temp);
         cellular->temp = NULL;
     }
 }
@@ -40,10 +40,10 @@ void free_cell_reset(free_cell_p cell)
     free(cell);
 }
 
-void temp_reset(cellular_p temp)
+void cellular_temp_reset(cellular_p temp)
 {
     if (temp->temp)
-        temp_reset(temp->temp);
+        cellular_temp_reset(temp->temp);
 
     free(temp->data);
     if (temp->free)

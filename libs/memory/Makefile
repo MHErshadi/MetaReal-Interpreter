@@ -1,11 +1,12 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -std=c99
 
 SDIR = srcs
 ODIR = objs
 
 SRCS = $(shell find $(SDIR) -name "*.c")
 OBJS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(SRCS))
+
 HEAD = memory.h
 LIB = ../libmemory.a
 

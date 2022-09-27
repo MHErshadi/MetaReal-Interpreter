@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS =
+CFLAGS = -Wall -std=c99
 
 SDIR = .
 ODIR = .
@@ -7,14 +7,14 @@ ODIR = .
 SRCS = $(shell find $(SDIR) -name "*.c")
 OUTS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.exe, $(SRCS))
 
-LIB = ../../libmemory.a
+LIBS = ../../libmemory.a
 
 make: $(OUTS)
 
 remake: clean $(OUTS)
 
 $(ODIR)/%.exe: $(SDIR)/%.c
-	$(CC) $(CFLAGS) $< $(LIB) -o $@ -I ..
+	$(CC) $(CFLAGS) $< $(LIBS) -o $@ -I ../..
 
 clean:
 	@rm -f $(shell find $(ODIR) -name "*.exe")

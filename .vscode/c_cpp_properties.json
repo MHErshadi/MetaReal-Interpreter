@@ -3,11 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/libs/memory",
-                "${workspaceFolder}/libs/str",
-                "${workspaceFolder}/libs/int",
-                "${workspaceFolder}/libs/float",
-                "${workspaceFolder}/libs/complex"
+                "${workspaceFolder}/heads",
+                "${workspaceFolder}/libs"
             ],
             "defines": [
                 "_DEBUG",

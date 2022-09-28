@@ -8,7 +8,7 @@ LDIR = libs
 
 SRCS = $(shell find $(SDIR) -name "*.c")
 OBJS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(SRCS))
-LIBS = $(wildcard *.a)
+LIBS = $(shell find $(LDIR) -name "*.a")
 OUT = metareal.exe
 
 make: $(OUT)

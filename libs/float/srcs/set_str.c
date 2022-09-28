@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
  *
  * Float Library version 1.0.0
- * 
+ *
  * Converts (str) into float based on (size)
 /*/
 

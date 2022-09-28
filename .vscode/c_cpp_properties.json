@@ -6,7 +6,8 @@
                 "${workspaceFolder}/libs/memory",
                 "${workspaceFolder}/libs/str",
                 "${workspaceFolder}/libs/int",
-                "${workspaceFolder}/libs/float"
+                "${workspaceFolder}/libs/float",
+                "${workspaceFolder}/libs/complex"
             ],
             "defines": [
                 "_DEBUG",

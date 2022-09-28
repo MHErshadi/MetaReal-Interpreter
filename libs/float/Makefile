@@ -1,4 +1,5 @@
 CC = gcc
+CFLAGS = -Wall -std=c99
 
 SDIR = srcs
 ODIR = objs
@@ -23,6 +24,6 @@ $(LIB): $(OBJS)
 	ar -r $(LIB) $(OBJS)
 
 $(ODIR)/%.o: $(SDIR)/%.c
-	$(CC) -c -o $@ $< -I . -I ..
+	$(CC) $(CFLAGS) -c -o $@ $< -I . -I ..
 
 .PHONY: make remake clean

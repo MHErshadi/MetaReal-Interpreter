@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_modulo_int(float_p num1, int_p num2, heap_p heap)
+void float_modulo_int(float_p num1, int_p num2)
 {
     mpfr_t num2f;
     mpfr_init2(num2f, mpfr_get_prec(num1->value));

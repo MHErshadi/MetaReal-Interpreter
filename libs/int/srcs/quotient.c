@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_quotient(int_p num1, int_p num2, heap_p heap)
+void int_quotient(int_p num1, int_p num2)
 {
     mpz_fdiv_q(num1->value, num1->value, num2->value);
 }

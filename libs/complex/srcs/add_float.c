@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_add_float(complex_p num1, float_p num2, heap_p heap)
+void complex_add_float(complex_p num1, float_p num2)
 {
     mpc_add_fr(num1->value, num1->value, num2->value, MPC_RNDNN);
 }

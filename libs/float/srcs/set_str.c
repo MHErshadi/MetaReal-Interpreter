@@ -7,10 +7,11 @@
 /*/
 
 #include <float.h>
+#include <memory.h>
 
-float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size, cellular_p cellular, heap_p heap)
+float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size)
 {
-    float_p dst = cellular_alloc(cellular);
+    float_p dst = cellular_alloc(&memory.float_cellular);
 
     mpfr_init2(dst->value, prec);
     mpfr_set_str(dst->value, str, 10, MPFR_RNDN);

@@ -7,6 +7,7 @@
 /*/
 
 #include <str.h>
+#include <memory.h>
 #include <stdio.h>
 
 #define HEAP_SIZE 1024
@@ -19,18 +20,15 @@ int main()
     puts("String Library version 1.0.0");
     puts("Testing set_str function\n");
 
-    heap_t heap;
-    cellular_t cellular;
+    heap_init(&memory.heap, HEAP_SIZE);
+    cellular_init(&memory.str_cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    heap_init(&heap, HEAP_SIZE);
-    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
-
-    str_p str = str_set_str("Hello World", 11, &cellular, &heap);
+    str_p str = str_set_str("Hello World", 11);
 
     printf("str = ");
     str_print(stdout, str, "\n");
 
-    heap_delete(&heap);
-    cellular_delete(&cellular);
+    heap_delete(&memory.heap);
+    cellular_delete(&memory.str_cellular);
     return 0;
 }

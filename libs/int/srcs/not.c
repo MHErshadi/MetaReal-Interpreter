@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_not(int_p num, heap_p heap)
+void int_not(int_p num)
 {
     mpz_com(num->value, num->value);
 }

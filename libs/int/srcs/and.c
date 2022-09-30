@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_and(int_p num1, int_p num2, heap_p heap)
+void int_and(int_p num1, int_p num2)
 {
     mpz_and(num1->value, num1->value, num2->value);
 }

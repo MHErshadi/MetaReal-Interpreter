@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_quotient_int(float_p num1, int_p num2, heap_p heap)
+void float_quotient_int(float_p num1, int_p num2)
 {
     mpfr_div_z(num1->value, num1->value, num2->value, MPFR_RNDN);
 

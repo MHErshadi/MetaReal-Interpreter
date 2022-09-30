@@ -19,42 +19,42 @@ struct __float__
 typedef struct __float__ float_t;
 typedef struct __float__* float_p;
 
-float_p float_set(unsigned long long prec, float_p src, cellular_p cellular, heap_p heap);
-float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size, cellular_p cellular, heap_p heap);
+float_p float_set(unsigned long long prec, float_p src);
+float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size);
 
-void float_free(float_p num, cellular_p cellular, heap_p heap);
+void float_free(float_p num);
 
 void float_print(FILE* stream, float_p num, unsigned long long prec, const char* end);
 
 /* */
 
-void float_add(float_p num1, float_p num2, heap_p heap);
-void float_add_int(float_p num1, int_p num2, heap_p heap);
+void float_add(float_p num1, float_p num2);
+void float_add_int(float_p num1, int_p num2);
 
-void float_subtract(float_p num1, float_p num2, heap_p heap);
-void float_subtract_int(float_p num1, int_p num2, heap_p heap);
-void float_int_subtract(int_p num1, float_p num2, heap_p heap);
+void float_subtract(float_p num1, float_p num2);
+void float_subtract_int(float_p num1, int_p num2);
+void float_int_subtract(int_p num1, float_p num2);
 
-void float_multiply(float_p num1, float_p num2, heap_p heap);
-void float_multiply_int(float_p num1, int_p num2, heap_p heap);
+void float_multiply(float_p num1, float_p num2);
+void float_multiply_int(float_p num1, int_p num2);
 
-void float_divide(float_p num1, float_p num2, heap_p heap);
-void float_divide_int(float_p num1, int_p num2, heap_p heap);
-void float_int_divide(int_p num1, float_p num2, heap_p heap);
-float_p float_int_divide_int(int_p num1, int_p num2, unsigned long long prec, cellular_p cellular, heap_p heap);
+void float_divide(float_p num1, float_p num2);
+void float_divide_int(float_p num1, int_p num2);
+void float_int_divide(int_p num1, float_p num2);
+float_p float_int_divide_int(int_p num1, int_p num2, unsigned long long prec);
 
-void float_modulo(float_p num1, float_p num2, heap_p heap);
-void float_modulo_int(float_p num1, int_p num2, heap_p heap);
-void float_int_modulo(int_p num1, float_p num2, heap_p heap);
+void float_modulo(float_p num1, float_p num2);
+void float_modulo_int(float_p num1, int_p num2);
+void float_int_modulo(int_p num1, float_p num2);
 
-int_p float_quotient(float_p num1, float_p num2, cellular_p cellular, heap_p heap);
-void float_quotient_int(float_p num1, int_p num2, heap_p heap);
-void float_int_quotient(int_p num1, float_p num2, heap_p heap);
+int_p float_quotient(float_p num1, float_p num2);
+void float_quotient_int(float_p num1, int_p num2);
+void float_int_quotient(int_p num1, float_p num2);
 
-void float_power(float_p num1, float_p num2, heap_p heap);
-void float_power_int(float_p num1, int_p num2, heap_p heap);
-void float_int_power(int_p num1, float_p num2, heap_p heap);
-float_p float_int_power_int(int_p num1, int_p num2, unsigned long long prec, cellular_p cellular, heap_p heap);
+void float_power(float_p num1, float_p num2);
+void float_power_int(float_p num1, int_p num2);
+void float_int_power(int_p num1, float_p num2);
+float_p float_int_power_int(int_p num1, int_p num2, unsigned long long prec);
 
 char float_equal(float_p num1, float_p num2);
 char float_equal_int(float_p num1, int_p num2);

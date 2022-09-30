@@ -7,8 +7,9 @@
 /*/
 
 #include <str.h>
+#include <memory.h>
 
-void str_repeat(str_p str, unsigned long long count, heap_p heap)
+void str_repeat(str_p str, unsigned long long count)
 {
     if (count == 1)
         return;
@@ -16,7 +17,7 @@ void str_repeat(str_p str, unsigned long long count, heap_p heap)
     unsigned long long bsize = str->size;
 
     str->size *= count;
-    str->str = heap_expand(heap, str->str, bsize + 1, str->size + 1);
+    str->str = heap_expand(&memory.heap, str->str, bsize + 1, str->size + 1);
 
     unsigned long long i, j;
     for (i = bsize; i < str->size;)

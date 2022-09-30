@@ -7,6 +7,7 @@
 /*/
 
 #include <str.h>
+#include <memory.h>
 #include <stdio.h>
 
 #define HEAP_SIZE 1024
@@ -19,19 +20,16 @@ int main()
     puts("String Library version 1.0.0");
     puts("Testing concat function\n");
 
-    heap_t heap;
-    cellular_t cellular;
+    heap_init(&memory.heap, HEAP_SIZE);
+    cellular_init(&memory.str_cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    heap_init(&heap, HEAP_SIZE);
-    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
+    str_p str1 = str_set_str("Hello ", 6);
+    str_p str2 = str_set_str("World", 5);
 
-    str_p str1 = str_set_str("Hello ", 6, &cellular, &heap);
-    str_p str2 = str_set_str("World", 5, &cellular, &heap);
-
-    str_concat(str1, str2, &heap);
+    str_concat(str1, str2);
     str_print(stdout, str1, "\n");
 
-    heap_delete(&heap);
-    cellular_delete(&cellular);
+    heap_delete(&memory.heap);
+    cellular_delete(&memory.str_cellular);
     return 0;
 }

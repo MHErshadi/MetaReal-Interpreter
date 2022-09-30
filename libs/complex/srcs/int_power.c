@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_int_power(int_p num1, complex_p num2, heap_p heap)
+void complex_int_power(int_p num1, complex_p num2)
 {
     mpc_t num1c;
     mpc_init3(num1c, mpfr_get_prec(mpc_realref(num2->value)), mpfr_get_prec(mpc_imagref(num2->value)));

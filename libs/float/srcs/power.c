@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_power(float_p num1, float_p num2, heap_p heap)
+void float_power(float_p num1, float_p num2)
 {
     mpfr_pow(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

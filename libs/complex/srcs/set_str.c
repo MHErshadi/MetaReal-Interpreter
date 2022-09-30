@@ -7,10 +7,11 @@
 /*/
 
 #include <complex.h>
+#include <memory.h>
 
-complex_p complex_set_str(unsigned long long prec, const char* str, unsigned long long size, cellular_p cellular, heap_p heap)
+complex_p complex_set_str(unsigned long long prec, const char* str, unsigned long long size)
 {
-    complex_p dst = cellular_alloc(cellular);
+    complex_p dst = cellular_alloc(&memory.complex_cellular);
 
     mpc_init3(dst->value, prec, prec);
     mpfr_set_zero(mpc_realref(dst->value), 0);

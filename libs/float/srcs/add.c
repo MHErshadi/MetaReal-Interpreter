@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_add(float_p num1, float_p num2, heap_p heap)
+void float_add(float_p num1, float_p num2)
 {
     mpfr_add(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

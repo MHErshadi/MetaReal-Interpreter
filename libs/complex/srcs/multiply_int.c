@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_multiply_int(complex_p num1, int_p num2, heap_p heap)
+void complex_multiply_int(complex_p num1, int_p num2)
 {
     mpfr_t num2f;
     mpfr_init2(num2f, mpfr_get_prec(mpc_realref(num1->value)));

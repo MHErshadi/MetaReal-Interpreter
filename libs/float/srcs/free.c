@@ -7,9 +7,10 @@
 /*/
 
 #include <float.h>
+#include <memory.h>
 
-void float_free(float_p num, cellular_p cellular, heap_p heap)
+void float_free(float_p num)
 {
     mpfr_clear(num->value);
-    cellular_free(cellular, num);
+    cellular_free(&memory.float_cellular, num);
 }

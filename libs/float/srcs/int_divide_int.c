@@ -7,10 +7,11 @@
 /*/
 
 #include <float.h>
+#include <memory.h>
 
-float_p float_int_divide_int(int_p num1, int_p num2, unsigned long long prec, cellular_p cellular, heap_p heap)
+float_p float_int_divide_int(int_p num1, int_p num2, unsigned long long prec)
 {
-    float_p res = cellular_alloc(cellular);
+    float_p res = cellular_alloc(&memory.float_cellular);
 
     mpfr_init2(res->value, prec);
     mpfr_set_z(res->value, num1->value, MPFR_RNDN);

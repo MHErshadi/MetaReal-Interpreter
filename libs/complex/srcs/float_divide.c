@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_float_divide(float_p num1, complex_p num2, heap_p heap)
+void complex_float_divide(float_p num1, complex_p num2)
 {
     mpc_fr_div(num2->value, num1->value, num2->value, MPC_RNDNN);
 }

@@ -7,6 +7,7 @@
 /*/
 
 #include <str.h>
+#include <memory.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -22,23 +23,20 @@ int main()
     puts("String Library version 1.0.0");
     puts("Speed test\n");
 
-    heap_t heap;
-    cellular_t cellular;
+    heap_init(&memory.heap, HEAP_SIZE);
+    cellular_init(&memory.str_cellular, CELLULAR_SIZE, CELLULAR_UNIT);
 
-    heap_init(&heap, HEAP_SIZE);
-    cellular_init(&cellular, CELLULAR_SIZE, CELLULAR_UNIT);
-
-    str_p str = str_set_str("Hello ", 6, &cellular, &heap);
+    str_p str = str_set_str("Hello ", 6);
 
     clock_t start = clock();
 
-    str_repeat(str, COUNT, &heap);
+    str_repeat(str, COUNT);
 
     clock_t end = clock();
 
     printf("Time: %ld milliseconds\n", end - start);
 
-    heap_delete(&heap);
-    cellular_delete(&cellular);
+    heap_delete(&memory.heap);
+    cellular_delete(&memory.str_cellular);
     return 0;
 }

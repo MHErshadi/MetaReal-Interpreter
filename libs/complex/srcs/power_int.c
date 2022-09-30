@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_power_int(complex_p num1, int_p num2, heap_p heap)
+void complex_power_int(complex_p num1, int_p num2)
 {
     mpc_pow_z(num1->value, num1->value, num2->value, MPC_RNDNN);
 }

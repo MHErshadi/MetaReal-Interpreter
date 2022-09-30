@@ -7,9 +7,10 @@
 /*/
 
 #include <str.h>
+#include <memory.h>
 
-void str_free(str_p str, cellular_p cellular, heap_p heap)
+void str_free(str_p str)
 {
-    heap_free(heap, str->str, str->size + 1);
-    cellular_free(cellular, str);
+    heap_free(&memory.heap, str->str, str->size + 1);
+    cellular_free(&memory.str_cellular, str);
 }

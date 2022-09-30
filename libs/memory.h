@@ -100,4 +100,21 @@ void heap_free(heap_p heap, void* block, unsigned long long bsize);
 void* heap_expand(heap_p heap, void* block, unsigned long long bsize, unsigned long long size);
 void heap_shrink(heap_p heap, void* block, unsigned long long bsize, unsigned long long size);
 
+/* memory */
+
+struct __memory__
+{
+    stack_t stack;
+    heap_t heap;
+
+    cellular_t int_cellular;
+    cellular_t float_cellular;
+    cellular_t complex_cellular;
+    cellular_t str_cellular;
+};
+typedef struct __memory__ memory_t;
+typedef struct __memory__* memory_p;
+
+memory_t memory;
+
 #endif /* __M_MEMORY__ */

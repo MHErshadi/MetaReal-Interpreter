@@ -7,10 +7,11 @@
 /*/
 
 #include <int.h>
+#include <memory.h>
 
-int_p int_set(int_p src, cellular_p cellular, heap_p heap)
+int_p int_set(int_p src)
 {
-    int_p dst = cellular_alloc(cellular);
+    int_p dst = cellular_alloc(&memory.int_cellular);
 
     mpz_init_set(dst->value, src->value);
 

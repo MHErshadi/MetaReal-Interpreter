@@ -28,9 +28,8 @@ void stack_reset(stack_p stack);
 void* stack_alloc(stack_p stack, unsigned long long size);
 void stack_free(stack_p stack, void* block);
 
+void* stack_expand(stack_p stack, void* block, unsigned long long size);
 void stack_shrink(stack_p stack, void* block, unsigned long long size);
-
-void* stack_increase(stack_p stack, void* block, unsigned long long add);
 
 /* cellular */
 

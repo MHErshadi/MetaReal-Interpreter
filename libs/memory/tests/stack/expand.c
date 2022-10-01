@@ -4,7 +4,7 @@
  * Memory Library version 1.0.0
  * Memory Stack form
  *
- * Testing increase fuction
+ * Testing expand fuction
 /*/
 
 #include <memory.h>
@@ -17,7 +17,7 @@ int main()
 {
     puts("Memory Library version 1.0.0");
     puts("Memory Stack form");
-    puts("Testing increase function\n");
+    puts("Testing expand function\n");
 
     stack_t stack;
     stack_init(&stack, STACK_SIZE);
@@ -28,7 +28,7 @@ int main()
 
     printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n\n", stack.data, stack.size, stack.sp, stack.temp);
 
-    ptr = stack_increase(&stack, ptr, 58);
+    ptr = stack_expand(&stack, ptr, 58);
 
     printf("stack: {data=%p, size=%llu, sp=%p, temp=%p}\n", stack.data, stack.size, stack.sp, stack.temp);
 

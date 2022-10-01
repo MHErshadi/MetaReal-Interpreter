@@ -4,30 +4,31 @@
  * Memory Library version 1.0.0
  * Memory Stack form
  *
- * Increases (block) size by (add) bytes, stores it in temporary stacks if needed
+ * Expands (block) up to (size) bytes
 /*/
 
 #include <memory.h>
 #include <stdlib.h>
 
-void* stack_increase(stack_p stack, void* block, unsigned long long add)
+void* stack_expand(stack_p stack, void* block, unsigned long long size)
 {
     unsigned long long alt = stack->size;
 
     while (stack->data > (char*)block || stack->sp <= (char*)block)
         stack = stack->temp;
 
-    unsigned long long fsize = stack->size - (stack->sp - stack->data);
+    unsigned long long pos = stack->sp - stack->data;
+    unsigned long long fsize = stack->size - pos;
+
+    unsigned long long osize = stack->sp - (char*)block;
+    unsigned long long add = size - osize;
 
     if (fsize < add)
     {
-        unsigned long long osize = stack->sp - (char*)block;
-        unsigned long long size = osize + add;
-
         if (stack->temp)
         {
             stack = stack->temp;
-            fsize = stack->size - (stack->sp - stack->data);
+            fsize = stack->size - pos;
 
             char new = 0;
             while (fsize < size)
@@ -39,7 +40,7 @@ void* stack_increase(stack_p stack, void* block, unsigned long long add)
                 }
 
                 stack = stack->temp;
-                fsize = stack->size - (stack->sp - stack->data);
+                fsize = stack->size - pos;
             }
 
             if (new)
@@ -87,6 +88,6 @@ void* stack_increase(stack_p stack, void* block, unsigned long long add)
         return stack->temp->data;
     }
 
-    stack->sp += add;
+    stack->sp = (char*)block + size;
     return block;
 }

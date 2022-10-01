@@ -2,15 +2,17 @@
  * MetaReal version 1.0.0
 /*/
 
-#ifndef __TOKEN__
-#define __TOKEN__
+#ifndef __M_TOKEN__
+#define __M_TOKEN__
 
 #include <debugger/pos.h>
 
 struct __token__
 {
     unsigned long long type;
+
     const char* value;
+    unsigned long long size;
 
     pos_t poss;
     pos_t pose;
@@ -34,6 +36,8 @@ enum _token_types_
     FLOAT_T,       // 8.5
     COMPLEX_T,     // 45i
 
+    CHAR_T,        // 'A'
+
     STR_T,         // "hello world"
 
     ELLIPSIS_T,    // ...
@@ -55,6 +59,8 @@ enum _token_types_
     RSHIFT_T,      // >>
     B_NOT_T,       // ~
 
+    /* */
+
     EQUAL_T,       // ==
     NEQUAL_T,      // !=
     LESS_T,        // <
@@ -71,6 +77,9 @@ enum _token_types_
 
     ASSIGN_T,      // =
 
+    INCREMENT_T,   // ++
+    DECREMENT_T,   // --
+
     PLUS_EQ_T,     // +=
     MINUS_EQ_T,    // -=
     MULTIPLY_EQ_T, // *=
@@ -82,6 +91,8 @@ enum _token_types_
     B_AND_EQ_T,    // &=
     B_OR_EQ_T,     // |=
     B_XOR_EQ_T,    // ^=
+    LSHIFT_EQ_T,   // <<=
+    RSHIFT_EQ_T,   // >>=
 
     /* */
 
@@ -194,7 +205,11 @@ enum _token_types_
     SET_TT         // set
 };
 
-#define KEYWORDS_PAD PRIVATE_TK
-#define TYPES_PAD OBJECT_TT
+token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_t poss, pos_t pose);
+token_t token_set2(unsigned char type, pos_t poss, pos_t pose);
 
-#endif /* __TOKEN__ */
+void token_print(token_p token);
+
+unsigned char identifier_type(const char* identifier);
+
+#endif /* __M_TOKEN__ */

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "xstring": "c",
+        "xutility": "c",
+        "sstream": "c"
+    }
+}

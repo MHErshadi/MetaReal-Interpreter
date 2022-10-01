@@ -13,4 +13,6 @@ struct __pos__
 typedef struct __pos__ pos_t;
 typedef struct __pos__* pos_p;
 
+pos_t pos_set(unsigned long long index, unsigned long long line);
+
 #endif /* __M_POS__ */

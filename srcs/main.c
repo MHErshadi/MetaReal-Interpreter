@@ -5,7 +5,8 @@
  * MetaReal Portal verified as mr-port version 1.0.0
 /*/
 
-#include <debugger/errlib.h>
+#include <lexer/lexer.h>
+#include <memory.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,15 +23,33 @@ int main(int argc, char** argv)
 
         setting = setting_init();
 
+        stack_init(&memory.stack, STACK_SIZE);
+        heap_init(&memory.heap, HEAP_SIZE);
+
         char* code = malloc(CMD_INPUT_SIZE);
         while (1)
         {
             printf(">>> ");
-            gets_s(code, CMD_INPUT_SIZE);
+            fgets(code, CMD_INPUT_SIZE, stdin);
 
-            illegal_char_t error = {*code, (pos_t){0, 1}};
-            illegal_char_print(&error, code, strlen(code), CMD_FILE_NAME);
+            unsigned long long size = strlen(code);
+            code[size - 1] = '\0';
+
+            lres_t lres = lex(code, '\0');
+            if (lres.has_error)
+            {
+                illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
+                continue;
+            }
+
+            free(lres.tokens);
+
+            stack_reset(&memory.stack);
+            heap_reset(&memory.heap);
         }
+
+        stack_delete(&memory.stack);
+        heap_delete(&memory.heap);
 
         free(code);
         return 0;

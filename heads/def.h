@@ -11,4 +11,12 @@
 #define STACK_SIZE 524288 // 512 * 1024
 #define HEAP_SIZE 1048576 // 1024 * 1024
 
+/* */
+
+#define TOKENS_SIZE 8192
+
+#define IDENTIFIER_SIZE 16
+#define NUMBER_SIZE 8
+#define STRING_SIZE 32
+
 #endif /* __M_DEF__ */

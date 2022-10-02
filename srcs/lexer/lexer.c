@@ -10,6 +10,8 @@
 lres_t lres_fail(illegal_char_t error);
 lres_t lres_success(token_p tokens);
 
+const char* skip_comment(const char* code, char terminator, pos_p pos);
+
 const char* gen_identifier(token_p token, const char* code, pos_p pos);
 const char* gen_number(token_p token, const char* code, pos_p pos);
 const char* gen_char(token_p token, const char* code, char terminator, pos_p pos);
@@ -64,11 +66,19 @@ lres_t lex(const char* code, char terminator)
             tokens[size++] = token_set2(NEWLINE_T, poss, pos);
             continue;
         }
+
+        if (*code == '#')
+        {
+            code = skip_comment(++code, terminator, &pos);
+            continue;
+        }
+
         if ((*code >= 'a' && *code <= 'z') || (*code >= 'A' && *code <= 'Z') || *code == '_')
         {
             code = gen_identifier(&tokens[size++], code, &pos);
             continue;
         }
+
         if (*code >= '0' && *code <= '9')
         {
             code = gen_number(&tokens[size++], code, &pos);
@@ -269,6 +279,53 @@ lres_t lres_success(token_p tokens)
     lres.has_error = 0;
 
     return lres;
+}
+
+const char* skip_comment(const char* code, char terminator, pos_p pos)
+{
+    if (*code == '*')
+    {
+        code++;
+        pos->index++;
+
+        while (*code != terminator)
+        {
+            if (*code == '*')
+            {
+                code++;
+                pos->index++;
+
+                if (*code == '#')
+                {
+                    pos->index++;
+                    return ++code;
+                }
+            }
+
+            if (*code == '\n')
+                pos->line++;
+
+            code++;
+            pos->index++;
+        }
+
+        return code;
+    }
+
+    while (*code != '\n' && *code != terminator)
+    {
+        code++;
+        pos->index++;
+    }
+
+    if (*code == '\n')
+    {
+        code++;
+        pos->line++;
+        pos->index++;
+    }
+
+    return code;
 }
 
 const char* gen_identifier(token_p token, const char* code, pos_p pos)

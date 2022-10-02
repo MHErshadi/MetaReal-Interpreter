@@ -6,6 +6,7 @@
 #define __M_TOKEN__
 
 #include <debugger/pos.h>
+#include <stdio.h>
 
 struct __token__
 {
@@ -208,7 +209,7 @@ enum _token_types_
 token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_t poss, pos_t pose);
 token_t token_set2(unsigned char type, pos_t poss, pos_t pose);
 
-void token_print(token_p token);
+void token_print(FILE* stream, token_p token);
 
 unsigned char identifier_type(const char* identifier);
 

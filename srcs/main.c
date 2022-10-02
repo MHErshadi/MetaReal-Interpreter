@@ -33,6 +33,14 @@ int main(int argc, char** argv)
             fgets(code, CMD_INPUT_SIZE, stdin);
 
             unsigned long long size = strlen(code);
+            while (code[size - 2] == '\\')
+            {
+                code[size - 2] = '\n';
+
+                printf("... ");
+                fgets(code + size - 1, CMD_INPUT_SIZE - size, stdin);
+                size = strlen(code);
+            }
             code[size - 1] = '\0';
 
             lres_t lres = lex(code, '\0');
@@ -41,6 +49,13 @@ int main(int argc, char** argv)
                 illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
                 continue;
             }
+
+            unsigned long long i = 0;
+            do
+            {
+                token_print(setting.output, &lres.tokens[i]);
+                putc('\n', setting.output);
+            } while (lres.tokens[i++].type != EOF_T);
 
             free(lres.tokens);
 

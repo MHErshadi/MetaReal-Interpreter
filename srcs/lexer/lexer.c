@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <def.h>
 
-lres_t lres_fail(illegal_char_t error);
+lres_t lres_fail(illegal_char_p error);
 lres_t lres_success(token_p tokens);
 
 const char* skip_comment(const char* code, char terminator, pos_p pos);
@@ -63,7 +63,7 @@ lres_t lex(const char* code, char terminator)
             if (tokens[size - 1].type == NEWLINE_T)
                 continue;
 
-            tokens[size++] = token_set2(NEWLINE_T, poss, pos);
+            tokens[size++] = token_set2(NEWLINE_T, &poss, &pos);
             continue;
         }
 
@@ -93,7 +93,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(SEMICOLON_T, poss, pos);
+            tokens[size++] = token_set2(SEMICOLON_T, &poss, &pos);
             break;
         case '\'':
             code = gen_char(&tokens[size++], ++code, terminator, &pos);
@@ -112,11 +112,11 @@ lres_t lex(const char* code, char terminator)
                 code += 2;
                 pos.index += 2;
 
-                tokens[size++] = token_set2(ELLIPSIS_T, poss, pos);
+                tokens[size++] = token_set2(ELLIPSIS_T, &poss, &pos);
                 break;
             }
 
-            tokens[size++] = token_set2(DOT_T, poss, pos);
+            tokens[size++] = token_set2(DOT_T, &poss, &pos);
             break;
         case '+':
             code = hand_plus(&tokens[size++], ++code, &pos);
@@ -154,7 +154,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(B_NOT_T, poss, pos);
+            tokens[size++] = token_set2(B_NOT_T, &poss, &pos);
             break;
         case '=':
             code = hand_equal(&tokens[size++], ++code, &pos);
@@ -168,7 +168,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(LPAREN_T, poss, pos);
+            tokens[size++] = token_set2(LPAREN_T, &poss, &pos);
             break;
         case ')':
             poss = pos;
@@ -176,7 +176,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(RPAREN_T, poss, pos);
+            tokens[size++] = token_set2(RPAREN_T, &poss, &pos);
             break;
         case '[':
             poss = pos;
@@ -184,7 +184,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(LSQUARE_T, poss, pos);
+            tokens[size++] = token_set2(LSQUARE_T, &poss, &pos);
             break;
         case ']':
             poss = pos;
@@ -192,7 +192,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(RSQUARE_T, poss, pos);
+            tokens[size++] = token_set2(RSQUARE_T, &poss, &pos);
             break;
         case '{':
             poss = pos;
@@ -200,7 +200,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(LCURLY_T, poss, pos);
+            tokens[size++] = token_set2(LCURLY_T, &poss, &pos);
             break;
         case '}':
             poss = pos;
@@ -208,7 +208,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(RCURLY_T, poss, pos);
+            tokens[size++] = token_set2(RCURLY_T, &poss, &pos);
             break;
         case '?':
             poss = pos;
@@ -216,7 +216,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(QUESTION_T, poss, pos);
+            tokens[size++] = token_set2(QUESTION_T, &poss, &pos);
             break;
         case ':':
             poss = pos;
@@ -224,7 +224,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(COLON_T, poss, pos);
+            tokens[size++] = token_set2(COLON_T, &poss, &pos);
             break;
         case ',':
             poss = pos;
@@ -232,7 +232,7 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(COMMA_T, poss, pos);
+            tokens[size++] = token_set2(COMMA_T, &poss, &pos);
             break;
         case '$':
             poss = pos;
@@ -240,13 +240,13 @@ lres_t lex(const char* code, char terminator)
             code++;
             pos.index++;
 
-            tokens[size++] = token_set2(DOLLAR_T, poss, pos);
+            tokens[size++] = token_set2(DOLLAR_T, &poss, &pos);
             break;
         default:
             free(tokens);
 
-            illegal_char_t error = illegal_char_set(*code, pos);
-            return lres_fail(error);
+            illegal_char_t error = illegal_char_set(*code, &pos);
+            return lres_fail(&error);
         }
     }
 
@@ -256,16 +256,16 @@ lres_t lex(const char* code, char terminator)
     poss = pos;
     pos.index++;
 
-    tokens[size] = token_set2(EOF_T, poss, pos);
+    tokens[size] = token_set2(EOF_T, &poss, &pos);
 
     return lres_success(tokens);
 }
 
-lres_t lres_fail(illegal_char_t error)
+lres_t lres_fail(illegal_char_p error)
 {
     lres_t lres;
 
-    lres.error = error;
+    lres.error = *error;
     lres.has_error = 1;
 
     return lres;
@@ -355,14 +355,14 @@ const char* gen_identifier(token_p token, const char* code, pos_p pos)
     {
         stack_free(&memory.stack, identifier);
 
-        *token = token_set2(type, poss, *pos);
+        *token = token_set2(type, &poss, pos);
         return code;
     }
 
     if (size != alloc)
         stack_shrink(&memory.stack, identifier, size);
 
-    *token = token_set1(IDENTIFIER_T, identifier, 0, poss, *pos);
+    *token = token_set1(IDENTIFIER_T, identifier, 0, &poss, pos);
     return code;
 }
 
@@ -406,14 +406,14 @@ const char* gen_number(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set1(COMPLEX_T, number, size, poss, *pos);
+        *token = token_set1(COMPLEX_T, number, size, &poss, pos);
         return ++code;
     }
 
     if (is_float)
-        *token = token_set1(FLOAT_T, number, size, poss, *pos);
+        *token = token_set1(FLOAT_T, number, size, &poss, pos);
     else
-        *token = token_set1(INT_T, number, size, poss, *pos);
+        *token = token_set1(INT_T, number, size, &poss, pos);
     return code;
 }
 
@@ -486,7 +486,7 @@ const char* gen_char(token_p token, const char* code, char terminator, pos_p pos
         pos->index++;
     }
 
-    *token = token_set2(CHAR_T, poss, *pos);
+    *token = token_set2(CHAR_T, &poss, pos);
     token->size = chr;
     return code;
 }
@@ -578,7 +578,7 @@ const char* gen_str(token_p token, const char* code, char terminator, pos_p pos)
     }
     str[size] = '\0';
 
-    *token = token_set1(STR_T, str, size, poss, *pos);
+    *token = token_set1(STR_T, str, size, &poss, pos);
     return code;
 }
 
@@ -591,18 +591,18 @@ const char* hand_plus(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(PLUS_EQ_T, poss, *pos);
+        *token = token_set2(PLUS_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '+')
     {
         pos->index++;
 
-        *token = token_set2(INCREMENT_T, poss, *pos);
+        *token = token_set2(INCREMENT_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(PLUS_T, poss, *pos);
+    *token = token_set2(PLUS_T, &poss, pos);
     return code;
 }
 
@@ -615,18 +615,18 @@ const char* hand_minus(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(MINUS_EQ_T, poss, *pos);
+        *token = token_set2(MINUS_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '-')
     {
         pos->index++;
 
-        *token = token_set2(DECREMENT_T, poss, *pos);
+        *token = token_set2(DECREMENT_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(MINUS_T, poss, *pos);
+    *token = token_set2(MINUS_T, &poss, pos);
     return code;
 }
 
@@ -639,7 +639,7 @@ const char* hand_multiply(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(MULTIPLY_EQ_T, poss, *pos);
+        *token = token_set2(MULTIPLY_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '*')
@@ -650,15 +650,15 @@ const char* hand_multiply(token_p token, const char* code, pos_p pos)
         {
             pos->index++;
 
-            *token = token_set2(POWER_EQ_T, poss, *pos);
+            *token = token_set2(POWER_EQ_T, &poss, pos);
             return ++code;
         }
 
-        *token = token_set2(POWER_T, poss, *pos);
+        *token = token_set2(POWER_T, &poss, pos);
         return code;
     }
 
-    *token = token_set2(MULTIPLY_T, poss, *pos);
+    *token = token_set2(MULTIPLY_T, &poss, pos);
     return code;
 }
 
@@ -671,7 +671,7 @@ const char* hand_divide(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(DIVIDE_EQ_T, poss, *pos);
+        *token = token_set2(DIVIDE_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '/')
@@ -682,15 +682,15 @@ const char* hand_divide(token_p token, const char* code, pos_p pos)
         {
             pos->index++;
 
-            *token = token_set2(QUOTIENT_EQ_T, poss, *pos);
+            *token = token_set2(QUOTIENT_EQ_T, &poss, pos);
             return ++code;
         }
 
-        *token = token_set2(QUOTIENT_T, poss, *pos);
+        *token = token_set2(QUOTIENT_T, &poss, pos);
         return code;
     }
 
-    *token = token_set2(DIVIDE_T, poss, *pos);
+    *token = token_set2(DIVIDE_T, &poss, pos);
     return code;
 }
 
@@ -703,11 +703,11 @@ const char* hand_modulo(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(MODULO_EQ_T, poss, *pos);
+        *token = token_set2(MODULO_EQ_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(MODULO_T, poss, *pos);
+    *token = token_set2(MODULO_T, &poss, pos);
     return code;
 }
 
@@ -720,18 +720,18 @@ const char* hand_and(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(B_AND_EQ_T, poss, *pos);
+        *token = token_set2(B_AND_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '&')
     {
         pos->index++;
 
-        *token = token_set2(AND_T, poss, *pos);
+        *token = token_set2(AND_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(B_AND_T, poss, *pos);
+    *token = token_set2(B_AND_T, &poss, pos);
     return code;
 }
 
@@ -744,18 +744,18 @@ const char* hand_or(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(B_OR_EQ_T, poss, *pos);
+        *token = token_set2(B_OR_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '|')
     {
         pos->index++;
 
-        *token = token_set2(OR_T, poss, *pos);
+        *token = token_set2(OR_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(B_OR_T, poss, *pos);
+    *token = token_set2(B_OR_T, &poss, pos);
     return code;
 }
 
@@ -768,18 +768,18 @@ const char* hand_xor(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(B_XOR_EQ_T, poss, *pos);
+        *token = token_set2(B_XOR_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '^')
     {
         pos->index++;
 
-        *token = token_set2(XOR_T, poss, *pos);
+        *token = token_set2(XOR_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(B_XOR_T, poss, *pos);
+    *token = token_set2(B_XOR_T, &poss, pos);
     return code;
 }
 
@@ -792,7 +792,7 @@ const char* hand_lshift(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(LESS_EQ_T, poss, *pos);
+        *token = token_set2(LESS_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '<')
@@ -803,15 +803,15 @@ const char* hand_lshift(token_p token, const char* code, pos_p pos)
         {
             pos->index++;
 
-            *token = token_set2(LSHIFT_EQ_T, poss, *pos);
+            *token = token_set2(LSHIFT_EQ_T, &poss, pos);
             return ++code;
         }
 
-        *token = token_set2(LSHIFT_T, poss, *pos);
+        *token = token_set2(LSHIFT_T, &poss, pos);
         return code;
     }
 
-    *token = token_set2(LESS_T, poss, *pos);
+    *token = token_set2(LESS_T, &poss, pos);
     return code;
 }
 
@@ -824,7 +824,7 @@ const char* hand_rshift(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(GREATER_EQ_T, poss, *pos);
+        *token = token_set2(GREATER_EQ_T, &poss, pos);
         return ++code;
     }
     if (*code == '>')
@@ -835,15 +835,15 @@ const char* hand_rshift(token_p token, const char* code, pos_p pos)
         {
             pos->index++;
 
-            *token = token_set2(RSHIFT_EQ_T, poss, *pos);
+            *token = token_set2(RSHIFT_EQ_T, &poss, pos);
             return ++code;
         }
 
-        *token = token_set2(RSHIFT_T, poss, *pos);
+        *token = token_set2(RSHIFT_T, &poss, pos);
         return code;
     }
 
-    *token = token_set2(GREATER_T, poss, *pos);
+    *token = token_set2(GREATER_T, &poss, pos);
     return code;
 }
 
@@ -856,11 +856,11 @@ const char* hand_equal(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(EQUAL_T, poss, *pos);
+        *token = token_set2(EQUAL_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(ASSIGN_T, poss, *pos);
+    *token = token_set2(ASSIGN_T, &poss, pos);
     return code;
 }
 
@@ -873,10 +873,10 @@ const char* hand_nequal(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
-        *token = token_set2(NEQUAL_T, poss, *pos);
+        *token = token_set2(NEQUAL_T, &poss, pos);
         return ++code;
     }
 
-    *token = token_set2(NOT_T, poss, *pos);
+    *token = token_set2(NOT_T, &poss, pos);
     return code;
 }

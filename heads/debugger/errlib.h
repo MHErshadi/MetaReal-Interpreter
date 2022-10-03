@@ -42,13 +42,13 @@ enum _runtime_types_
     DIV_BY_ZERO_E
 };
 
-illegal_char_t illegal_char_set(char chr, pos_t pos);
+illegal_char_t illegal_char_set(char chr, pos_p pos);
 void illegal_char_print(illegal_char_p error, const char* code, unsigned long long size, const char* fname);
 
-invalid_syntax_t invalid_syntax_set(const char* detail, pos_t poss, pos_t pose);
+invalid_syntax_t invalid_syntax_set(const char* detail, pos_p poss, pos_p pose);
 void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned long long size, const char* fname);
 
-runtime_t runtime_set(unsigned char type, char* detail, pos_t poss, pos_t pose);
+runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose);
 void runtime_print(runtime_p error, const char* code, unsigned long long size);
 
 #endif /* __M_ERRLIB__ */

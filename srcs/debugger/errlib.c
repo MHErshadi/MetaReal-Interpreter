@@ -11,12 +11,12 @@ const char* runtime_labels[1] =
     "DivByZero"
 };
 
-illegal_char_t illegal_char_set(char chr, pos_t pos)
+illegal_char_t illegal_char_set(char chr, pos_p pos)
 {
     illegal_char_t error;
 
     error.chr = chr;
-    error.pos = pos;
+    error.pos = *pos;
 
     return error;
 }
@@ -27,13 +27,13 @@ void illegal_char_print(illegal_char_p error, const char* code, unsigned long lo
     fprintf(setting.error, "File \"%s\", line %llu\n\n", fname, error->pos.line);
 }
 
-invalid_syntax_t invalid_syntax_set(const char* detail, pos_t poss, pos_t pose)
+invalid_syntax_t invalid_syntax_set(const char* detail, pos_p poss, pos_p pose)
 {
     invalid_syntax_t error;
 
     error.detail = detail;
-    error.poss = poss;
-    error.pose = pose;
+    error.poss = *poss;
+    error.pose = *pose;
 
     return error;
 }
@@ -47,14 +47,14 @@ void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned lon
     fprintf(setting.error, "File \"%s\", line %llu\n\n", fname, error->poss.line);
 }
 
-runtime_t runtime_set(unsigned char type, char* detail, pos_t poss, pos_t pose)
+runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose)
 {
     runtime_t error;
 
     error.type = type;
     error.detail = detail;
-    error.poss = poss;
-    error.pose = pose;
+    error.poss = *poss;
+    error.pose = *pose;
 
     return error;
 }

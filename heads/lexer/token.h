@@ -206,8 +206,8 @@ enum _token_types_
     SET_TT         // set
 };
 
-token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_t poss, pos_t pose);
-token_t token_set2(unsigned char type, pos_t poss, pos_t pose);
+token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_p poss, pos_p pose);
+token_t token_set2(unsigned char type, pos_p poss, pos_p pose);
 
 void token_print(FILE* stream, token_p token);
 

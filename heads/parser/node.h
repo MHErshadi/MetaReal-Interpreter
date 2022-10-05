@@ -6,6 +6,9 @@
 #define __M_NODE__
 
 #include <debugger/pos.h>
+#include <stdio.h>
+
+#define VFA_PROP(post) 0b ## post
 
 enum _node_types_
 {
@@ -317,10 +320,10 @@ struct __class_def_n__
 
     body_t body;
 };
-typedef struct __class_def__ class_def_nt;
-typedef struct __class_def__* class_def_np;
+typedef struct __class_def_n__ class_def_nt;
+typedef struct __class_def_n__* class_def_np;
 
-struct __struct_def__
+struct __struct_def_n__
 {
     char properties;
     const char* name;
@@ -448,6 +451,8 @@ typedef struct __return_n__* return_np;
 node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose);
 node_t node_set2(unsigned char type, pos_p poss, pos_p pose);
 
+void node_print(FILE* stream, node_p node);
+
 pair_t pair_set(node_p key, node_p value);
 
 arg_t arg_set(const char* name, unsigned char type, node_p value);
@@ -466,7 +471,7 @@ complex_np complex_n_set(const char* value, unsigned long long size);
 str_np str_n_set(const char* value, unsigned long long size);
 list_np list_n_set(node_p elements, unsigned long long size);
 tuple_np tuple_n_set(node_p elements, unsigned long long size);
-dict_np dict_n_set(pair_p value, unsigned long long size);
+dict_np dict_n_set(pair_p elements, unsigned long long size);
 set_np set_n_set(node_p elements, unsigned long long size);
 binary_operation_np binary_operation_n_set(unsigned char operator, node_p left, node_p right);
 unary_operation_np unary_operation_n_set(unsigned char operator, node_p operand);

@@ -11,68 +11,6 @@
 #define TYPES_PAD OBJECT_TT
 #define TYPES_COUNT 11
 
-const char* token_labels[110] =
-{
-    "EOF", "NEWLINE", "SEMICOLON",
-
-    "IDENTIFIER",
-
-    "INT", "FLOAT", "COMPLEX",
-    "CHAR",
-    "STR",
-    "ELLIPSIS",
-
-    "PLUS", "MINUS", "MULTIPLY", "DIVIDE", "MODULO", "QUOTIENT", "POWER",
-    "B_AND", "B_OR", "B_XOR", "LSHIFT", "RSHIFT", "B_NOT",
-
-    "EQUAL", "NEQUAL", "LESS", "GREATER", "LESS_EQ", "GREATER_EQ",
-    "AND", "OR", "XOR", "NOT",
-
-    "ASSIGN",
-    "INCREMENT", "DECREMENT",
-    "PLUS_EQ", "MINUS_EQ", "MULTIPLY_EQ", "DIVIDE_EQ", "MODULO_EQ", "QUOTIENT_EQ", "POWER_EQ",
-    "B_AND_EQ", "B_OR_EQ", "B_XOR_EQ", "LSHIFT_EQ", "RSHIFT_EQ",
-
-    "LPAREN", "RPAREN",
-    "LSQUARE", "RSQUARE",
-    "LCURLY", "RCURLY",
-
-    "QUESTION", "COLON",
-    "DOT",
-    "COMMA",
-    "DOLLAR",
-
-    "PRIVATE_K", "PUBLIC_K",
-    "LOCAL_K", "GLOBAL_K",
-    "CONST_K", "STATIC_K",
-
-    "VAR_K", "FUNC_K", "CLASS_K", "STRUCT_K", "ENUM_K",
-
-    "IF_K", "ELIF_K", "ELSE_K",
-    "SWITCH_K", "CASE_K", "DEFAULT_K",
-    "FOR_K", "TO_K", "STEP_K",
-    "DO_K", "WHILE_K",
-    "TRY_K", "EXCEPT_K", "FINALLY_K",
-    "IMPORT_K", "INCLUDE_K",
-
-    "RETURN_K",
-    "CONTINUE_K", "BREAK_K",
-
-    "AND_K", "OR_K", "XOR_K", "NOT_K",
-    "IN_K",
-    "IS_K", "ARE_K",
-
-    "NONE_K",
-    "TRUE_K", "FALSE_K",
-
-    "OBJECT_T",
-    "INT_T", "FLOAT_T", "COMPLEX_T",
-    "CHAR_T",
-    "BOOL_T",
-    "STR_T",
-    "LIST_T", "TUPLE_T", "DICT_T", "SET_T"
-};
-
 const char* keywords[KEYWORDS_COUNT] =
 {
     "private", "public",

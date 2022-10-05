@@ -3,6 +3,15 @@
         "*.h": "c",
         "xstring": "c",
         "xutility": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "complex": "c",
+        "system_error": "c",
+        "type_traits": "c",
+        "xlocnum": "c",
+        "xtr1common": "c",
+        "initializer_list": "c",
+        "xiosbase": "c",
+        "ios": "c",
+        "xlocale": "c"
     }
 }

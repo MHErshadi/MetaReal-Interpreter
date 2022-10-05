@@ -6,6 +6,7 @@
 /*/
 
 #include <lexer/lexer.h>
+#include <parser/parser.h>
 #include <memory.h>
 #include <setting.h>
 #include <stdlib.h>
@@ -50,14 +51,20 @@ int main(int argc, char** argv)
                 continue;
             }
 
-            unsigned long long i = 0;
+            pres_t pres = parse(lres.tokens);
+            if (pres.has_error)
+            {
+                invalid_syntax_print(&pres.error, code, size, CMD_FILE_NAME);
+                continue;
+            }
+
             do
             {
-                token_print(setting.output, &lres.tokens[i]);
-                putc('\n', setting.output);
-            } while (lres.tokens[i++].type != EOF_T);
+                node_print(stdout, pres.nodes);
+                putc('\n', stdout);
+            } while (pres.nodes++->type != NULL_N);
 
-            free(lres.tokens);
+            free(pres.nodes);
 
             stack_reset(&memory.stack);
             heap_reset(&memory.heap);

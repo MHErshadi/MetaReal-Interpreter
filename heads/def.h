@@ -19,4 +19,8 @@
 #define NUMBER_SIZE 8
 #define STRING_SIZE 32
 
+/* */
+
+#define NODES_SIZE 2048
+
 #endif /* __M_DEF__ */

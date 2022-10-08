@@ -73,6 +73,19 @@ void node_print(FILE* stream, node_p node)
         putc(')', stream);
         return;
     }
+    if (node->type == TERNARY_CONDITION_N)
+    {
+        ternary_condition_np value = node->value;
+
+        fputs("(TERNARY_CONDITION: ", stream);
+        node_print(stream, &value->condition);
+        fputs(", ", stream);
+        node_print(stream, &value->left);
+        fputs(", ", stream);
+        node_print(stream, &value->right);
+        putc(')', stream);
+        return;
+    }
 
     if (node->type == VAR_FIXED_ASSIGN_N)
     {

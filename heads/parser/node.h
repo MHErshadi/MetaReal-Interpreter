@@ -16,8 +16,6 @@ enum _node_types_
 
     /* */
 
-    OBJECT_N,
-
     NONE_N,
 
     INT_N,
@@ -34,6 +32,8 @@ enum _node_types_
     TUPLE_N,
     DICT_N,
     SET_N,
+
+    TYPE_N,
 
     /* */
 

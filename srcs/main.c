@@ -28,12 +28,17 @@ int main(int argc, char** argv)
         heap_init(&memory.heap, HEAP_SIZE);
 
         char* code = malloc(CMD_INPUT_SIZE);
+        unsigned long long size;
+
+        lres_t lres;
+        pres_t pres;
+
         while (1)
         {
             printf(">>> ");
             fgets(code, CMD_INPUT_SIZE, stdin);
 
-            unsigned long long size = strlen(code);
+            size = strlen(code);
             while (code[size - 2] == '\\')
             {
                 code[size - 2] = '\n';
@@ -44,14 +49,14 @@ int main(int argc, char** argv)
             }
             code[size - 1] = '\0';
 
-            lres_t lres = lex(code, '\0');
+            lres = lex(code, '\0');
             if (lres.has_error)
             {
                 illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
                 continue;
             }
 
-            pres_t pres = parse(lres.tokens);
+            pres = parse(lres.tokens);
             if (pres.has_error)
             {
                 invalid_syntax_print(&pres.error, code, size, CMD_FILE_NAME);

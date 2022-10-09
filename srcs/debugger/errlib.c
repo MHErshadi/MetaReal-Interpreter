@@ -25,6 +25,23 @@ void illegal_char_print(illegal_char_p error, const char* code, unsigned long lo
 {
     fprintf(setting.error, "\nIllegal Character Error: '%c'\n", error->chr);
     fprintf(setting.error, "File \"%s\", line %llu\n\n", fname, error->pos.line);
+
+    unsigned long long start;
+    for (start = error->pos.index; code[start] != '\n' && start > 0; start--);
+    if (start)
+        start++;
+
+    unsigned long long end;
+    for (end = error->pos.index; code[end] != '\n' && end < size; end++);
+
+    unsigned long long i;
+    for (i = start; i < end; i++)
+        putc(code[i], setting.error);
+    putc('\n', setting.error);
+
+    for (i = start; i < error->pos.index; i++)
+        putc(' ', setting.error);
+    fputs("^\n\n", setting.error);
 }
 
 invalid_syntax_t invalid_syntax_set(const char* detail, pos_p poss, pos_p pose)
@@ -45,6 +62,49 @@ void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned lon
     else
         fputs("\nInvalid Syntax Error\n", setting.error);
     fprintf(setting.error, "File \"%s\", line %llu\n\n", fname, error->poss.line);
+
+    if (error->poss.line != error->pose.line)
+    {
+        unsigned long long start;
+        for (start = error->poss.index; code[start] != '\n' && start > 0; start--);
+        if (start)
+            start++;
+
+        unsigned long long end;
+        for (end = error->poss.index; code[end] != '\n' && end < size; end++);
+
+        unsigned long long i;
+        for (i = start; i < end; i++)
+            putc(code[i], setting.error);
+        putc('\n', setting.error);
+
+        for (i = start; i < error->poss.index; i++)
+            putc(' ', setting.error);
+        for (; i < end; i++)
+            putc('^', setting.error);
+        fputs("~\n\n", setting.error);
+
+        return;
+    }
+
+    unsigned long long start;
+    for (start = error->poss.index; code[start] != '\n' && start > 0; start--);
+    if (start)
+        start++;
+
+    unsigned long long end;
+    for (end = error->pose.index; code[end] != '\n' && end < size; end++);
+
+    unsigned long long i;
+    for (i = start; i < end; i++)
+        putc(code[i], setting.error);
+    putc('\n', setting.error);
+
+    for (i = start; i < error->poss.index; i++)
+        putc(' ', setting.error);
+    for (; i < error->pose.index; i++)
+        putc('^', setting.error);
+    fputs("\n\n", setting.error);
 }
 
 runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose)

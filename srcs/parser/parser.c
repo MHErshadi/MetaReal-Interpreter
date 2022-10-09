@@ -3,6 +3,7 @@
 /*/
 
 #include <parser/parser.h>
+#include <memory.h>
 #include <stdlib.h>
 #include <def.h>
 
@@ -30,8 +31,8 @@ token_p expression(pres_p pres, token_p tokens);  // + -
 token_p term(pres_p pres, token_p tokens);        // * / % //
 token_p factor(pres_p pres, token_p tokens);      // +(unary) -(unary) ~ ! not ++ --
 token_p exponent(pres_p pres, token_p tokens);    // **
-token_p post(pres_p pres, token_p tokens);        // array-subscripting ++(post) --(post) function-call access
-token_p core(pres_p pres, token_p tokens);        // statements types
+token_p post(pres_p pres, token_p tokens);        // array-subscripting access ++(post) --(post) function-call
+token_p core(pres_p pres, token_p tokens);        // types statements
 
 pres_t parse(token_p tokens)
 {
@@ -95,17 +96,172 @@ void pres_fail(pres_p pres, invalid_syntax_p error)
 
 token_p dollar_func(pres_p pres, token_p tokens)
 {
+    if (tokens->type == DOLLAR_T)
+    {
+        pos_p poss = &tokens++->poss;
+
+        advance_newline(tokens);
+
+        if (tokens->type != IDENTIFIER_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected dollar-function name", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        const char* name = tokens->value;
+
+        pos_p pose = &tokens++->pose;
+
+        advance_newline(tokens);
+
+        if (tokens->type != COLON_T)
+        {
+            dollar_func_call_np node = dollar_func_call_n_set(name, NULL, 0);
+            *pres->nodes = node_set1(DOLLAR_FUNC_CALL_N, node, poss, pose);
+            return tokens;
+        }
+
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = assign(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        node_p args = heap_alloc(&memory.heap, DOLLAR_FUNC_ARGS_SIZE * sizeof(node_t));
+        *args = *pres->nodes;
+
+        unsigned long long alloc = DOLLAR_FUNC_ARGS_SIZE;
+        unsigned long long size = 1;
+
+        pose = &args->pose;
+
+        while (tokens->type == COMMA_T)
+        {
+            tokens++;
+            advance_newline(tokens);
+
+            tokens = assign(pres, tokens);
+            if (pres->has_error)
+                return tokens;
+
+            if (size == alloc)
+                args = heap_expand(&memory.heap, args, size * sizeof(node_t), (alloc += DOLLAR_FUNC_ARGS_SIZE) * sizeof(node_t));
+
+            args[size++] = *pres->nodes;
+
+            pose = &pres->nodes->pose;
+        }
+
+        if (size != alloc)
+            heap_shrink(&memory.heap, args, alloc * sizeof(node_t), size * sizeof(node_t));
+
+        dollar_func_call_np node = dollar_func_call_n_set(name, args, size);
+        *pres->nodes = node_set1(DOLLAR_FUNC_CALL_N, node, poss, pose);
+        return tokens;
+    }
+
     return statement(pres, tokens);
 }
 
 token_p statement(pres_p pres, token_p tokens)
 {
+    if (tokens->type == RETURN_TK)
+    {
+        pos_p poss = &tokens->poss;
+        pos_p pose = &tokens++->pose;
+
+        advance_newline(tokens);
+
+        token_p new = tuple(pres, tokens);
+        if (pres->has_error)
+        {
+            pres->has_error = 0;
+
+            *pres->nodes = node_set1(RETURN_N, NULL, poss, pose);
+            return tokens;
+        }
+
+        return_np node = return_n_set(pres->nodes);
+        *pres->nodes = node_set1(RETURN_N, node, poss, &pres->nodes->pose);
+        return new;
+    }
+
+    if (tokens->type == CONTINUE_TK)
+    {
+        *pres->nodes = node_set2(CONTINUE_N, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+    if (tokens->type == BREAK_TK)
+    {
+        *pres->nodes = node_set2(BREAK_N, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
     return tuple(pres, tokens);
 }
 
 token_p tuple(pres_p pres, token_p tokens)
 {
-    return assign(pres, tokens);
+    tokens = assign(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    if (tokens->type == COMMA_T)
+    {
+        pos_p pose;
+
+        node_p elements = heap_alloc(&memory.heap, TUPLE_SIZE);
+        *elements = *pres->nodes;
+
+        unsigned long long alloc = TUPLE_SIZE;
+        unsigned long long size = 1;
+
+        token_p new;
+        do
+        {
+            pose = &tokens++->pose;
+
+            advance_newline(tokens);
+
+            new = assign(pres, tokens);
+            if (pres->has_error)
+            {
+                pres->has_error = 0;
+
+                if (size != alloc)
+                    heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+
+                tuple_np node = tuple_n_set(elements, size);
+                *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, pose);
+                return tokens;
+            }
+            tokens = new;
+
+            if (size == alloc)
+                elements = heap_expand(&memory.heap, elements, size * sizeof(node_t), (alloc += TUPLE_SIZE) * sizeof(node_t));
+
+            elements[size++] = *pres->nodes;
+        } while (tokens->type == COMMA_T);
+
+        if (size != alloc)
+            heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+
+        tuple_np node = tuple_n_set(elements, size);
+        *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, &elements[size - 1].pose);
+        return tokens;
+    }
+
+    return tokens;
 }
 
 token_p assign(pres_p pres, token_p tokens)
@@ -180,9 +336,10 @@ token_p typeof(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type == IS_TK || tokens->type == ARE_TK)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -311,9 +468,10 @@ token_p compare1(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type == EQUAL_T || tokens->type == NEQUAL_T)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -338,9 +496,10 @@ token_p compare2(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type >= LESS_T && tokens->type <= GREATER_EQ_T)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -443,9 +602,10 @@ token_p shift(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type == LSHIFT_T || tokens->type == RSHIFT_T)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -470,9 +630,10 @@ token_p expression(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type == PLUS_T || tokens->type == MINUS_T)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -497,9 +658,10 @@ token_p term(pres_p pres, token_p tokens)
 
     node_t left = *pres->nodes;
 
+    unsigned char operator;
     while (tokens->type >= MULTIPLY_T && tokens->type <= QUOTIENT_T)
     {
-        unsigned char operator = tokens++->type;
+        operator = tokens++->type;
 
         advance_newline(tokens);
 
@@ -585,7 +747,75 @@ token_p exponent(pres_p pres, token_p tokens)
 
 token_p post(pres_p pres, token_p tokens)
 {
-    return core(pres, tokens);
+    tokens = core(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+check:
+    if (tokens->type == LSQUARE_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        node_t value = *pres->nodes;
+
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        if (tokens->type != RSQUARE_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ']'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens++;
+        advance_newline(tokens);
+
+        subscript_np node = subscript_n_set(&value, pres->nodes);
+        *pres->nodes = node_set1(SUBSCRIPT_N, node, &value.poss, &pres->nodes->pose);
+        goto check;
+    }
+
+    if (tokens->type == DOT_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        node_t value = *pres->nodes;
+
+        tokens = core(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        access_np node = access_n_set(&value, pres->nodes);
+        *pres->nodes = node_set1(ACCESS_N, node, &value.poss, &pres->nodes->pose);
+        goto check;
+    }
+
+    if (tokens->type == INCREMENT_T || tokens->type == DECREMENT_T)
+    {
+        unsigned char operator = tokens->type;
+
+        pos_p poss = &tokens++->poss;
+
+        advance_newline(tokens);
+
+        var_fixed_assign_np node = var_fixed_assign_n_set(VFA_PROP(1), operator, pres->nodes);
+        *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, poss, &pres->nodes->pose);
+        goto check;
+    }
+
+    if (tokens->type == LPAREN_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        goto check;
+    }
+
+    return tokens;
 }
 
 token_p core(pres_p pres, token_p tokens)
@@ -615,6 +845,16 @@ token_p core(pres_p pres, token_p tokens)
         return tokens;
     }
 
+    if (tokens->type == NONE_TK)
+    {
+        *pres->nodes = node_set2(NONE_N, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
     if (tokens->type == INT_T)
     {
         int_np node = int_n_set(tokens->value, tokens->size);
@@ -625,20 +865,70 @@ token_p core(pres_p pres, token_p tokens)
 
         return tokens;
     }
-    if (tokens->type == FLOAT_N)
+    if (tokens->type == FLOAT_T)
     {
-        int_np node = int_n_set(tokens->value, tokens->size);
-        *pres->nodes = node_set1(INT_N, node, &tokens->poss, &tokens->pose);
+        float_np node = float_n_set(tokens->value, tokens->size);
+        *pres->nodes = node_set1(FLOAT_N, node, &tokens->poss, &tokens->pose);
 
         tokens++;
         advance_newline(tokens);
 
         return tokens;
     }
-    if (tokens->type == COMPLEX_N)
+    if (tokens->type == COMPLEX_T)
     {
-        int_np node = int_n_set(tokens->value, tokens->size);
-        *pres->nodes = node_set1(INT_N, node, &tokens->poss, &tokens->pose);
+        complex_np node = complex_n_set(tokens->value, tokens->size);
+        *pres->nodes = node_set1(COMPLEX_N, node, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
+    if (tokens->type == TRUE_TK)
+    {
+        *pres->nodes = node_set1(BOOL_N, (void*)1, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+    if (tokens->type == FALSE_TK)
+    {
+        *pres->nodes = node_set1(BOOL_N, NULL, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
+    if (tokens->type == CHAR_T)
+    {
+        *pres->nodes = node_set1(CHAR_N, (void*)tokens->size, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
+    if (tokens->type == STR_T)
+    {
+        str_np node = str_n_set(tokens->value, tokens->size);
+        *pres->nodes = node_set1(STR_N, node, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
+    if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
+    {
+        *pres->nodes = node_set1(TYPE_N, (void*)tokens->type, &tokens->poss, &tokens->pose);
 
         tokens++;
         advance_newline(tokens);

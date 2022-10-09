@@ -23,4 +23,7 @@
 
 #define NODES_SIZE 2048
 
+#define DOLLAR_FUNC_ARGS_SIZE 4
+#define TUPLE_SIZE 8
+
 #endif /* __M_DEF__ */

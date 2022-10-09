@@ -6,6 +6,8 @@
 #include <memory.h>
 #include <lexer/token.h>
 
+void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
+
 node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
 {
     node_t node;
@@ -37,6 +39,12 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == NONE_N)
+    {
+        fputs("(NONE)", stream);
+        return;
+    }
+
     if (node->type == INT_N)
     {
         fprintf(stream, "(INT: %s)", ((int_np)node->value)->value);
@@ -50,6 +58,107 @@ void node_print(FILE* stream, node_p node)
     if (node->type == COMPLEX_N)
     {
         fprintf(stream, "(COMPLEX: %s)", ((complex_np)node->value)->value);
+        return;
+    }
+
+    if (node->type == BOOL_N)
+    {
+        fprintf(stream, "(BOOL: %u)", node->value);
+        return;
+    }
+
+    if (node->type == CHAR_N)
+    {
+        fputs("(CHAR: '", stream);
+
+        switch ((char)node->value)
+        {
+        case '\0':
+            fputs("\\0')", stream);
+            return;
+        case '\a':
+            fputs("\\a')", stream);
+            return;
+        case '\b':
+            fputs("\\b')", stream);
+            return;
+        case '\f':
+            fputs("\\f')", stream);
+            return;
+        case '\n':
+            fputs("\\n')", stream);
+            return;
+        case '\r':
+            fputs("\\r')", stream);
+            return;
+        case '\t':
+            fputs("\\t')", stream);
+            return;
+        case '\v':
+            fputs("\\v')", stream);
+            return;
+        default:
+            fprintf(stream, "%c')", node->value);
+            return;
+        }
+    }
+
+    if (node->type == STR_N)
+    {
+        str_np value = node->value;
+
+        fputs("(STR: \"", stream);
+
+        unsigned long long i;
+        for (i = 0; i < value->size; i++)
+            switch (value->value[i])
+            {
+            case '\0':
+                fputs("\\0", stream);
+                break;
+            case '\a':
+                fputs("\\a", stream);
+                break;
+            case '\b':
+                fputs("\\b", stream);
+                break;
+            case '\f':
+                fputs("\\f", stream);
+                break;
+            case '\n':
+                fputs("\\n", stream);
+                break;
+            case '\r':
+                fputs("\\r", stream);
+                break;
+            case '\t':
+                fputs("\\t", stream);
+                break;
+            case '\v':
+                fputs("\\v", stream);
+                break;
+            default:
+                putc(value->value[i], stream);
+                break;
+            }
+
+        fputs("\")", stream);
+        return;
+    }
+
+    if (node->type == TUPLE_N)
+    {
+        tuple_np value = node->value;
+
+        fputs("(TUPLE: {", stream);
+        node_p_print(stream, value->elements, value->size);
+        fputs("})", stream);
+        return;
+    }
+
+    if (node->type == TYPE_N)
+    {
+        fprintf(stream, "(TYPE: %s)", token_labels[(unsigned char)node->value]);
         return;
     }
 
@@ -73,6 +182,7 @@ void node_print(FILE* stream, node_p node)
         putc(')', stream);
         return;
     }
+
     if (node->type == TERNARY_CONDITION_N)
     {
         ternary_condition_np value = node->value;
@@ -87,6 +197,30 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == SUBSCRIPT_N)
+    {
+        subscript_np value = node->value;
+
+        fputs("(SUBSCRIPT: ", stream);
+        node_print(stream, &value->value);
+        fputs(", ", stream);
+        node_print(stream, &value->pos);
+        putc(')', stream);
+        return;
+    }
+
+    if (node->type == ACCESS_N)
+    {
+        access_np value = node->value;
+
+        fputs("(ACCESS: ", stream);
+        node_print(stream, &value->value);
+        fputs(", ", stream);
+        node_print(stream, &value->property);
+        putc(')', stream);
+        return;
+    }
+
     if (node->type == VAR_FIXED_ASSIGN_N)
     {
         var_fixed_assign_np value = node->value;
@@ -95,6 +229,56 @@ void node_print(FILE* stream, node_p node)
         node_print(stream, &value->var);
         putc(')', stream);
         return;
+    }
+
+    if (node->type == DOLLAR_FUNC_CALL_N)
+    {
+        dollar_func_call_np value = node->value;
+
+        fprintf(stream, "(DOLLAR_FUNC_CALL: %s, {", value->name);
+        node_p_print(stream, value->args, value->size);
+        fputs("})", stream);
+        return;
+    }
+
+    if (node->type == RETURN_N)
+    {
+        if (!node->value)
+        {
+            fputs("(RETURN)", stream);
+            return;
+        }
+
+        fputs("(RETURN: ", stream);
+        node_print(stream, &((return_np)node->value)->value);
+        putc(')', stream);
+        return;
+    }
+
+    if (node->type == CONTINUE_N)
+    {
+        fputs("(CONTINUE)", stream);
+        return;
+    }
+    if (node->type == BREAK_N)
+    {
+        fputs("(BREAK)", stream);
+        return;
+    }
+}
+
+void node_p_print(FILE* stream, node_p nodes, unsigned long long size)
+{
+    if (!size)
+        return;
+
+    node_print(stream, nodes);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fputs(", ", stream);
+        node_print(stream, nodes + i);
     }
 }
 

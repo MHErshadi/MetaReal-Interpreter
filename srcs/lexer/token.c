@@ -81,33 +81,33 @@ void token_print(FILE* stream, token_p token)
 
     if (token->type == CHAR_T)
     {
-        fprintf(stream, "(%s: '", token_labels[token->type]);
+        fputs("(CHAR: '", stream);
 
         switch (token->size)
         {
         case '\0':
-            fprintf(stream, "\\0')");
+            fputs("\\0')", stream);
             return;
         case '\a':
-            fprintf(stream, "\\a')");
+            fputs("\\a')", stream);
             return;
         case '\b':
-            fprintf(stream, "\\b')");
+            fputs("\\b')", stream);
             return;
         case '\f':
-            fprintf(stream, "\\f')");
+            fputs("\\f')", stream);
             return;
         case '\n':
-            fprintf(stream, "\\n')");
+            fputs("\\n')", stream);
             return;
         case '\r':
-            fprintf(stream, "\\r')");
+            fputs("\\r')", stream);
             return;
         case '\t':
-            fprintf(stream, "\\t')");
+            fputs("\\t')", stream);
             return;
         case '\v':
-            fprintf(stream, "\\v')");
+            fputs("\\v')", stream);
             return;
         default:
             fprintf(stream, "%c')", token->size);
@@ -117,43 +117,42 @@ void token_print(FILE* stream, token_p token)
 
     if (token->type == STR_T)
     {
-        fprintf(stream, "(%s: \"", token_labels[token->type]);
+        fputs("(STR: \"", stream);
 
-        unsigned long long i = 0;
-        while (token->value[i])
-        {
+        unsigned long long i;
+        for (i = 0; i < token->size; i++)
             switch (token->value[i])
             {
+            case '\0':
+                fputs("\\0", stream);
+                break;
             case '\a':
-                fprintf(stream, "\\a");
+                fputs("\\a", stream);
                 break;
             case '\b':
-                fprintf(stream, "\\b");
+                fputs("\\b", stream);
                 break;
             case '\f':
-                fprintf(stream, "\\f");
+                fputs("\\f", stream);
                 break;
             case '\n':
-                fprintf(stream, "\\n");
+                fputs("\\n", stream);
                 break;
             case '\r':
-                fprintf(stream, "\\r");
+                fputs("\\r", stream);
                 break;
             case '\t':
-                fprintf(stream, "\\t");
+                fputs("\\t", stream);
                 break;
             case '\v':
-                fprintf(stream, "\\v");
+                fputs("\\v", stream);
                 break;
             default:
                 putc(token->value[i], stream);
                 break;
             }
 
-            i++;
-        }
-
-        fprintf(stream, "\")");
+        fputs("\")", stream);
         return;
     }
 

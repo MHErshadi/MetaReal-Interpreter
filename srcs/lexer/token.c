@@ -47,7 +47,7 @@ const char* types[TYPES_COUNT] =
     "list", "tuple", "dict", "set"
 };
 
-token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_p poss, pos_p pose)
+token_t token_set1(unsigned char type, char* value, unsigned long long size, pos_p poss, pos_p pose)
 {
     token_t token;
 

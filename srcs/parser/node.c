@@ -7,20 +7,33 @@
 #include <lexer/token.h>
 
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
+void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size);
 
-node_t node_set1(unsigned char type, const void* value, pos_p poss, pos_p pose)
+node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
 {
     node_t node;
 
     node.type = type;
-    node.value = value;
+    node.value.ptr = value;
     node.poss = *poss;
     node.pose = *pose;
 
     return node;
 }
 
-node_t node_set2(unsigned char type, pos_p poss, pos_p pose)
+node_t node_set2(unsigned char type, unsigned char value, pos_p poss, pos_p pose)
+{
+    node_t node;
+
+    node.type = type;
+    node.value.chr = value;
+    node.poss = *poss;
+    node.pose = *pose;
+
+    return node;
+}
+
+node_t node_set3(unsigned char type, pos_p poss, pos_p pose)
 {
     node_t node;
 
@@ -47,23 +60,23 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == INT_N)
     {
-        fprintf(stream, "(INT: %s)", ((int_np)node->value)->value);
+        fprintf(stream, "(INT: %s)", ((int_np)node->value.ptr)->value);
         return;
     }
     if (node->type == FLOAT_N)
     {
-        fprintf(stream, "(FLOAT: %s)", ((float_np)node->value)->value);
+        fprintf(stream, "(FLOAT: %s)", ((float_np)node->value.ptr)->value);
         return;
     }
     if (node->type == COMPLEX_N)
     {
-        fprintf(stream, "(COMPLEX: %s)", ((complex_np)node->value)->value);
+        fprintf(stream, "(COMPLEX: %s)", ((complex_np)node->value.ptr)->value);
         return;
     }
 
     if (node->type == BOOL_N)
     {
-        fprintf(stream, "(BOOL: %u)", node->value);
+        fprintf(stream, "(BOOL: %u)", node->value.chr);
         return;
     }
 
@@ -71,7 +84,7 @@ void node_print(FILE* stream, node_p node)
     {
         fputs("(CHAR: '", stream);
 
-        switch ((char)node->value)
+        switch (node->value.chr)
         {
         case '\0':
             fputs("\\0')", stream);
@@ -98,14 +111,14 @@ void node_print(FILE* stream, node_p node)
             fputs("\\v')", stream);
             return;
         default:
-            fprintf(stream, "%c')", node->value);
+            fprintf(stream, "%c')", node->value.chr);
             return;
         }
     }
 
     if (node->type == STR_N)
     {
-        str_np value = node->value;
+        str_np value = node->value.ptr;
 
         fputs("(STR: \"", stream);
 
@@ -146,11 +159,49 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == LIST_N)
+    {
+        list_np value = node->value.ptr;
+
+        if (!node->value.ptr)
+        {
+            fputs("(LIST)", stream);
+            return;
+        }
+
+        fputs("(LIST: {", stream);
+        node_p_print(stream, value->elements, value->size);
+        fputs("})", stream);
+        return;
+    }
     if (node->type == TUPLE_N)
     {
-        tuple_np value = node->value;
+        tuple_np value = node->value.ptr;
 
         fputs("(TUPLE: {", stream);
+        node_p_print(stream, value->elements, value->size);
+        fputs("})", stream);
+        return;
+    }
+    if (node->type == DICT_N)
+    {
+        dict_np value = node->value.ptr;
+
+        if (!node->value.ptr)
+        {
+            fputs("(DICT)", stream);
+            return;
+        }
+
+        fputs("(DICT: {", stream);
+        pair_p_print(stream, value->elements, value->size);
+        fputs("})", stream);
+    }
+    if (node->type == SET_N)
+    {
+        set_np value = node->value.ptr;
+
+        fputs("(SET: {", stream);
         node_p_print(stream, value->elements, value->size);
         fputs("})", stream);
         return;
@@ -158,13 +209,13 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == TYPE_N)
     {
-        fprintf(stream, "(TYPE: %s)", token_labels[(unsigned char)node->value]);
+        fprintf(stream, "(TYPE: %s)", token_labels[node->value.chr]);
         return;
     }
 
     if (node->type == BINARY_OPERATION_N)
     {
-        binary_operation_np value = node->value;
+        binary_operation_np value = node->value.ptr;
 
         fprintf(stream, "(BINARY_OPERATION: %s, ", token_labels[value->operator]);
         node_print(stream, &value->left);
@@ -175,7 +226,7 @@ void node_print(FILE* stream, node_p node)
     }
     if (node->type == UNARY_OPERATION_N)
     {
-        unary_operation_np value = node->value;
+        unary_operation_np value = node->value.ptr;
 
         fprintf(stream, "(UNARY_OPERATION: %s, ", token_labels[value->operator]);
         node_print(stream, &value->operand);
@@ -185,7 +236,7 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == TERNARY_CONDITION_N)
     {
-        ternary_condition_np value = node->value;
+        ternary_condition_np value = node->value.ptr;
 
         fputs("(TERNARY_CONDITION: ", stream);
         node_print(stream, &value->condition);
@@ -199,7 +250,7 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == SUBSCRIPT_N)
     {
-        subscript_np value = node->value;
+        subscript_np value = node->value.ptr;
 
         fputs("(SUBSCRIPT: ", stream);
         node_print(stream, &value->value);
@@ -211,7 +262,7 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == ACCESS_N)
     {
-        access_np value = node->value;
+        access_np value = node->value.ptr;
 
         fputs("(ACCESS: ", stream);
         node_print(stream, &value->value);
@@ -223,25 +274,29 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == VAR_ASSIGN_N)
     {
-        var_assign_np value = node->value;
+        var_assign_np value = node->value.ptr;
 
-        fprintf(stream, "(VAR_ASSIGN: %u, %s, %s, ", value->properties, value->name, token_labels[value->type]);
+        fprintf(stream, "(VAR_ASSIGN: (#public=%u, #global=%u, #const=%u, #static=%u), %s, %s, ",
+            VAS_PUBLIC(value->properties), VAS_GLOBAL(value->properties), VAS_CONST(value->properties), VAS_STATIC(value->properties),
+            value->name, token_labels[value->type]);
         node_print(stream, &value->value);
         putc(')', stream);
         return;
     }
     if (node->type == VAR_FIXED_ASSIGN_N)
     {
-        var_fixed_assign_np value = node->value;
+        var_fixed_assign_np value = node->value.ptr;
 
-        fprintf(stream, "(VAR_FIXED_ASSIGN: %s, ", token_labels[value->operator]);
+        fprintf(stream, "(VAR_FIXED_ASSIGN: (#post=%u), %s, ",
+            VFA_POST(value->properties),
+            token_labels[value->operator]);
         node_print(stream, &value->var);
         putc(')', stream);
         return;
     }
     if (node->type == VAR_REASSIGN_N)
     {
-        var_reassign_np value = node->value;
+        var_reassign_np value = node->value.ptr;
 
         fprintf(stream, "(VAR_REASSIGN: %s, ", token_labels[value->operator]);
         node_print(stream, &value->var);
@@ -258,7 +313,7 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == DOLLAR_FUNC_CALL_N)
     {
-        dollar_func_call_np value = node->value;
+        dollar_func_call_np value = node->value.ptr;
 
         fprintf(stream, "(DOLLAR_FUNC_CALL: %s, {", value->name);
         node_p_print(stream, value->args, value->size);
@@ -268,14 +323,14 @@ void node_print(FILE* stream, node_p node)
 
     if (node->type == RETURN_N)
     {
-        if (!node->value)
+        if (!node->value.ptr)
         {
             fputs("(RETURN)", stream);
             return;
         }
 
         fputs("(RETURN: ", stream);
-        node_print(stream, &((return_np)node->value)->value);
+        node_print(stream, &((return_np)node->value.ptr)->value);
         putc(')', stream);
         return;
     }
@@ -290,31 +345,6 @@ void node_print(FILE* stream, node_p node)
         fputs("(BREAK)", stream);
         return;
     }
-}
-
-void node_p_print(FILE* stream, node_p nodes, unsigned long long size)
-{
-    if (!size)
-        return;
-
-    node_print(stream, nodes);
-
-    unsigned long long i;
-    for (i = 1; i < size; i++)
-    {
-        fputs(", ", stream);
-        node_print(stream, nodes + i);
-    }
-}
-
-pair_t pair_set(node_p key, node_p value)
-{
-    pair_t pair;
-
-    pair.key = *key;
-    pair.value = *value;
-
-    return pair;
 }
 
 arg_t arg_set(const char* name, unsigned char type, node_p value)
@@ -693,4 +723,35 @@ return_np return_n_set(node_p value)
     return_n->value = *value;
 
     return return_n;
+}
+
+void node_p_print(FILE* stream, node_p nodes, unsigned long long size)
+{
+    if (!size)
+        return;
+
+    node_print(stream, nodes);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fputs(", ", stream);
+        node_print(stream, nodes + i);
+    }
+}
+
+void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size)
+{
+    node_print(stream, &pairs->key);
+    fputs(": ", stream);
+    node_print(stream, &pairs->value);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fputs(", ", stream);
+        node_print(stream, &pairs[i].key);
+        fputs(": ", stream);
+        node_print(stream, &pairs[i].value);
+    }
 }

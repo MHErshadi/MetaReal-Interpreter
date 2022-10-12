@@ -97,10 +97,17 @@ enum _node_types_
     BREAK_N
 };
 
+union __node_value__
+{
+    void* ptr;
+    unsigned char chr;
+};
+typedef union __node_value__ node_value_t;
+
 struct __node__
 {
     unsigned char type;
-    const void* value;
+    node_value_t value;
 
     pos_t poss;
     pos_t pose;
@@ -455,12 +462,11 @@ struct __return_n__
 typedef struct __return_n__ return_nt;
 typedef struct __return_n__* return_np;
 
-node_t node_set1(unsigned char type, const void* value, pos_p poss, pos_p pose);
-node_t node_set2(unsigned char type, pos_p poss, pos_p pose);
+node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose);
+node_t node_set2(unsigned char type, unsigned char value, pos_p poss, pos_p pose);
+node_t node_set3(unsigned char type, pos_p poss, pos_p pose);
 
 void node_print(FILE* stream, node_p node);
-
-pair_t pair_set(node_p key, node_p value);
 
 arg_t arg_set(const char* name, unsigned char type, node_p value);
 

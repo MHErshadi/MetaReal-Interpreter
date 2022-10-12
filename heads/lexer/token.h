@@ -12,7 +12,7 @@ struct __token__
 {
     unsigned long long type;
 
-    const char* value;
+    char* value;
     unsigned long long size;
 
     pos_t poss;
@@ -268,7 +268,7 @@ static const char* token_labels[110] =
     "LIST_T", "TUPLE_T", "DICT_T", "SET_T"
 };
 
-token_t token_set1(unsigned char type, const char* value, unsigned long long size, pos_p poss, pos_p pose);
+token_t token_set1(unsigned char type, char* value, unsigned long long size, pos_p poss, pos_p pose);
 token_t token_set2(unsigned char type, pos_p poss, pos_p pose);
 
 void token_print(FILE* stream, token_p token);

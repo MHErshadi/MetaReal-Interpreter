@@ -8,7 +8,7 @@
 
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
 
-node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
+node_t node_set1(unsigned char type, const void* value, pos_p poss, pos_p pose)
 {
     node_t node;
 
@@ -221,6 +221,15 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == VAR_ASSIGN_N)
+    {
+        var_assign_np value = node->value;
+
+        fprintf(stream, "(VAR_ASSIGN: %u, %s, %s, ", value->properties, value->name, token_labels[value->type]);
+        node_print(stream, &value->value);
+        putc(')', stream);
+        return;
+    }
     if (node->type == VAR_FIXED_ASSIGN_N)
     {
         var_fixed_assign_np value = node->value;
@@ -228,6 +237,22 @@ void node_print(FILE* stream, node_p node)
         fprintf(stream, "(VAR_FIXED_ASSIGN: %s, ", token_labels[value->operator]);
         node_print(stream, &value->var);
         putc(')', stream);
+        return;
+    }
+    if (node->type == VAR_REASSIGN_N)
+    {
+        var_reassign_np value = node->value;
+
+        fprintf(stream, "(VAR_REASSIGN: %s, ", token_labels[value->operator]);
+        node_print(stream, &value->var);
+        fputs(", ", stream);
+        node_print(stream, &value->value);
+        putc(')', stream);
+        return;
+    }
+    if (node->type == VAR_ACCESS_N)
+    {
+        fprintf(stream, "(VAR_ACCESS: %s)", node->value);
         return;
     }
 

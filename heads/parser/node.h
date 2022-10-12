@@ -8,7 +8,14 @@
 #include <debugger/pos.h>
 #include <stdio.h>
 
+#define VAS_PROP(public, global, const, static) 0b ## static ## const ## global ## public
+#define VAS_PUBLIC(x) (x & 1)
+#define VAS_GLOBAL(x) (x >> 1 & 1)
+#define VAS_CONST(x)  (x >> 1 & 2)
+#define VAS_STATIC(x) (x >> 1 & 3)
+
 #define VFA_PROP(post) 0b ## post
+#define VFA_POST(x) (x & 1)
 
 enum _node_types_
 {
@@ -93,7 +100,7 @@ enum _node_types_
 struct __node__
 {
     unsigned char type;
-    void* value;
+    const void* value;
 
     pos_t poss;
     pos_t pose;
@@ -448,7 +455,7 @@ struct __return_n__
 typedef struct __return_n__ return_nt;
 typedef struct __return_n__* return_np;
 
-node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose);
+node_t node_set1(unsigned char type, const void* value, pos_p poss, pos_p pose);
 node_t node_set2(unsigned char type, pos_p poss, pos_p pose);
 
 void node_print(FILE* stream, node_p node);

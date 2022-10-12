@@ -34,6 +34,10 @@ token_p exponent(pres_p pres, token_p tokens);    // **
 token_p post(pres_p pres, token_p tokens);        // array-subscripting access ++(post) --(post) function-call
 token_p core(pres_p pres, token_p tokens);        // types statements
 
+token_p var_parse(pres_p pres, token_p tokens);
+
+token_p properties_gen(char* properties, pres_p pres, token_p tokens);
+
 pres_t parse(token_p tokens)
 {
     pres_t pres;
@@ -266,7 +270,31 @@ token_p tuple(pres_p pres, token_p tokens)
 
 token_p assign(pres_p pres, token_p tokens)
 {
-    return ternary(pres, tokens);
+    if (tokens->type == VAR_TK)
+        return var_parse(pres, tokens);
+
+    tokens = ternary(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    if (tokens->type >= ASSIGN_T && tokens->type <= RSHIFT_EQ_T)
+    {
+        unsigned char operator = tokens++->type;
+
+        advance_newline(tokens);
+
+        node_t var = *pres->nodes;
+
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        var_reassign_np node = var_reassign_n_set(operator, &var, pres->nodes);
+        *pres->nodes = node_set1(VAR_REASSIGN_N, node, &var.poss, &pres->nodes->pose);
+        return tokens;
+    }
+
+    return tokens;
 }
 
 token_p ternary(pres_p pres, token_p tokens)
@@ -936,7 +964,131 @@ token_p core(pres_p pres, token_p tokens)
         return tokens;
     }
 
+    if (tokens->type == IDENTIFIER_T)
+    {
+        *pres->nodes = node_set1(VAR_ACCESS_N, tokens->value, &tokens->poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+
     invalid_syntax_t error = invalid_syntax_set(NULL, &tokens->poss, &tokens->pose);
     pres_fail(pres, &error);
+    return tokens;
+}
+
+token_p var_parse(pres_p pres, token_p tokens)
+{
+    pos_p poss = &tokens++->poss;
+
+    advance_newline(tokens);
+
+    char properties = 0;
+    tokens = properties_gen(&properties, pres, tokens);
+
+    unsigned char type = 0;
+    if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
+    {
+        type = tokens++->type;
+
+        advance_newline(tokens);
+    }
+
+    if (tokens->type != IDENTIFIER_T)
+    {
+        invalid_syntax_t error = invalid_syntax_set("Expected identifier", &tokens->poss, &tokens->pose);
+        pres_fail(pres, &error);
+        return tokens;
+    }
+
+    const char* name = tokens++->value;
+
+    advance_newline(tokens);
+
+    if (tokens->type != ASSIGN_T)
+    {
+        invalid_syntax_t error = invalid_syntax_set("Expected '='", &tokens->poss, &tokens->pose);
+        pres_fail(pres, &error);
+        return tokens;
+    }
+
+    tokens++;
+    advance_newline(tokens);
+
+    tokens = tuple(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    var_assign_np node = var_assign_n_set(properties, name, type, pres->nodes);
+    *pres->nodes = node_set1(VAR_ASSIGN_N, node, poss, &pres->nodes->pose);
+    return tokens;
+}
+
+token_p properties_gen(char* properties, pres_p pres, token_p tokens)
+{
+    char public = 0;
+    char global = 0;
+
+    while (1)
+    {
+        if (!public && tokens->type == PUBLIC_TK)
+        {
+            public = 1;
+            *properties |= 1;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+        if (!public && tokens->type == PRIVATE_TK)
+        {
+            public = 1;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+
+        if (!global && tokens->type == GLOBAL_TK)
+        {
+            global = 1;
+            *properties |= 2;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+        if (!global && tokens->type == LOCAL_TK)
+        {
+            global = 1;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+
+        if (!VAS_CONST(*properties) && tokens->type == CONST_TK)
+        {
+            *properties |= 4;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+
+        if (!VAS_STATIC(*properties) && tokens->type == STATIC_TK)
+        {
+            *properties |= 8;
+
+            tokens++;
+            advance_newline(tokens);
+            continue;
+        }
+
+        break;
+    }
+
     return tokens;
 }

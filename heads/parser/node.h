@@ -8,14 +8,13 @@
 #include <debugger/pos.h>
 #include <stdio.h>
 
-#define VAS_PROP(public, global, const, static) 0b ## static ## const ## global ## public
-#define VAS_PUBLIC(x) (x & 1)
-#define VAS_GLOBAL(x) (x >> 1 & 1)
-#define VAS_CONST(x)  (x >> 1 & 2)
-#define VAS_STATIC(x) (x >> 1 & 3)
+#define PROP_PUBLIC(x) (x & 1)
+#define PROP_GLOBAL(x) (x >> 1 & 1)
+#define PROP_CONST(x)  (x >> 2 & 1)
+#define PROP_STATIC(x) (x >> 3 & 1)
 
 #define VFA_PROP(post) 0b ## post
-#define VFA_POST(x) (x & 1)
+#define PROP_POST(x) (x & 1)
 
 enum _node_types_
 {

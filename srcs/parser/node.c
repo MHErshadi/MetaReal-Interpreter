@@ -8,6 +8,7 @@
 
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
 void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size);
+void arg_p_print(FILE* stream, arg_p args, unsigned long long size);
 
 node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
 {
@@ -277,7 +278,7 @@ void node_print(FILE* stream, node_p node)
         var_assign_np value = node->value.ptr;
 
         fprintf(stream, "(VAR_ASSIGN: (#public=%u, #global=%u, #const=%u, #static=%u), %s, %s, ",
-            VAS_PUBLIC(value->properties), VAS_GLOBAL(value->properties), VAS_CONST(value->properties), VAS_STATIC(value->properties),
+            PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
             value->name, token_labels[value->type]);
         node_print(stream, &value->value);
         putc(')', stream);
@@ -288,7 +289,7 @@ void node_print(FILE* stream, node_p node)
         var_fixed_assign_np value = node->value.ptr;
 
         fprintf(stream, "(VAR_FIXED_ASSIGN: (#post=%u), %s, ",
-            VFA_POST(value->properties),
+            PROP_POST(value->properties),
             token_labels[value->operator]);
         node_print(stream, &value->var);
         putc(')', stream);
@@ -308,6 +309,20 @@ void node_print(FILE* stream, node_p node)
     if (node->type == VAR_ACCESS_N)
     {
         fprintf(stream, "(VAR_ACCESS: %s)", node->value);
+        return;
+    }
+
+    if (node->type == FUNC_DEF_N)
+    {
+        func_def_np value = node->value.ptr;
+
+        fprintf(stream, "(FUNC_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, %s, {",
+            PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
+            value->name, token_labels[value->type]);
+        arg_p_print(stream, value->args, value->size);
+        fputs("}, {", stream);
+        node_p_print(stream, value->body.nodes, value->body.size);
+        fputs("})", stream);
         return;
     }
 
@@ -753,5 +768,23 @@ void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size)
         node_print(stream, &pairs[i].key);
         fputs(": ", stream);
         node_print(stream, &pairs[i].value);
+    }
+}
+
+void arg_p_print(FILE* stream, arg_p args, unsigned long long size)
+{
+    if (!size)
+        return;
+
+    fprintf(stream, "(%s, %s, ", args->name, token_labels[args->type]);
+    node_print(stream, &args->value);
+    putc(')', stream);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fprintf(stream, ", (%s, %s, ", args[i].name, token_labels[args[i].type]);
+        node_print(stream, &args[i].value);
+        putc(')', stream);
     }
 }

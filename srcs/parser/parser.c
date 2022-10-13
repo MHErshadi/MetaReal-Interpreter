@@ -38,8 +38,10 @@ token_p list_parse(pres_p pres, token_p tokens);
 token_p dict_parse(pres_p pres, token_p tokens);
 token_p set_parse(pres_p pres, token_p tokens, pos_p poss);
 token_p var_parse(pres_p pres, token_p tokens);
+token_p func_def_parse(pres_p pres, token_p tokens);
 
 token_p properties_gen(char* properties, pres_p pres, token_p tokens);
+token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens);
 
 pres_t parse(token_p tokens)
 {
@@ -116,7 +118,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
             return tokens;
         }
 
-        const char* name = tokens->value;
+        char* name = tokens->value;
 
         pos_p pose = &tokens++->pose;
 
@@ -983,6 +985,9 @@ token_p core(pres_p pres, token_p tokens)
         return tokens;
     }
 
+    if (tokens->type == FUNC_TK)
+        return func_def_parse(pres, tokens);
+
     invalid_syntax_t error = invalid_syntax_set(NULL, &tokens->poss, &tokens->pose);
     pres_fail(pres, &error);
     return tokens;
@@ -1232,7 +1237,7 @@ token_p var_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    const char* name = tokens++->value;
+    char* name = tokens++->value;
 
     advance_newline(tokens);
 
@@ -1252,6 +1257,166 @@ token_p var_parse(pres_p pres, token_p tokens)
 
     var_assign_np node = var_assign_n_set(properties, name, type, pres->nodes);
     *pres->nodes = node_set1(VAR_ASSIGN_N, node, poss, &pres->nodes->pose);
+    return tokens;
+}
+
+token_p func_def_parse(pres_p pres, token_p tokens)
+{
+    pos_p poss = &tokens++->poss;
+
+    advance_newline(tokens);
+
+    char properties = 0;
+    tokens = properties_gen(&properties, pres, tokens);
+
+    unsigned char type = 0;
+    if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
+    {
+        type = tokens++->type;
+
+        advance_newline(tokens);
+    }
+
+    char* name = NULL;
+    if (tokens->type == IDENTIFIER_T)
+    {
+        name = tokens++->value;
+
+        advance_newline(tokens);
+    }
+
+    if (tokens->type != LPAREN_T)
+    {
+        invalid_syntax_t error = invalid_syntax_set("Expected '('", &tokens->poss, &tokens->pose);
+        pres_fail(pres, &error);
+        return tokens;
+    }
+
+    tokens++;
+    advance_newline(tokens);
+
+    arg_p args;
+
+    unsigned long long size = 0;
+
+    if (tokens->type != RPAREN_T)
+    {
+        args = heap_alloc(&memory.heap, FUNC_DEF_SIZE * sizeof(arg_t));
+
+        unsigned long long alloc = FUNC_DEF_SIZE;
+
+        do
+        {
+            if (size == alloc)
+                args = heap_expand(&memory.heap, args, size * sizeof(arg_t), (alloc += FUNC_DEF_SIZE) * sizeof(arg_t));
+
+            if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
+            {
+                args[size].type = tokens++->type;
+
+                advance_newline(tokens);
+            }
+            else
+                args[size].type = 0;
+
+            if (tokens->type != IDENTIFIER_T)
+            {
+                invalid_syntax_t error = invalid_syntax_set("Expected identifier", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+
+            args[size].name = tokens++->value;
+
+            advance_newline(tokens);
+
+            if (tokens->type == ASSIGN_T)
+            {
+                tokens++;
+                advance_newline(tokens);
+
+                tokens = assign(pres, tokens);
+                if (pres->has_error)
+                    return tokens;
+
+                args[size++].value = *pres->nodes;
+            }
+            else
+                args[size++].value.type = NONE_N;
+
+            if (tokens->type != COMMA_T)
+                break;
+
+            tokens++;
+            advance_newline(tokens);
+        } while (1);
+
+        if (tokens->type != RPAREN_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        if (size != alloc)
+            heap_shrink(&memory.heap, args, alloc * sizeof(arg_t), size * sizeof(arg_t));
+    }
+
+    tokens++;
+    advance_newline(tokens);
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens++;
+        advance_newline(tokens);
+
+        if (tokens->type == RCURLY_T)
+            body.size = 0;
+        else
+        {
+            tokens = body_gen(&body, FUNC_DEF_BODY_SIZE, pres, tokens);
+            if (pres->has_error)
+                return tokens;
+
+            if (tokens->type != RCURLY_T)
+            {
+                invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    func_def_np node = func_def_n_set(properties, name, args, size, type, &body);
+    *pres->nodes = node_set1(FUNC_DEF_N, node, poss, pose);
     return tokens;
 }
 
@@ -1298,7 +1463,7 @@ token_p properties_gen(char* properties, pres_p pres, token_p tokens)
             continue;
         }
 
-        if (!VAS_CONST(*properties) && tokens->type == CONST_TK)
+        if (!PROP_CONST(*properties) && tokens->type == CONST_TK)
         {
             *properties |= 4;
 
@@ -1307,7 +1472,7 @@ token_p properties_gen(char* properties, pres_p pres, token_p tokens)
             continue;
         }
 
-        if (!VAS_STATIC(*properties) && tokens->type == STATIC_TK)
+        if (!PROP_STATIC(*properties) && tokens->type == STATIC_TK)
         {
             *properties |= 8;
 
@@ -1318,6 +1483,32 @@ token_p properties_gen(char* properties, pres_p pres, token_p tokens)
 
         break;
     }
+
+    return tokens;
+}
+
+token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens)
+{
+    body->nodes = heap_alloc(&memory.heap, size * sizeof(node_t));
+
+    unsigned long long alloc = size;
+    body->size = 0;
+
+    do
+    {
+        for (; tokens->type == NEWLINE_T || tokens->type == SEMICOLON_T; tokens++);
+        if (tokens->type == RCURLY_T || tokens->type == EOF_T)
+            break;
+
+        if (body->size == alloc)
+            body->nodes = heap_expand(&memory.heap, body->nodes, body->size * sizeof(node_t), (alloc += size) * sizeof(node_t));
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body->nodes[body->size++] = *pres->nodes;
+    } while ((tokens - 1)->type == NEWLINE_T || tokens->type == SEMICOLON_T);
 
     return tokens;
 }

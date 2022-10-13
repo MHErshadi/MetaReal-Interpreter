@@ -9,6 +9,7 @@
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
 void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size);
 void arg_p_print(FILE* stream, arg_p args, unsigned long long size);
+void arg_access_p_print(FILE* stream, arg_access_p args, unsigned long long size);
 
 node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
 {
@@ -325,6 +326,17 @@ void node_print(FILE* stream, node_p node)
         fputs("})", stream);
         return;
     }
+    if (node->type == FUNC_CALL_N)
+    {
+        func_call_np value = node->value.ptr;
+
+        fputs("(FUNC_CALL: ", stream);
+        node_print(stream, &value->func);
+        fputs(", {", stream);
+        arg_access_p_print(stream, value->args, value->size);
+        fputs("})", stream);
+        return;
+    }
 
     if (node->type == DOLLAR_FUNC_CALL_N)
     {
@@ -362,17 +374,6 @@ void node_print(FILE* stream, node_p node)
     }
 }
 
-arg_t arg_set(const char* name, unsigned char type, node_p value)
-{
-    arg_t arg;
-
-    arg.name = name;
-    arg.type = type;
-    arg.value = *value;
-
-    return arg;
-}
-
 body_t body_set(node_p node)
 {
     body_t body;
@@ -382,26 +383,6 @@ body_t body_set(node_p node)
     body.size = 1;
 
     return body;
-}
-
-arg_access_t arg_access_set(const char* name, node_p value)
-{
-    arg_access_t arg_access;
-
-    arg_access.name = name;
-    arg_access.value = *value;
-
-    return arg_access;
-}
-
-case_t case_set(node_p condition, body_p body)
-{
-    case_t case_;
-
-    case_.condition = *condition;
-    case_.body = *body;
-
-    return case_;
 }
 
 int_np int_n_set(const char* value, unsigned long long size)
@@ -784,6 +765,24 @@ void arg_p_print(FILE* stream, arg_p args, unsigned long long size)
     for (i = 1; i < size; i++)
     {
         fprintf(stream, ", (%s, %s, ", args[i].name, token_labels[args[i].type]);
+        node_print(stream, &args[i].value);
+        putc(')', stream);
+    }
+}
+
+void arg_access_p_print(FILE* stream, arg_access_p args, unsigned long long size)
+{
+    if (!size)
+        return;
+
+    fprintf(stream, "(%s, ", args->name);
+    node_print(stream, &args->value);
+    putc(')', stream);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fprintf(stream, ", (%s, ", args[i].name);
         node_print(stream, &args[i].value);
         putc(')', stream);
     }

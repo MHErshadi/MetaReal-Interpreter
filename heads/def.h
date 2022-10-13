@@ -29,7 +29,9 @@
 #define SET_SIZE 8
 
 #define FUNC_DEF_SIZE 4
-#define FUNC_DEF_BODY_SIZE 4
+#define FUNC_DEF_BODY_SIZE 16
+
+#define FUNC_CALL_SIZE 4
 
 #define DOLLAR_FUNC_ARGS_SIZE 4
 

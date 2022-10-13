@@ -845,6 +845,76 @@ check:
         tokens++;
         advance_newline(tokens);
 
+        node_t func = *pres->nodes;
+
+        if (tokens->type == RPAREN_T)
+        {
+            func_call_np node = func_call_n_set(&func, NULL, 0);
+            *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
+        }
+        else
+        {
+            arg_access_p args = heap_alloc(&memory.heap, FUNC_CALL_SIZE * sizeof(arg_access_t));
+
+            unsigned long long alloc = FUNC_CALL_SIZE;
+            unsigned long long size = 0;
+
+            do
+            {
+                if (size == alloc)
+                    args = heap_expand(&memory.heap, args, size * sizeof(arg_access_t), (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
+
+                if (tokens->type == IDENTIFIER_T)
+                {
+                    if ((tokens + 1)->type == COLON_T)
+                    {
+                        args[size].name = tokens++->value;
+
+                        tokens++;
+                        advance_newline(tokens);
+                    }
+                    else if ((tokens + 1)->type == NEWLINE_T && (tokens + 2)->type == COLON_T)
+                    {
+                        args[size].name = tokens++->value;
+
+                        tokens += 2;
+                        advance_newline(tokens);
+                    }
+                    else
+                        args[size].name = NULL;
+                }
+                else
+                    args[size].name = NULL;
+
+                tokens = assign(pres, tokens);
+                if (pres->has_error)
+                    return tokens;
+
+                args[size++].value = *pres->nodes;
+
+                if (tokens->type != COMMA_T)
+                    break;
+
+                tokens++;
+                advance_newline(tokens);
+            } while (1);
+
+            if (tokens->type != RPAREN_T)
+            {
+                invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+
+            if (size != alloc)
+                heap_shrink(&memory.heap, args, alloc * sizeof(arg_access_t), size * sizeof(arg_access_t));
+
+            func_call_np node = func_call_n_set(&func, args, size);
+            *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
+        }
+
+        advance_newline(tokens);
+
         goto check;
     }
 

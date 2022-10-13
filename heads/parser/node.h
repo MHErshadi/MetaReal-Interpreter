@@ -467,13 +467,7 @@ node_t node_set3(unsigned char type, pos_p poss, pos_p pose);
 
 void node_print(FILE* stream, node_p node);
 
-arg_t arg_set(const char* name, unsigned char type, node_p value);
-
 body_t body_set(node_p node);
-
-arg_access_t arg_access_set(const char* name, node_p value);
-
-case_t case_set(node_p condition, body_p body);
 
 /* */
 

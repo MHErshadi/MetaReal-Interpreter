@@ -6,10 +6,13 @@
 #include <memory.h>
 #include <lexer/token.h>
 
+void body_print(FILE* stream, body_p body);
+
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size);
 void pair_p_print(FILE* stream, pair_p pairs, unsigned long long size);
 void arg_p_print(FILE* stream, arg_p args, unsigned long long size);
 void arg_access_p_print(FILE* stream, arg_access_p args, unsigned long long size);
+void case_p_print(FILE* stream, case_p cases, unsigned long long size);
 
 node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose)
 {
@@ -321,9 +324,9 @@ void node_print(FILE* stream, node_p node)
             PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
             value->name, token_labels[value->type]);
         arg_p_print(stream, value->args, value->size);
-        fputs("}, {", stream);
-        node_p_print(stream, value->body.nodes, value->body.size);
-        fputs("})", stream);
+        fputs("}, ", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
         return;
     }
     if (node->type == FUNC_CALL_N)
@@ -342,11 +345,11 @@ void node_print(FILE* stream, node_p node)
     {
         class_def_np value = node->value.ptr;
 
-        fprintf(stream, "(CLASS_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, {",
+        fprintf(stream, "(CLASS_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, ",
             PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
             value->name);
-        node_p_print(stream, value->body.nodes, value->body.size);
-        fputs("})", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
         return;
     }
 
@@ -354,11 +357,11 @@ void node_print(FILE* stream, node_p node)
     {
         struct_def_np value = node->value.ptr;
 
-        fprintf(stream, "(STRUCT_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, {",
+        fprintf(stream, "(STRUCT_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, ",
             PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
             value->name);
-        node_p_print(stream, value->body.nodes, value->body.size);
-        fputs("})", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
         return;
     }
 
@@ -369,6 +372,42 @@ void node_print(FILE* stream, node_p node)
         fprintf(stream, "(DOLLAR_FUNC_CALL: %s, {", value->name);
         node_p_print(stream, value->args, value->size);
         fputs("})", stream);
+        return;
+    }
+
+    if (node->type == IF_N)
+    {
+        if_np value = node->value.ptr;
+
+        fputs("(IF: {", stream);
+        case_p_print(stream, value->cases, value->size);
+        fputs("}, ", stream);
+        body_print(stream, &value->ebody);
+        fputc(')', stream);
+        return;
+    }
+    if (node->type == SWITCH_N)
+    {
+        switch_np value = node->value.ptr;
+
+        fputs("(SWITCH: ", stream);
+        node_print(stream, &value->value);
+        fputs(", {", stream);
+        case_p_print(stream, value->cases, value->size);
+        fputs("}, ", stream);
+        body_print(stream, &value->dbody);
+        fputc(')', stream);
+        return;
+    }
+
+    if (node->type == IMPORT_N)
+    {
+        fprintf(stream, "(IMPORT: %s)", node->value);
+        return;
+    }
+    if (node->type == INCLUDE_N)
+    {
+        fprintf(stream, "(INCLUDE: %s)", node->value);
         return;
     }
 
@@ -733,6 +772,13 @@ return_np return_n_set(node_p value)
     return return_n;
 }
 
+void body_print(FILE* stream, body_p body)
+{
+    fputc('{', stream);
+    node_p_print(stream, body->nodes, body->size);
+    fputc('}', stream);
+}
+
 void node_p_print(FILE* stream, node_p nodes, unsigned long long size)
 {
     if (!size)
@@ -797,5 +843,27 @@ void arg_access_p_print(FILE* stream, arg_access_p args, unsigned long long size
         fprintf(stream, ", (%s, ", args[i].name);
         node_print(stream, &args[i].value);
         putc(')', stream);
+    }
+}
+
+void case_p_print(FILE* stream, case_p cases, unsigned long long size)
+{
+    if (!size)
+        return;
+
+    fputc('(', stream);
+    node_print(stream, &cases->condition);
+    fputs(", ", stream);
+    body_print(stream, &cases->body);
+    fputc(')', stream);
+
+    unsigned long long i;
+    for (i = 1; i < size; i++)
+    {
+        fputs(", (", stream);
+        node_print(stream, &cases[i].condition);
+        fputs(", ", stream);
+        body_print(stream, &cases[i].body);
+        fputc(')', stream);
     }
 }

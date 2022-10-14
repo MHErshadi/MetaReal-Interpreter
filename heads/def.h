@@ -37,6 +37,12 @@
 
 #define FUNC_CALL_SIZE 4
 
+#define IF_CASE_SIZE 4
+#define IF_BODY_SIZE 16
+
+#define SWITCH_CASE_SIZE 8
+#define SWITCH_BODY_SIZE 4
+
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
 #endif /* __M_DEF__ */

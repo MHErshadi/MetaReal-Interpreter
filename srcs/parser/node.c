@@ -338,6 +338,30 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == CLASS_DEF_N)
+    {
+        class_def_np value = node->value.ptr;
+
+        fprintf(stream, "(CLASS_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, {",
+            PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
+            value->name);
+        node_p_print(stream, value->body.nodes, value->body.size);
+        fputs("})", stream);
+        return;
+    }
+
+    if (node->type == STRUCT_DEF_N)
+    {
+        struct_def_np value = node->value.ptr;
+
+        fprintf(stream, "(STRUCT_DEF: (#public=%u, #global=%u, #const=%u, #static=%u), %s, {",
+            PROP_PUBLIC(value->properties), PROP_GLOBAL(value->properties), PROP_CONST(value->properties), PROP_STATIC(value->properties),
+            value->name);
+        node_p_print(stream, value->body.nodes, value->body.size);
+        fputs("})", stream);
+        return;
+    }
+
     if (node->type == DOLLAR_FUNC_CALL_N)
     {
         dollar_func_call_np value = node->value.ptr;
@@ -385,7 +409,7 @@ body_t body_set(node_p node)
     return body;
 }
 
-int_np int_n_set(const char* value, unsigned long long size)
+int_np int_n_set(char* value, unsigned long long size)
 {
     int_np int_n = stack_alloc(&memory.stack, sizeof(int_nt));
 
@@ -395,7 +419,7 @@ int_np int_n_set(const char* value, unsigned long long size)
     return int_n;
 }
 
-float_np float_n_set(const char* value, unsigned long long size)
+float_np float_n_set(char* value, unsigned long long size)
 {
     float_np float_n = stack_alloc(&memory.stack, sizeof(float_nt));
 
@@ -405,7 +429,7 @@ float_np float_n_set(const char* value, unsigned long long size)
     return float_n;
 }
 
-complex_np complex_n_set(const char* value, unsigned long long size)
+complex_np complex_n_set(char* value, unsigned long long size)
 {
     complex_np complex_n = stack_alloc(&memory.stack, sizeof(complex_nt));
 
@@ -415,7 +439,7 @@ complex_np complex_n_set(const char* value, unsigned long long size)
     return complex_n;
 }
 
-str_np str_n_set(const char* value, unsigned long long size)
+str_np str_n_set(char* value, unsigned long long size)
 {
     str_np str_n = stack_alloc(&memory.stack, sizeof(str_nt));
 
@@ -517,7 +541,7 @@ access_np access_n_set(node_p value, node_p property)
     return access_n;
 }
 
-var_assign_np var_assign_n_set(char properties, const char* name, unsigned char type, node_p value)
+var_assign_np var_assign_n_set(char properties, char* name, unsigned char type, node_p value)
 {
     var_assign_np var_assign_n = stack_alloc(&memory.stack, sizeof(var_assign_nt));
 
@@ -551,7 +575,7 @@ var_reassign_np var_reassign_n_set(unsigned char operator, node_p var, node_p va
     return var_reassign_n;
 }
 
-func_def_np func_def_n_set(char properties, const char* name, arg_p args, unsigned long long size, unsigned char type, body_p body)
+func_def_np func_def_n_set(char properties, char* name, arg_p args, unsigned long long size, unsigned char type, body_p body)
 {
     func_def_np func_def_n = stack_alloc(&memory.stack, sizeof(func_def_nt));
 
@@ -576,7 +600,7 @@ func_call_np func_call_n_set(node_p func, arg_access_p args, unsigned long long 
     return func_call_n;
 }
 
-class_def_np class_def_n_set(char properties, const char* name, body_p body)
+class_def_np class_def_n_set(char properties, char* name, body_p body)
 {
     class_def_np class_def_n = stack_alloc(&memory.stack, sizeof(class_def_nt));
 
@@ -587,7 +611,7 @@ class_def_np class_def_n_set(char properties, const char* name, body_p body)
     return class_def_n;
 }
 
-struct_def_np struct_def_n_set(char properties, const char* name, body_p body)
+struct_def_np struct_def_n_set(char properties, char* name, body_p body)
 {
     struct_def_np struct_def_n = stack_alloc(&memory.stack, sizeof(struct_def_nt));
 
@@ -598,19 +622,7 @@ struct_def_np struct_def_n_set(char properties, const char* name, body_p body)
     return struct_def_n;
 }
 
-enum_def_np enum_def_n_set(char properties, const char* name, const char** elements, unsigned long long size)
-{
-    enum_def_np enum_def_n = stack_alloc(&memory.stack, sizeof(enum_def_nt));
-
-    enum_def_n->properties = properties;
-    enum_def_n->name = name;
-    enum_def_n->elements = elements;
-    enum_def_n->size = size;
-
-    return enum_def_n;
-}
-
-dollar_func_call_np dollar_func_call_n_set(const char* name, node_p args, unsigned long long size)
+dollar_func_call_np dollar_func_call_n_set(char* name, node_p args, unsigned long long size)
 {
     dollar_func_call_np dollar_func_call_n = stack_alloc(&memory.stack, sizeof(dollar_func_call_nt));
 
@@ -644,7 +656,7 @@ switch_np switch_n_set(node_p value, case_p cases, unsigned long long size, body
     return switch_n;
 }
 
-for_np for_n_set(const char* iterator, node_p start, node_p end, node_p step, body_p body)
+for_np for_n_set(char* iterator, node_p start, node_p end, node_p step, body_p body)
 {
     for_np for_n = stack_alloc(&memory.stack, sizeof(for_nt));
 
@@ -657,7 +669,7 @@ for_np for_n_set(const char* iterator, node_p start, node_p end, node_p step, bo
     return for_n;
 }
 
-foreach_np foreach_n_set(const char* iterator, node_p iterable, body_p body)
+foreach_np foreach_n_set(char* iterator, node_p iterable, body_p body)
 {
     foreach_np foreach_n = stack_alloc(&memory.stack, sizeof(foreach_nt));
 

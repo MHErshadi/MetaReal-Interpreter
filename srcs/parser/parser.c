@@ -39,8 +39,11 @@ token_p dict_parse(pres_p pres, token_p tokens);
 token_p set_parse(pres_p pres, token_p tokens, pos_p poss);
 token_p var_parse(pres_p pres, token_p tokens);
 token_p func_def_parse(pres_p pres, token_p tokens);
+token_p func_call_parse(pres_p pres, token_p tokens);
+token_p class_def_parse(pres_p pres, token_p tokens);
+token_p struct_def_parse(pres_p pres, token_p tokens);
 
-token_p properties_gen(char* properties, pres_p pres, token_p tokens);
+token_p properties_gen(char* properties, token_p tokens);
 token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens);
 
 pres_t parse(token_p tokens)
@@ -842,78 +845,9 @@ check:
 
     if (tokens->type == LPAREN_T)
     {
-        tokens++;
-        advance_newline(tokens);
-
-        node_t func = *pres->nodes;
-
-        if (tokens->type == RPAREN_T)
-        {
-            func_call_np node = func_call_n_set(&func, NULL, 0);
-            *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
-        }
-        else
-        {
-            arg_access_p args = heap_alloc(&memory.heap, FUNC_CALL_SIZE * sizeof(arg_access_t));
-
-            unsigned long long alloc = FUNC_CALL_SIZE;
-            unsigned long long size = 0;
-
-            do
-            {
-                if (size == alloc)
-                    args = heap_expand(&memory.heap, args, size * sizeof(arg_access_t), (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
-
-                if (tokens->type == IDENTIFIER_T)
-                {
-                    if ((tokens + 1)->type == COLON_T)
-                    {
-                        args[size].name = tokens++->value;
-
-                        tokens++;
-                        advance_newline(tokens);
-                    }
-                    else if ((tokens + 1)->type == NEWLINE_T && (tokens + 2)->type == COLON_T)
-                    {
-                        args[size].name = tokens++->value;
-
-                        tokens += 2;
-                        advance_newline(tokens);
-                    }
-                    else
-                        args[size].name = NULL;
-                }
-                else
-                    args[size].name = NULL;
-
-                tokens = assign(pres, tokens);
-                if (pres->has_error)
-                    return tokens;
-
-                args[size++].value = *pres->nodes;
-
-                if (tokens->type != COMMA_T)
-                    break;
-
-                tokens++;
-                advance_newline(tokens);
-            } while (1);
-
-            if (tokens->type != RPAREN_T)
-            {
-                invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
-                pres_fail(pres, &error);
-                return tokens;
-            }
-
-            if (size != alloc)
-                heap_shrink(&memory.heap, args, alloc * sizeof(arg_access_t), size * sizeof(arg_access_t));
-
-            func_call_np node = func_call_n_set(&func, args, size);
-            *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
-        }
-
-        advance_newline(tokens);
+        tokens = func_call_parse(pres, tokens);
+        if (pres->has_error)
+            return tokens;
 
         goto check;
     }
@@ -1057,6 +991,50 @@ token_p core(pres_p pres, token_p tokens)
 
     if (tokens->type == FUNC_TK)
         return func_def_parse(pres, tokens);
+
+    if (tokens->type == CLASS_TK)
+        return class_def_parse(pres, tokens);
+
+    if (tokens->type == IMPORT_TK)
+    {
+        pos_p poss = &tokens++->poss;
+
+        advance_newline(tokens);
+
+        if (tokens->type != IDENTIFIER_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected identifier", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        *pres->nodes = node_set1(IMPORT_N, tokens->value, poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
+    if (tokens->type == INCLUDE_TK)
+    {
+        pos_p poss = &tokens++->poss;
+
+        advance_newline(tokens);
+
+        if (tokens->type != IDENTIFIER_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected identifier", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        *pres->nodes = node_set1(INCLUDE_N, tokens->value, poss, &tokens->pose);
+
+        tokens++;
+        advance_newline(tokens);
+
+        return tokens;
+    }
 
     invalid_syntax_t error = invalid_syntax_set(NULL, &tokens->poss, &tokens->pose);
     pres_fail(pres, &error);
@@ -1290,15 +1268,17 @@ token_p var_parse(pres_p pres, token_p tokens)
     advance_newline(tokens);
 
     char properties = 0;
-    tokens = properties_gen(&properties, pres, tokens);
+    tokens = properties_gen(&properties, tokens);
 
-    unsigned char type = 0;
+    unsigned char type;
     if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
     {
         type = tokens++->type;
 
         advance_newline(tokens);
     }
+    else
+        type = 0;
 
     if (tokens->type != IDENTIFIER_T)
     {
@@ -1337,23 +1317,27 @@ token_p func_def_parse(pres_p pres, token_p tokens)
     advance_newline(tokens);
 
     char properties = 0;
-    tokens = properties_gen(&properties, pres, tokens);
+    tokens = properties_gen(&properties, tokens);
 
-    unsigned char type = 0;
+    unsigned char type;
     if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
     {
         type = tokens++->type;
 
         advance_newline(tokens);
     }
+    else
+        type = 0;
 
-    char* name = NULL;
+    char* name;
     if (tokens->type == IDENTIFIER_T)
     {
         name = tokens++->value;
 
         advance_newline(tokens);
     }
+    else
+        name = NULL;
 
     if (tokens->type != LPAREN_T)
     {
@@ -1490,7 +1474,232 @@ token_p func_def_parse(pres_p pres, token_p tokens)
     return tokens;
 }
 
-token_p properties_gen(char* properties, pres_p pres, token_p tokens)
+token_p func_call_parse(pres_p pres, token_p tokens)
+{
+    tokens++;
+    advance_newline(tokens);
+
+    node_t func = *pres->nodes;
+
+    if (tokens->type == RPAREN_T)
+    {
+        func_call_np node = func_call_n_set(&func, NULL, 0);
+        *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
+    }
+    else
+    {
+        arg_access_p args = heap_alloc(&memory.heap, FUNC_CALL_SIZE * sizeof(arg_access_t));
+
+        unsigned long long alloc = FUNC_CALL_SIZE;
+        unsigned long long size = 0;
+
+        do
+        {
+            if (size == alloc)
+                args = heap_expand(&memory.heap, args, size * sizeof(arg_access_t), (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
+
+            if (tokens->type == IDENTIFIER_T)
+            {
+                if ((tokens + 1)->type == COLON_T)
+                {
+                    args[size].name = tokens++->value;
+
+                    tokens++;
+                    advance_newline(tokens);
+                }
+                else if ((tokens + 1)->type == NEWLINE_T && (tokens + 2)->type == COLON_T)
+                {
+                    args[size].name = tokens++->value;
+
+                    tokens += 2;
+                    advance_newline(tokens);
+                }
+                else
+                    args[size].name = NULL;
+            }
+            else
+                args[size].name = NULL;
+
+            tokens = assign(pres, tokens);
+            if (pres->has_error)
+                return tokens;
+
+            args[size++].value = *pres->nodes;
+
+            if (tokens->type != COMMA_T)
+                break;
+
+            tokens++;
+            advance_newline(tokens);
+        } while (1);
+
+        if (tokens->type != RPAREN_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        if (size != alloc)
+            heap_shrink(&memory.heap, args, alloc * sizeof(arg_access_t), size * sizeof(arg_access_t));
+
+        func_call_np node = func_call_n_set(&func, args, size);
+        *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
+    }
+
+    advance_newline(tokens);
+    return tokens;
+}
+
+token_p class_def_parse(pres_p pres, token_p tokens)
+{
+    pos_p poss = &tokens++->poss;
+
+    advance_newline(tokens);
+
+    char properties = 0;
+    tokens = properties_gen(&properties, tokens);
+
+    char* name;
+    if (tokens->type == IDENTIFIER_T)
+    {
+        name = tokens++->value;
+
+        advance_newline(tokens);
+    }
+    else
+        name = NULL;
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens++;
+        advance_newline(tokens);
+
+        if (tokens->type == RCURLY_T)
+            body.size = 0;
+        else
+        {
+            tokens = body_gen(&body, CLASS_DEF_BODY_SIZE, pres, tokens);
+            if (pres->has_error)
+                return tokens;
+
+            if (tokens->type != RCURLY_T)
+            {
+                invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    class_def_np node = class_def_n_set(properties, name, &body);
+    *pres->nodes = node_set1(CLASS_DEF_N, node, poss, pose);
+    return tokens;
+}
+
+token_p struct_def_parse(pres_p pres, token_p tokens)
+{
+    pos_p poss = &tokens++->poss;
+
+    advance_newline(tokens);
+
+    char properties = 0;
+    tokens = properties_gen(&properties, tokens);
+
+    char* name;
+    if (tokens->type == IDENTIFIER_T)
+    {
+        name = tokens++->value;
+
+        advance_newline(tokens);
+    }
+    else
+        name = NULL;
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens++;
+        advance_newline(tokens);
+
+        if (tokens->type == RCURLY_T)
+            body.size = 0;
+        else
+        {
+            tokens = body_gen(&body, STRUCT_DEF_BODY_SIZE, pres, tokens);
+            if (pres->has_error)
+                return tokens;
+
+            if (tokens->type != RCURLY_T)
+            {
+                invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    struct_def_np node = struct_def_n_set(properties, name, &body);
+    *pres->nodes = node_set1(STRUCT_DEF_N, node, poss, pose);
+    return tokens;
+}
+
+token_p properties_gen(char* properties, token_p tokens)
 {
     char public = 0;
     char global = 0;

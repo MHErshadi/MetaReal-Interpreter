@@ -134,7 +134,6 @@ enum _token_types_
     FUNC_TK,       // func
     CLASS_TK,      // class
     STRUCT_TK,     // struct
-    ENUM_TK,       // enum
 
     /* */
 
@@ -206,7 +205,7 @@ enum _token_types_
     SET_TT         // set
 };
 
-static const char* token_labels[110] =
+static const char* token_labels[109] =
 {
     "EOF", "NEWLINE", "SEMICOLON",
 
@@ -241,7 +240,7 @@ static const char* token_labels[110] =
     "LOCAL_K", "GLOBAL_K",
     "CONST_K", "STATIC_K",
 
-    "VAR_K", "FUNC_K", "CLASS_K", "STRUCT_K", "ENUM_K",
+    "VAR_K", "FUNC_K", "CLASS_K", "STRUCT_K",
 
     "IF_K", "ELIF_K", "ELSE_K",
     "SWITCH_K", "CASE_K", "DEFAULT_K",

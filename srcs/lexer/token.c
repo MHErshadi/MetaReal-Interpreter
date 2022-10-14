@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define KEYWORDS_PAD PRIVATE_TK
-#define KEYWORDS_COUNT 40
+#define KEYWORDS_COUNT 39
 
 #define TYPES_PAD OBJECT_TT
 #define TYPES_COUNT 11
@@ -17,7 +17,7 @@ const char* keywords[KEYWORDS_COUNT] =
     "local", "global",
     "const", "static",
 
-    "var", "func", "class", "struct", "enum",
+    "var", "func", "class", "struct",
 
     "if", "elif", "else",
     "switch", "case", "default",

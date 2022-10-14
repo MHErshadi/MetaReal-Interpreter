@@ -66,8 +66,6 @@ enum _node_types_
 
     STRUCT_DEF_N,
 
-    ENUM_DEF_N,
-
     DOLLAR_FUNC_CALL_N,
 
     /* */
@@ -124,7 +122,7 @@ typedef struct __pair__* pair_p;
 
 struct __arg__
 {
-    const char* name;
+    char* name;
 
     unsigned char type;
     node_t value;
@@ -142,7 +140,7 @@ typedef struct __body__* body_p;
 
 struct __arg_access__
 {
-    const char* name;
+    char* name;
 
     node_t value;
 };
@@ -162,7 +160,7 @@ typedef struct __case__* case_p;
 
 struct __int_n__
 {
-    const char* value;
+    char* value;
     unsigned long long size;
 };
 typedef struct __int_n__ int_nt;
@@ -170,7 +168,7 @@ typedef struct __int_n__* int_np;
 
 struct __float_n__
 {
-    const char* value;
+    char* value;
     unsigned long long size;
 };
 typedef struct __float_n__ float_nt;
@@ -178,7 +176,7 @@ typedef struct __float_n__* float_np;
 
 struct __complex_n__
 {
-    const char* value;
+    char* value;
     unsigned long long size;
 };
 typedef struct __complex_n__ complex_nt;
@@ -186,7 +184,7 @@ typedef struct __complex_n__* complex_np;
 
 struct __str_n__
 {
-    const char* value;
+    char* value;
     unsigned long long size;
 };
 typedef struct __str_n__ str_nt;
@@ -274,7 +272,7 @@ typedef struct __access_n__* access_np;
 struct __var_assign_n__
 {
     char properties;
-    const char* name;
+    char* name;
 
     unsigned char type;
     node_t value;
@@ -305,7 +303,7 @@ typedef struct __var_reassign_n__* var_reassign_np;
 struct __func_def_n__
 {
     char properties;
-    const char* name;
+    char* name;
 
     arg_p args;
     unsigned long long size;
@@ -329,7 +327,7 @@ typedef struct __func_call_n__* func_call_np;
 struct __class_def_n__
 {
     char properties;
-    const char* name;
+    char* name;
 
     body_t body;
 };
@@ -339,27 +337,16 @@ typedef struct __class_def_n__* class_def_np;
 struct __struct_def_n__
 {
     char properties;
-    const char* name;
+    char* name;
 
     body_t body;
 };
 typedef struct __struct_def_n__ struct_def_nt;
 typedef struct __struct_def_n__* struct_def_np;
 
-struct __enum_def_n__
-{
-    char properties;
-    const char* name;
-
-    const char** elements;
-    unsigned long long size;
-};
-typedef struct __enum_def_n__ enum_def_nt;
-typedef struct __enum_def_n__* enum_def_np;
-
 struct __dollar_func_call_n__
 {
-    const char* name;
+    char* name;
 
     node_p args;
     unsigned long long size;
@@ -391,7 +378,7 @@ typedef struct __switch_n__* switch_np;
 
 struct __for_n__
 {
-    const char* iterator;
+    char* iterator;
 
     node_t start;
     node_t end;
@@ -404,7 +391,7 @@ typedef struct __for_n__* for_np;
 
 struct __foreach_n__
 {
-    const char* iterator;
+    char* iterator;
 
     node_t iterable;
 
@@ -471,10 +458,10 @@ body_t body_set(node_p node);
 
 /* */
 
-int_np int_n_set(const char* value, unsigned long long size);
-float_np float_n_set(const char* value, unsigned long long size);
-complex_np complex_n_set(const char* value, unsigned long long size);
-str_np str_n_set(const char* value, unsigned long long size);
+int_np int_n_set(char* value, unsigned long long size);
+float_np float_n_set(char* value, unsigned long long size);
+complex_np complex_n_set(char* value, unsigned long long size);
+str_np str_n_set(char* value, unsigned long long size);
 list_np list_n_set(node_p elements, unsigned long long size);
 tuple_np tuple_n_set(node_p elements, unsigned long long size);
 dict_np dict_n_set(pair_p elements, unsigned long long size);
@@ -484,19 +471,18 @@ unary_operation_np unary_operation_n_set(unsigned char operator, node_p operand)
 ternary_condition_np ternary_condition_n_set(node_p condition, node_p left, node_p right);
 subscript_np subscript_n_set(node_p value, node_p pos);
 access_np access_n_set(node_p value, node_p property);
-var_assign_np var_assign_n_set(char properties, const char* name, unsigned char type, node_p value);
+var_assign_np var_assign_n_set(char properties, char* name, unsigned char type, node_p value);
 var_fixed_assign_np var_fixed_assign_n_set(char properties, unsigned char operator, node_p var);
 var_reassign_np var_reassign_n_set(unsigned char operator, node_p var, node_p value);
-func_def_np func_def_n_set(char properties, const char* name, arg_p args, unsigned long long size, unsigned char type, body_p body);
+func_def_np func_def_n_set(char properties, char* name, arg_p args, unsigned long long size, unsigned char type, body_p body);
 func_call_np func_call_n_set(node_p func, arg_access_p args, unsigned long long size);
-class_def_np class_def_n_set(char properties, const char* name, body_p body);
-struct_def_np struct_def_n_set(char properties, const char* name, body_p body);
-enum_def_np enum_def_n_set(char properties, const char* name, const char** elements, unsigned long long size);
-dollar_func_call_np dollar_func_call_n_set(const char* name, node_p args, unsigned long long size);
+class_def_np class_def_n_set(char properties, char* name, body_p body);
+struct_def_np struct_def_n_set(char properties, char* name, body_p body);
+dollar_func_call_np dollar_func_call_n_set(char* name, node_p args, unsigned long long size);
 if_np if_n_set(case_p cases, unsigned long long size, body_p ebody);
 switch_np switch_n_set(node_p value, case_p cases, unsigned long long size, body_p dbody);
-for_np for_n_set(const char* iterator, node_p start, node_p end, node_p step, body_p body);
-foreach_np foreach_n_set(const char* iterator, node_p iterable, body_p body);
+for_np for_n_set(char* iterator, node_p start, node_p end, node_p step, body_p body);
+foreach_np foreach_n_set(char* iterator, node_p iterable, body_p body);
 loop_np loop_n_set(node_p init, node_p condition, node_p step, body_p body);
 do_while_np do_while_n_set(body_p body, node_p condition);
 while_np while_n_set(node_p condition, body_p body);

@@ -44,6 +44,9 @@ token_p class_def_parse(pres_p pres, token_p tokens);
 token_p struct_def_parse(pres_p pres, token_p tokens);
 token_p if_parse(pres_p pres, token_p tokens);
 token_p switch_parse(pres_p pres, token_p tokens);
+token_p for_parse(pres_p pres, token_p tokens);
+token_p foreach_parse(pres_p pres, token_p tokens, char* iterator, pos_p poss);
+token_p loop_parse(pres_p pres, token_p tokens, pos_p poss);
 
 token_p properties_gen(char* properties, token_p tokens);
 token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens);
@@ -1006,6 +1009,9 @@ token_p core(pres_p pres, token_p tokens)
     if (tokens->type == SWITCH_TK)
         return switch_parse(pres, tokens);
 
+    if (tokens->type == FOR_TK)
+        return for_parse(pres, tokens);
+
     if (tokens->type == IMPORT_TK)
     {
         pos_p poss = &tokens++->poss;
@@ -1149,7 +1155,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
     pair_p elements = heap_alloc(&memory.heap, DICT_SIZE * sizeof(pair_t));
     elements->key = *pres->nodes;
-    
+
     if (tokens->type != COLON_T)
     {
         invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
@@ -1931,6 +1937,309 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
     advance_newline(tokens);
 
+    return tokens;
+}
+
+token_p for_parse(pres_p pres, token_p tokens)
+{
+    pos_p poss = &tokens++->poss;
+
+    advance_newline(tokens);
+
+    if (tokens->type == LPAREN_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        return loop_parse(pres, tokens, poss);
+    }
+
+    if (tokens->type != IDENTIFIER_T)
+    {
+        invalid_syntax_t error = invalid_syntax_set("Expected identifier or '('", &tokens->poss, &tokens->pose);
+        pres_fail(pres, &error);
+        return tokens;
+    }
+
+    char* iterator = tokens++->value;
+
+    advance_newline(tokens);
+
+    if (tokens->type == IN_TK)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        return foreach_parse(pres, tokens, iterator, poss);
+    }
+
+    if (tokens->type != ASSIGN_T)
+    {
+        invalid_syntax_t error = invalid_syntax_set("Expected '=' or 'in'", &tokens->poss, &tokens->pose);
+        pres_fail(pres, &error);
+        return tokens;
+    }
+
+    tokens++;
+    advance_newline(tokens);
+
+    node_t start;
+    if (tokens->type != TO_TK)
+    {
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        if (tokens->type != TO_TK)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected 'to'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        start = *pres->nodes;
+    }
+    else
+        start.type = NULL_N;
+
+    tokens++;
+    advance_newline(tokens);
+
+    tokens = tuple(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    node_t end = *pres->nodes;
+
+    node_t step;
+    if (tokens->type == STEP_TK)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        step = *pres->nodes;
+    }
+    else
+        step.type = NULL_N;
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens = body_gen(&body, FOR_BODY_SIZE, pres, ++tokens);
+        if (pres->has_error)
+            return tokens;
+
+        if (tokens->type != RCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    for_np node = for_n_set(iterator, &start, &end, &step, &body);
+    *pres->nodes = node_set1(FOR_N, node, poss, pose);
+    return tokens;
+}
+
+token_p foreach_parse(pres_p pres, token_p tokens, char* iterator, pos_p poss)
+{
+    tokens = tuple(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    node_t iterable = *pres->nodes;
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens = body_gen(&body, FOREACH_BODY_SIZE, pres, ++tokens);
+        if (pres->has_error)
+            return tokens;
+
+        if (tokens->type != RCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    foreach_np node = foreach_n_set(iterator, &iterable, &body);
+    *pres->nodes = node_set1(FOREACH_N, node, poss, pose);
+    return tokens;
+}
+
+token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
+{
+    node_t init;
+    if (tokens->type != SEMICOLON_T)
+    {
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        init = *pres->nodes;
+
+        if (tokens->type != SEMICOLON_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ';'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+    }
+    else
+        init.type = NULL_N;
+
+    tokens++;
+    advance_newline(tokens);
+
+    node_t condition;
+    if (tokens->type != SEMICOLON_T)
+    {
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        condition = *pres->nodes;
+
+        if (tokens->type != SEMICOLON_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ';'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+    }
+    else
+        condition.type = NULL_N;
+
+    tokens++;
+    advance_newline(tokens);
+
+    node_t step;
+    if (tokens->type != RPAREN_T)
+    {
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        step = *pres->nodes;
+
+        if (tokens->type != RPAREN_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+    }
+    else
+        step.type = NULL_N;
+
+    tokens++;
+    advance_newline(tokens);
+
+    body_t body;
+
+    pos_p pose;
+
+    if (tokens->type == COLON_T)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = dollar_func(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        body = body_set(pres->nodes);
+
+        pose = &pres->nodes->pose;
+    }
+    else
+    {
+        if (tokens->type != LCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        tokens = body_gen(&body, FOREACH_BODY_SIZE, pres, ++tokens);
+        if (pres->has_error)
+            return tokens;
+
+        if (tokens->type != RCURLY_T)
+        {
+            invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
+            pres_fail(pres, &error);
+            return tokens;
+        }
+
+        pose = &tokens++->pose;
+
+        advance_newline(tokens);
+    }
+
+    loop_np node = loop_n_set(&init, &condition, &step, &body);
+    *pres->nodes = node_set1(LOOP_N, node, poss, pose);
     return tokens;
 }
 

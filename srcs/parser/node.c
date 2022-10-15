@@ -400,6 +400,48 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == FOR_N)
+    {
+        for_np value = node->value.ptr;
+
+        fprintf(stream, "(FOR: %s, ", value->iterator);
+        node_print(stream, &value->start);
+        fputs(", ", stream);
+        node_print(stream, &value->end);
+        fputs(", ", stream);
+        node_print(stream, &value->step);
+        fputs(", ", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
+        return;
+    }
+    if (node->type == FOREACH_N)
+    {
+        foreach_np value = node->value.ptr;
+
+        fprintf(stream, "(FOREACH: %s, ", value->iterator);
+        node_print(stream, &value->iterable);
+        fputs(", ", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
+        return;
+    }
+    if (node->type == LOOP_N)
+    {
+        loop_np value = node->value.ptr;
+
+        fputs("(LOOP: ", stream);
+        node_print(stream, &value->init);
+        fputs(", ", stream);
+        node_print(stream, &value->condition);
+        fputs(", ", stream);
+        node_print(stream, &value->step);
+        fputs(", ", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
+        return;
+    }
+
     if (node->type == IMPORT_N)
     {
         fprintf(stream, "(IMPORT: %s)", node->value);

@@ -43,6 +43,12 @@
 #define SWITCH_CASE_SIZE 8
 #define SWITCH_BODY_SIZE 4
 
+#define FOR_BODY_SIZE 16
+
+#define FOREACH_BODY_SIZE 16
+
+#define LOOP_BODY_SIZE 16
+
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
 #endif /* __M_DEF__ */

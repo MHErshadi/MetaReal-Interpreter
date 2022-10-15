@@ -442,6 +442,29 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == WHILE_N)
+    {
+        while_np value = node->value.ptr;
+
+        fputs("(WHILE: ", stream);
+        node_print(stream, &value->condition);
+        fputs(", ", stream);
+        body_print(stream, &value->body);
+        fputc(')', stream);
+        return;
+    }
+    if (node->type == DO_WHILE_N)
+    {
+        do_while_np value = node->value.ptr;
+
+        fputs("(DO_WHILE: ", stream);
+        body_print(stream, &value->body);
+        fputs(", ", stream);
+        node_print(stream, &value->condition);
+        fputc(')', stream);
+        return;
+    }
+
     if (node->type == IMPORT_N)
     {
         fprintf(stream, "(IMPORT: %s)", node->value);

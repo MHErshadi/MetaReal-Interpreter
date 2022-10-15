@@ -49,6 +49,10 @@
 
 #define LOOP_BODY_SIZE 16
 
+#define WHILE_BODY_SIZE 16
+
+#define DO_WHILE_BODY_SIZE 16
+
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
 #endif /* __M_DEF__ */

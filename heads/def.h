@@ -53,6 +53,9 @@
 
 #define DO_WHILE_BODY_SIZE 16
 
+#define TRY_EXCEPT_SIZE 8
+#define TRY_BODY_SIZE 8
+
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
 #endif /* __M_DEF__ */

@@ -465,6 +465,20 @@ void node_print(FILE* stream, node_p node)
         return;
     }
 
+    if (node->type == TRY_N)
+    {
+        try_np value = node->value.ptr;
+
+        fputs("(TRY: ", stream);
+        body_print(stream, &value->tbody);
+        fputs(", {", stream);
+        case_p_print(stream, value->excepts, value->size);
+        fputs("}, ", stream);
+        body_print(stream, &value->fbody);
+        fputc(')', stream);
+        return;
+    }
+
     if (node->type == IMPORT_N)
     {
         fprintf(stream, "(IMPORT: %s)", node->value);

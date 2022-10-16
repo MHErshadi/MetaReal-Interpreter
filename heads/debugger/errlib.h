@@ -5,7 +5,7 @@
 #ifndef __M_ERRLIB__
 #define __M_ERRLIB__
 
-#include "pos.h"
+#include <interpreter/context.h>
 
 struct __illegal_char__
 {
@@ -33,6 +33,8 @@ struct __runtime__
 
     pos_t poss;
     pos_t pose;
+
+    context_p context;
 };
 typedef struct __runtime__ runtime_t;
 typedef struct __runtime__* runtime_p;
@@ -48,7 +50,7 @@ void illegal_char_print(illegal_char_p error, const char* code, unsigned long lo
 invalid_syntax_t invalid_syntax_set(const char* detail, pos_p poss, pos_p pose);
 void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned long long size, const char* fname);
 
-runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose);
+runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose, context_p context);
 void runtime_print(runtime_p error, const char* code, unsigned long long size);
 
 #endif /* __M_ERRLIB__ */

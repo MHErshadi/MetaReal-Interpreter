@@ -7,6 +7,7 @@
 
 #include <lexer/lexer.h>
 #include <parser/parser.h>
+#include <interpreter/interpreter.h>
 #include <memory.h>
 #include <setting.h>
 #include <stdlib.h>
@@ -32,6 +33,9 @@ int main(int argc, char** argv)
 
         lres_t lres;
         pres_t pres;
+        ires_t ires;
+
+        context_t context = context_set2(ROOT_CONTEXT, CMD_FILE_NAME);
 
         while (1)
         {
@@ -63,13 +67,12 @@ int main(int argc, char** argv)
                 continue;
             }
 
-            do
+            ires = interpret(pres.nodes, &context);
+            if (ires.has_error)
             {
-                node_print(stdout, pres.nodes);
-                putc('\n', stdout);
-            } while (pres.nodes++->type != NULL_N);
-
-            free(pres.nodes);
+                runtime_print(&ires.error, code, size);
+                continue;
+            }
 
             stack_reset(&memory.stack);
             heap_reset(&memory.heap);

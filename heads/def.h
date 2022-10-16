@@ -11,6 +11,8 @@
 #define STACK_SIZE 524288 // 512 * 1024
 #define HEAP_SIZE 1048576 // 1024 * 1024
 
+#define ROOT_CONTEXT "<program>"
+
 /* */
 
 #define TOKENS_SIZE 8192

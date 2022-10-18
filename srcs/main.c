@@ -9,6 +9,9 @@
 #include <parser/parser.h>
 #include <interpreter/interpreter.h>
 #include <memory.h>
+#include <int.h>
+#include <float.h>
+#include <complex.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +30,9 @@ int main(int argc, char** argv)
 
         stack_init(&memory.stack, STACK_SIZE);
         heap_init(&memory.heap, HEAP_SIZE);
+        cellular_init(&memory.int_cellular, INT_CELLULAR_SIZE, sizeof(int_t));
+        cellular_init(&memory.float_cellular, FLOAT_CELLULAR_SIZE, sizeof(float_t));
+        cellular_init(&memory.complex_cellular, COMPLEX_CELLULAR_SIZE, sizeof(complex_t));
 
         char* code = malloc(CMD_INPUT_SIZE);
         unsigned long long size;
@@ -74,12 +80,20 @@ int main(int argc, char** argv)
                 continue;
             }
 
+            value_print(&ires.value);
+
             stack_reset(&memory.stack);
             heap_reset(&memory.heap);
+            cellular_reset(&memory.int_cellular);
+            cellular_reset(&memory.float_cellular);
+            cellular_reset(&memory.complex_cellular);
         }
 
         stack_delete(&memory.stack);
         heap_delete(&memory.heap);
+        cellular_delete(&memory.int_cellular);
+        cellular_delete(&memory.float_cellular);
+        cellular_delete(&memory.complex_cellular);
 
         free(code);
         return 0;

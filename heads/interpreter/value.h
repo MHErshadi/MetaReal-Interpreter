@@ -7,6 +7,13 @@
 
 #include <debugger/pos.h>
 
+enum _value_types_
+{
+    INT_V,
+    FLOAT_V,
+    COMPLEX_V
+};
+
 struct __value__
 {
     unsigned char type;
@@ -20,5 +27,7 @@ typedef struct __value__* value_p;
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose);
 value_t value_set2(unsigned char type, pos_p poss, pos_p pose);
+
+void value_print(value_p value);
 
 #endif /* __M_VALUE__ */

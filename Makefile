@@ -16,7 +16,7 @@ make: $(OUT)
 remake: clean $(OUT)
 
 $(OUT): $(OBJS)
-	$(CC) -o $(OUT) $(OBJS) $(LIBS)
+	$(CC) -o $(OUT) $(OBJS) $(LIBS) -lgmp -lmpfr -lmpc
 
 $(ODIR)/%.o: $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $< -I $(HDIR) -I $(LDIR)

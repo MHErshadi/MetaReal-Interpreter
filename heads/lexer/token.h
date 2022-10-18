@@ -8,19 +8,6 @@
 #include <debugger/pos.h>
 #include <stdio.h>
 
-struct __token__
-{
-    unsigned long long type;
-
-    char* value;
-    unsigned long long size;
-
-    pos_t poss;
-    pos_t pose;
-};
-typedef struct __token__ token_t;
-typedef struct __token__* token_p;
-
 enum _token_types_
 {
     EOF_T,         // end of file
@@ -204,6 +191,19 @@ enum _token_types_
     DICT_TT,       // dict
     SET_TT         // set
 };
+
+struct __token__
+{
+    unsigned long long type;
+
+    char* value;
+    unsigned long long size;
+
+    pos_t poss;
+    pos_t pose;
+};
+typedef struct __token__ token_t;
+typedef struct __token__* token_p;
 
 static const char* token_labels[109] =
 {

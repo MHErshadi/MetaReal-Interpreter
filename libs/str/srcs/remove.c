@@ -7,7 +7,7 @@
 /*/
 
 #include <str.h>
-#include <memory.h>
+#include <stdlib.h>
 
 void str_remove(str_p str, unsigned long long pos)
 {
@@ -15,6 +15,5 @@ void str_remove(str_p str, unsigned long long pos)
     for (i = pos, j = pos + 1; j <= str->size; i++, j++)
         str->str[i] = str->str[j];
 
-    heap_shrink(&memory.heap, str->str, str->size + 1, str->size);
-    str->size--;
+    str->str = realloc(str->str, str->size--);
 }

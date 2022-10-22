@@ -7,10 +7,10 @@
 /*/
 
 #include <complex.h>
-#include <memory.h>
+#include <stdlib.h>
 
 void complex_free(complex_p num)
 {
     mpc_clear(num->value);
-    cellular_free(&memory.complex_cellular, num);
+    free(num);
 }

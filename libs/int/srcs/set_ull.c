@@ -7,11 +7,11 @@
 /*/
 
 #include <int.h>
-#include <memory.h>
+#include <stdlib.h>
 
 int_p int_set_ull(unsigned long long src)
 {
-    int_p dst = cellular_alloc(&memory.int_cellular);
+    int_p dst = malloc(sizeof(int_t));
 
     mpz_import(dst->value, 1, -1, sizeof(unsigned long long), 0, 0, &src);
 

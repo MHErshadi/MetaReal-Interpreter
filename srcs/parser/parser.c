@@ -3,7 +3,6 @@
 /*/
 
 #include <parser/parser.h>
-#include <memory.h>
 #include <stdlib.h>
 #include <def.h>
 
@@ -79,8 +78,8 @@ pres_t parse(token_p tokens)
         if (pres.has_error)
         {
             pres.nodes -= size;
-            free(pres.nodes);
-            free(tokens_copy);
+            node_p_free1(pres.nodes, size);
+            token_p_free2(tokens_copy);
             return pres;
         }
 
@@ -91,8 +90,8 @@ pres_t parse(token_p tokens)
     if (tokens->type != EOF_T)
     {
         pres.nodes -= size;
-        free(pres.nodes);
-        free(tokens_copy);
+        node_p_free1(pres.nodes, size);
+        token_p_free2(tokens_copy);
 
         invalid_syntax_t error = invalid_syntax_set("Expected EOF", &tokens->poss, &tokens->pose);
         pres_fail(&pres, &error);
@@ -150,7 +149,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
         if (pres->has_error)
             return tokens;
 
-        node_p args = heap_alloc(&memory.heap, DOLLAR_FUNC_ARGS_SIZE * sizeof(node_t));
+        node_p args = malloc(DOLLAR_FUNC_ARGS_SIZE * sizeof(node_t));
         *args = *pres->nodes;
 
         unsigned long long alloc = DOLLAR_FUNC_ARGS_SIZE;
@@ -165,10 +164,13 @@ token_p dollar_func(pres_p pres, token_p tokens)
 
             tokens = assign(pres, tokens);
             if (pres->has_error)
+            {
+                node_p_free1(args, size);
                 return tokens;
+            }
 
             if (size == alloc)
-                args = heap_expand(&memory.heap, args, size * sizeof(node_t), (alloc += DOLLAR_FUNC_ARGS_SIZE) * sizeof(node_t));
+                args = realloc(args, (alloc += DOLLAR_FUNC_ARGS_SIZE) * sizeof(node_t));
 
             args[size++] = *pres->nodes;
 
@@ -176,7 +178,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
         }
 
         if (size != alloc)
-            heap_shrink(&memory.heap, args, alloc * sizeof(node_t), size * sizeof(node_t));
+            args = realloc(args, size * sizeof(node_t));
 
         dollar_func_call_np node = dollar_func_call_n_set(name, args, size);
         *pres->nodes = node_set1(DOLLAR_FUNC_CALL_N, node, poss, pose);
@@ -241,7 +243,7 @@ token_p tuple(pres_p pres, token_p tokens)
     {
         pos_p pose;
 
-        node_p elements = heap_alloc(&memory.heap, TUPLE_SIZE);
+        node_p elements = malloc(TUPLE_SIZE);
         *elements = *pres->nodes;
 
         unsigned long long alloc = TUPLE_SIZE;
@@ -260,7 +262,7 @@ token_p tuple(pres_p pres, token_p tokens)
                 pres->has_error = 0;
 
                 if (size != alloc)
-                    heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+                    elements = realloc(elements, size * sizeof(node_t));
 
                 tuple_np node = tuple_n_set(elements, size);
                 *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, pose);
@@ -269,13 +271,13 @@ token_p tuple(pres_p pres, token_p tokens)
             tokens = new;
 
             if (size == alloc)
-                elements = heap_expand(&memory.heap, elements, size * sizeof(node_t), (alloc += TUPLE_SIZE) * sizeof(node_t));
+                elements = realloc(elements, (alloc += TUPLE_SIZE) * sizeof(node_t));
 
             elements[size++] = *pres->nodes;
         } while (tokens->type == COMMA_T);
 
         if (size != alloc)
-            heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+            elements = realloc(elements, size * sizeof(node_t));
 
         tuple_np node = tuple_n_set(elements, size);
         *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, &elements[size - 1].pose);
@@ -304,7 +306,10 @@ token_p assign(pres_p pres, token_p tokens)
 
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&var);
             return tokens;
+        }
 
         var_reassign_np node = var_reassign_n_set(operator, &var, pres->nodes);
         *pres->nodes = node_set1(VAR_REASSIGN_N, node, &var.poss, &pres->nodes->pose);
@@ -337,7 +342,10 @@ token_p ternary(pres_p pres, token_p tokens)
 
             tokens = dollar_func(pres, tokens);
             if (pres->has_error)
+            {
+                node_free(&condition);
                 return tokens;
+            }
 
             left.type = NULL_N;
             right = *pres->nodes;
@@ -346,7 +354,10 @@ token_p ternary(pres_p pres, token_p tokens)
         {
             tokens = dollar_func(pres, tokens);
             if (pres->has_error)
+            {
+                node_free(&condition);
                 return tokens;
+            }
 
             left = *pres->nodes;
 
@@ -357,7 +368,11 @@ token_p ternary(pres_p pres, token_p tokens)
 
                 tokens = dollar_func(pres, tokens);
                 if (pres->has_error)
+                {
+                    node_free(&left);
+                    node_free(&condition);
                     return tokens;
+                }
 
                 right = *pres->nodes;
             }
@@ -390,7 +405,10 @@ token_p typeof(pres_p pres, token_p tokens)
 
         tokens = contain(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -416,7 +434,10 @@ token_p contain(pres_p pres, token_p tokens)
 
         tokens = or(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(IN_TK, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -442,7 +463,10 @@ token_p or(pres_p pres, token_p tokens)
 
         tokens = xor(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(OR_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -468,7 +492,10 @@ token_p xor(pres_p pres, token_p tokens)
 
         tokens = and(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(XOR_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -494,7 +521,10 @@ token_p and(pres_p pres, token_p tokens)
 
         tokens = compare1(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(AND_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -522,7 +552,10 @@ token_p compare1(pres_p pres, token_p tokens)
 
         tokens = compare2(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -550,7 +583,10 @@ token_p compare2(pres_p pres, token_p tokens)
 
         tokens = b_or(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -576,7 +612,10 @@ token_p b_or(pres_p pres, token_p tokens)
 
         tokens = b_xor(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(B_OR_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -602,7 +641,10 @@ token_p b_xor(pres_p pres, token_p tokens)
 
         tokens = b_and(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(B_XOR_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -628,7 +670,10 @@ token_p b_and(pres_p pres, token_p tokens)
 
         tokens = shift(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(B_AND_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -656,7 +701,10 @@ token_p shift(pres_p pres, token_p tokens)
 
         tokens = expression(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -684,7 +732,10 @@ token_p expression(pres_p pres, token_p tokens)
 
         tokens = term(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -712,7 +763,10 @@ token_p term(pres_p pres, token_p tokens)
 
         tokens = factor(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -779,7 +833,10 @@ token_p exponent(pres_p pres, token_p tokens)
 
         tokens = factor(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&left);
             return tokens;
+        }
 
         left.value.ptr = binary_operation_n_set(POWER_T, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
@@ -806,10 +863,16 @@ check:
 
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&value);
             return tokens;
+        }
 
         if (tokens->type != RSQUARE_T)
         {
+            node_free(pres->nodes);
+            node_free(&value);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ']'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -832,7 +895,10 @@ check:
 
         tokens = core(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&value);
             return tokens;
+        }
 
         access_np node = access_n_set(&value, pres->nodes);
         *pres->nodes = node_set1(ACCESS_N, node, &value.poss, &pres->nodes->pose);
@@ -878,6 +944,8 @@ token_p core(pres_p pres, token_p tokens)
 
         if (tokens->type != RPAREN_T)
         {
+            node_free(pres->nodes);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -1084,7 +1152,7 @@ token_p list_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    node_p elements = heap_alloc(&memory.heap, LIST_SIZE * sizeof(node_t));
+    node_p elements = malloc(LIST_SIZE * sizeof(node_t));
 
     unsigned long long alloc = LIST_SIZE;
     unsigned long long size = 0;
@@ -1093,10 +1161,13 @@ token_p list_parse(pres_p pres, token_p tokens)
     {
         tokens = assign(pres, tokens);
         if (pres->has_error)
+        {
+            node_p_free1(elements, size);
             return tokens;
+        }
 
         if (size == alloc)
-            elements = heap_expand(&memory.heap, elements, size * sizeof(node_t), (alloc += LIST_SIZE) * sizeof(node_t));
+            elements = realloc(elements, (alloc += LIST_SIZE) * sizeof(node_t));
 
         elements[size++] = *pres->nodes;
 
@@ -1109,13 +1180,15 @@ token_p list_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != RSQUARE_T)
     {
+        node_p_free1(elements, size);
+
         invalid_syntax_t error = invalid_syntax_set("Expected ']'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
     }
 
     if (size != alloc)
-        heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+        elements = realloc(elements, size * sizeof(node_t));
 
     list_np node = list_n_set(elements, size);
     *pres->nodes = node_set1(LIST_N, node, poss, &tokens++->pose);
@@ -1153,7 +1226,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
     }
     if (tokens->type == RCURLY_T)
     {
-        node_p elements = heap_alloc(&memory.heap, sizeof(node_t));
+        node_p elements = malloc(sizeof(node_t));
         *elements = *pres->nodes;
 
         set_np node = set_n_set(elements, 1);
@@ -1164,11 +1237,14 @@ token_p dict_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    pair_p elements = heap_alloc(&memory.heap, DICT_SIZE * sizeof(pair_t));
+    pair_p elements = malloc(DICT_SIZE * sizeof(pair_t));
     elements->key = *pres->nodes;
 
     if (tokens->type != COLON_T)
     {
+        node_free(&elements->key);
+        free(elements);
+
         invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
@@ -1179,7 +1255,11 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
     tokens = assign(pres, tokens);
     if (pres->has_error)
+    {
+        node_free(&elements->key);
+        free(elements);
         return tokens;
+    }
 
     elements->value = *pres->nodes;
 
@@ -1195,15 +1275,21 @@ token_p dict_parse(pres_p pres, token_p tokens)
         {
             tokens = assign(pres, tokens);
             if (pres->has_error)
+            {
+                pair_p_free(elements, size);
                 return tokens;
+            }
 
             if (size == alloc)
-                elements = heap_expand(&memory.heap, elements, size * sizeof(pair_t), (alloc += DICT_SIZE) * sizeof(pair_t));
+                elements = realloc(elements, (alloc += DICT_SIZE) * sizeof(pair_t));
 
             elements[size].key = *pres->nodes;
 
             if (tokens->type != COLON_T)
             {
+                node_free(&elements[size].key);
+                pair_p_free(elements, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1214,7 +1300,11 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
             tokens = assign(pres, tokens);
             if (pres->has_error)
+            {
+                node_free(&elements[size].key);
+                pair_p_free(elements, size);
                 return tokens;
+            }
 
             elements[size++].value = *pres->nodes;
 
@@ -1228,13 +1318,15 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != RCURLY_T)
     {
+        pair_p_free(elements, size);
+
         invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
     }
 
     if (size != alloc)
-        heap_shrink(&memory.heap, elements, alloc * sizeof(pair_t), size * sizeof(pair_t));
+        elements = realloc(elements, size * sizeof(pair_t));
 
     dict_np node = dict_n_set(elements, size);
     *pres->nodes = node_set1(DICT_N, node, poss, &tokens++->pose);
@@ -1246,7 +1338,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
 token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
 {
-    node_p elements = heap_alloc(&memory.heap, SET_SIZE * sizeof(node_t));
+    node_p elements = malloc(SET_SIZE * sizeof(node_t));
     *elements = *pres->nodes;
 
     unsigned long long alloc = SET_SIZE;
@@ -1256,10 +1348,13 @@ token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
     {
         tokens = assign(pres, tokens);
         if (pres->has_error)
+        {
+            node_p_free1(elements, size);
             return tokens;
+        }
 
         if (size == alloc)
-            elements = heap_expand(&memory.heap, elements, size * sizeof(node_t), (alloc += SET_SIZE) * sizeof(node_t));
+            elements = realloc(elements, (alloc += SET_SIZE) * sizeof(node_t));
 
         elements[size++] = *pres->nodes;
 
@@ -1272,13 +1367,15 @@ token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
 
     if (tokens->type != RCURLY_T)
     {
+        node_p_free1(elements, size);
+
         invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
     }
 
     if (size != alloc)
-        heap_shrink(&memory.heap, elements, alloc * sizeof(node_t), size * sizeof(node_t));
+        elements = realloc(elements, size * sizeof(node_t));
 
     set_np node = set_n_set(elements, size);
     *pres->nodes = node_set1(SET_N, node, poss, &tokens->pose);
@@ -1383,14 +1480,14 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != RPAREN_T)
     {
-        args = heap_alloc(&memory.heap, FUNC_DEF_SIZE * sizeof(arg_t));
+        args = malloc(FUNC_DEF_SIZE * sizeof(arg_t));
 
         unsigned long long alloc = FUNC_DEF_SIZE;
 
         do
         {
             if (size == alloc)
-                args = heap_expand(&memory.heap, args, size * sizeof(arg_t), (alloc += FUNC_DEF_SIZE) * sizeof(arg_t));
+                args = realloc(args, (alloc += FUNC_DEF_SIZE) * sizeof(arg_t));
 
             if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
             {
@@ -1403,6 +1500,8 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
             if (tokens->type != IDENTIFIER_T)
             {
+                arg_p_free(args, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected identifier", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1419,7 +1518,10 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
                 tokens = assign(pres, tokens);
                 if (pres->has_error)
+                {
+                    arg_p_free(args, size);
                     return tokens;
+                }
 
                 args[size++].value = *pres->nodes;
             }
@@ -1435,13 +1537,15 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != RPAREN_T)
         {
+            arg_p_free(args, size);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
         }
 
         if (size != alloc)
-            heap_shrink(&memory.heap, args, alloc * sizeof(arg_t), size * sizeof(arg_t));
+            args = realloc(args, size * sizeof(arg_t));
     }
 
     tokens++;
@@ -1458,7 +1562,10 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            arg_p_free(args, size);
             return tokens;
+        }
 
         body = body_set(pres->nodes);
 
@@ -1468,6 +1575,8 @@ token_p func_def_parse(pres_p pres, token_p tokens)
     {
         if (tokens->type != LCURLY_T)
         {
+            arg_p_free(args, size);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -1482,10 +1591,16 @@ token_p func_def_parse(pres_p pres, token_p tokens)
         {
             tokens = body_gen(&body, FUNC_DEF_BODY_SIZE, pres, tokens);
             if (pres->has_error)
+            {
+                arg_p_free(args, size);
                 return tokens;
+            }
 
             if (tokens->type != RCURLY_T)
             {
+                node_p_free1(body.nodes, body.size);
+                arg_p_free(args, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1516,7 +1631,7 @@ token_p func_call_parse(pres_p pres, token_p tokens)
     }
     else
     {
-        arg_access_p args = heap_alloc(&memory.heap, FUNC_CALL_SIZE * sizeof(arg_access_t));
+        arg_access_p args = malloc(FUNC_CALL_SIZE * sizeof(arg_access_t));
 
         unsigned long long alloc = FUNC_CALL_SIZE;
         unsigned long long size = 0;
@@ -1524,7 +1639,7 @@ token_p func_call_parse(pres_p pres, token_p tokens)
         do
         {
             if (size == alloc)
-                args = heap_expand(&memory.heap, args, size * sizeof(arg_access_t), (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
+                args = realloc(args, (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
 
             if (tokens->type == IDENTIFIER_T)
             {
@@ -1550,7 +1665,10 @@ token_p func_call_parse(pres_p pres, token_p tokens)
 
             tokens = assign(pres, tokens);
             if (pres->has_error)
+            {
+                arg_access_p_free(args, size);
                 return tokens;
+            }
 
             args[size++].value = *pres->nodes;
 
@@ -1563,13 +1681,15 @@ token_p func_call_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != RPAREN_T)
         {
+            arg_access_p_free(args, size);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
         }
 
         if (size != alloc)
-            heap_shrink(&memory.heap, args, alloc * sizeof(arg_access_t), size * sizeof(arg_access_t));
+            args = realloc(args, size * sizeof(arg_access_t));
 
         func_call_np node = func_call_n_set(&func, args, size);
         *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
@@ -1637,6 +1757,8 @@ token_p class_def_parse(pres_p pres, token_p tokens)
 
             if (tokens->type != RCURLY_T)
             {
+                node_p_free1(body.nodes, body.size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1711,6 +1833,8 @@ token_p struct_def_parse(pres_p pres, token_p tokens)
 
             if (tokens->type != RCURLY_T)
             {
+                node_p_free1(body.nodes, body.size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1733,7 +1857,7 @@ token_p if_parse(pres_p pres, token_p tokens)
 
     advance_newline(tokens);
 
-    case_p cases = heap_alloc(&memory.heap, IF_CASE_SIZE * sizeof(case_t));
+    case_p cases = malloc(IF_CASE_SIZE * sizeof(case_t));
 
     unsigned long long alloc = IF_CASE_SIZE;
     unsigned long long size = 0;
@@ -1744,10 +1868,13 @@ token_p if_parse(pres_p pres, token_p tokens)
     {
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            case_p_free(cases, size);
             return tokens;
+        }
 
         if (size == alloc)
-            cases = heap_expand(&memory.heap, cases, size * sizeof(case_t), (alloc += IF_CASE_SIZE) * sizeof(case_t));
+            cases = realloc(cases, (alloc += IF_CASE_SIZE) * sizeof(case_t));
 
         cases[size].condition = *pres->nodes;
 
@@ -1758,7 +1885,11 @@ token_p if_parse(pres_p pres, token_p tokens)
 
             tokens = dollar_func(pres, tokens);
             if (pres->has_error)
+            {
+                node_free(&cases[size].condition);
+                case_p_free(cases, size);
                 return tokens;
+            }
 
             cases[size++].body = body_set(pres->nodes);
 
@@ -1768,17 +1899,28 @@ token_p if_parse(pres_p pres, token_p tokens)
         {
             if (tokens->type != LCURLY_T)
             {
+                node_free(&cases[size].condition);
+                case_p_free(cases, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
             }
 
-            tokens = body_gen(&cases[size++].body, IF_BODY_SIZE, pres, ++tokens);
+            tokens = body_gen(&cases[size].body, IF_BODY_SIZE, pres, ++tokens);
             if (pres->has_error)
+            {
+                node_free(&cases[size].condition);
+                case_p_free(cases, size);
                 return tokens;
+            }
+
+            size++;
 
             if (tokens->type != RCURLY_T)
             {
+                case_p_free(cases, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1809,7 +1951,10 @@ token_p if_parse(pres_p pres, token_p tokens)
 
             tokens = dollar_func(pres, tokens);
             if (pres->has_error)
+            {
+                case_p_free(cases, size);
                 return tokens;
+            }
 
             ebody = body_set(pres->nodes);
 
@@ -1819,6 +1964,8 @@ token_p if_parse(pres_p pres, token_p tokens)
         {
             if (tokens->type != LCURLY_T)
             {
+                case_p_free(cases, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1826,10 +1973,16 @@ token_p if_parse(pres_p pres, token_p tokens)
 
             tokens = body_gen(&ebody, IF_BODY_SIZE, pres, ++tokens);
             if (pres->has_error)
+            {
+                case_p_free(cases, size);
                 return tokens;
+            }
 
             if (tokens->type != RCURLY_T)
             {
+                node_p_free1(ebody.nodes, ebody.size);
+                case_p_free(cases, size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1862,6 +2015,8 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != LCURLY_T)
     {
+        node_free(&value);
+
         invalid_syntax_t error = invalid_syntax_set("Expected '{'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
@@ -1876,7 +2031,7 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
     if (tokens->type == CASE_TK)
     {
-        cases = heap_alloc(&memory.heap, SWITCH_CASE_SIZE * sizeof(case_t));
+        cases = malloc(SWITCH_CASE_SIZE * sizeof(case_t));
 
         unsigned long long alloc = SWITCH_CASE_SIZE;
 
@@ -1887,10 +2042,18 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
             tokens = tuple(pres, tokens);
             if (pres->has_error)
+            {
+                case_p_free(cases, size);
+                node_free(&value);
                 return tokens;
+            }
 
             if (tokens->type != COLON_T)
             {
+                node_free(pres->nodes);
+                case_p_free(cases, size);
+                node_free(&value);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -1900,17 +2063,24 @@ token_p switch_parse(pres_p pres, token_p tokens)
             advance_newline(tokens);
 
             if (size == alloc)
-                cases = heap_expand(&memory.heap, cases, size * sizeof(case_t), (alloc += SWITCH_CASE_SIZE) * sizeof(case_t));
+                cases = realloc(cases, (alloc += SWITCH_CASE_SIZE) * sizeof(case_t));
 
             cases[size].condition = *pres->nodes;
 
-            tokens = switch_case_body_gen(&cases[size++].body, SWITCH_BODY_SIZE, pres, tokens);
+            tokens = switch_case_body_gen(&cases[size].body, SWITCH_BODY_SIZE, pres, tokens);
             if (pres->has_error)
+            {
+                node_free(&cases[size].condition);
+                case_p_free(cases, size);
+                node_free(&value);
                 return tokens;
+            }
+
+            size++;
         } while (tokens->type == CASE_TK);
 
         if (size != alloc)
-            heap_shrink(&memory.heap, cases, alloc * sizeof(case_t), size * sizeof(case_t));
+            cases = realloc(cases, size * sizeof(case_t));
     }
 
     body_t dbody;
@@ -1921,6 +2091,9 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != COLON_T)
         {
+            case_p_free(cases, size);
+            node_free(&value);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -1931,13 +2104,20 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
         tokens = body_gen(&dbody, SWITCH_BODY_SIZE, pres, tokens);
         if (pres->has_error)
-            return tokens;
+        {
+            case_p_free(cases, size);
+            node_free(&value);
+        }
     }
     else
         dbody.size = 0;
 
     if (tokens->type != RCURLY_T)
     {
+        node_p_free1(dbody.nodes, dbody.size);
+        case_p_free(cases, size);
+        node_free(&value);
+
         invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
@@ -2003,6 +2183,8 @@ token_p for_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != TO_TK)
         {
+            node_free(pres->nodes);
+
             invalid_syntax_t error = invalid_syntax_set("Expected 'to'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2018,7 +2200,10 @@ token_p for_parse(pres_p pres, token_p tokens)
 
     tokens = tuple(pres, tokens);
     if (pres->has_error)
+    {
+        node_free(&start);
         return tokens;
+    }
 
     node_t end = *pres->nodes;
 
@@ -2030,7 +2215,11 @@ token_p for_parse(pres_p pres, token_p tokens)
 
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&end);
+            node_free(&start);
             return tokens;
+        }
 
         step = *pres->nodes;
     }
@@ -2048,7 +2237,12 @@ token_p for_parse(pres_p pres, token_p tokens)
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&step);
+            node_free(&end);
+            node_free(&start);
             return tokens;
+        }
 
         body = body_set(pres->nodes);
 
@@ -2058,6 +2252,10 @@ token_p for_parse(pres_p pres, token_p tokens)
     {
         if (tokens->type != LCURLY_T)
         {
+            node_free(&step);
+            node_free(&end);
+            node_free(&start);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2065,10 +2263,20 @@ token_p for_parse(pres_p pres, token_p tokens)
 
         tokens = body_gen(&body, FOR_BODY_SIZE, pres, ++tokens);
         if (pres->has_error)
+        {
+            node_free(&step);
+            node_free(&end);
+            node_free(&start);
             return tokens;
+        }
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(body.nodes, body.size);
+            node_free(&step);
+            node_free(&end);
+            node_free(&start);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2103,7 +2311,10 @@ token_p foreach_parse(pres_p pres, token_p tokens, char* iterator, pos_p poss)
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&iterable);
             return tokens;
+        }
 
         body = body_set(pres->nodes);
 
@@ -2113,6 +2324,8 @@ token_p foreach_parse(pres_p pres, token_p tokens, char* iterator, pos_p poss)
     {
         if (tokens->type != LCURLY_T)
         {
+            node_free(&iterable);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2120,10 +2333,16 @@ token_p foreach_parse(pres_p pres, token_p tokens, char* iterator, pos_p poss)
 
         tokens = body_gen(&body, FOREACH_BODY_SIZE, pres, ++tokens);
         if (pres->has_error)
+        {
+            node_free(&iterable);
             return tokens;
+        }
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(body.nodes, body.size);
+            node_free(&iterable);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2152,6 +2371,8 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
 
         if (tokens->type != SEMICOLON_T)
         {
+            node_free(&init);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ';'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2168,12 +2389,18 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
     {
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&init);
             return tokens;
+        }
 
         condition = *pres->nodes;
 
         if (tokens->type != SEMICOLON_T)
         {
+            node_free(&condition);
+            node_free(&init);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ';'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2190,12 +2417,20 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
     {
         tokens = tuple(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&condition);
+            node_free(&init);
             return tokens;
+        }
 
         step = *pres->nodes;
 
         if (tokens->type != RPAREN_T)
         {
+            node_free(&step);
+            node_free(&condition);
+            node_free(&init);
+
             invalid_syntax_t error = invalid_syntax_set("Expected ')'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2218,7 +2453,12 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&step);
+            node_free(&condition);
+            node_free(&init);
             return tokens;
+        }
 
         body = body_set(pres->nodes);
 
@@ -2228,6 +2468,10 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
     {
         if (tokens->type != LCURLY_T)
         {
+            node_free(&step);
+            node_free(&condition);
+            node_free(&init);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2235,10 +2479,20 @@ token_p loop_parse(pres_p pres, token_p tokens, pos_p poss)
 
         tokens = body_gen(&body, FOREACH_BODY_SIZE, pres, ++tokens);
         if (pres->has_error)
+        {
+            node_free(&step);
+            node_free(&condition);
+            node_free(&init);
             return tokens;
+        }
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(body.nodes, body.size);
+            node_free(&step);
+            node_free(&condition);
+            node_free(&init);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2277,7 +2531,10 @@ token_p while_parse(pres_p pres, token_p tokens)
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_free(&condition);
             return tokens;
+        }
 
         body = body_set(pres->nodes);
 
@@ -2287,6 +2544,8 @@ token_p while_parse(pres_p pres, token_p tokens)
     {
         if (tokens->type != LCURLY_T)
         {
+            node_free(&condition);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2294,10 +2553,16 @@ token_p while_parse(pres_p pres, token_p tokens)
 
         tokens = body_gen(&body, WHILE_BODY_SIZE, pres, ++tokens);
         if (pres->has_error)
+        {
+            node_free(&condition);
             return tokens;
+        }
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(body.nodes, body.size);
+            node_free(&condition);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2346,6 +2611,8 @@ token_p do_while_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(body.nodes, body.size);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2357,6 +2624,8 @@ token_p do_while_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != WHILE_TK)
     {
+        node_p_free1(body.nodes, body.size);
+
         invalid_syntax_t error = invalid_syntax_set("Expected 'while'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
         return tokens;
@@ -2367,7 +2636,10 @@ token_p do_while_parse(pres_p pres, token_p tokens)
 
     tokens = tuple(pres, tokens);
     if (pres->has_error)
+    {
+        node_p_free1(body.nodes, body.size);
         return tokens;
+    }
 
     do_while_np node = do_while_n_set(&body, pres->nodes);
     *pres->nodes = node_set1(DO_WHILE_N, node, poss, &pres->nodes->pose);
@@ -2412,6 +2684,8 @@ token_p try_parse(pres_p pres, token_p tokens)
 
         if (tokens->type != RCURLY_T)
         {
+            node_p_free1(tbody.nodes, tbody.size);
+
             invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
             pres_fail(pres, &error);
             return tokens;
@@ -2428,7 +2702,7 @@ token_p try_parse(pres_p pres, token_p tokens)
 
     if (tokens->type == EXCEPT_TK)
     {
-        excepts = heap_alloc(&memory.heap, TRY_EXCEPT_SIZE * sizeof(case_t));
+        excepts = malloc(TRY_EXCEPT_SIZE * sizeof(case_t));
 
         unsigned long long alloc = TRY_EXCEPT_SIZE;
 
@@ -2439,10 +2713,14 @@ token_p try_parse(pres_p pres, token_p tokens)
 
             tokens = tuple(pres, tokens);
             if (pres->has_error)
+            {
+                case_p_free(excepts, size);
+                node_p_free1(tbody.nodes, tbody.size);
                 return tokens;
+            }
 
             if (size == alloc)
-                excepts = heap_expand(&memory.heap, excepts, size * sizeof(case_t), (alloc += TRY_EXCEPT_SIZE) * sizeof(case_t));
+                excepts = realloc(excepts, (alloc += TRY_EXCEPT_SIZE) * sizeof(case_t));
 
             excepts[size].condition = *pres->nodes;
 
@@ -2453,7 +2731,12 @@ token_p try_parse(pres_p pres, token_p tokens)
 
                 tokens = dollar_func(pres, tokens);
                 if (pres->has_error)
+                {
+                    node_free(&excepts[size].condition);
+                    case_p_free(excepts, size);
+                    node_p_free1(tbody.nodes, tbody.size);
                     return tokens;
+                }
 
                 excepts[size++].body = body_set(pres->nodes);
 
@@ -2463,17 +2746,31 @@ token_p try_parse(pres_p pres, token_p tokens)
             {
                 if (tokens->type != LCURLY_T)
                 {
+                    node_free(&excepts[size].condition);
+                    case_p_free(excepts, size);
+                    node_p_free1(tbody.nodes, tbody.size);
+
                     invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
                     pres_fail(pres, &error);
                     return tokens;
                 }
 
-                tokens = body_gen(&excepts[size++].body, TRY_BODY_SIZE, pres, ++tokens);
+                tokens = body_gen(&excepts[size].body, TRY_BODY_SIZE, pres, ++tokens);
                 if (pres->has_error)
+                {
+                    node_free(&excepts[size].condition);
+                    case_p_free(excepts, size);
+                    node_p_free1(tbody.nodes, tbody.size);
                     return tokens;
+                }
+
+                size++;
 
                 if (tokens->type != RCURLY_T)
                 {
+                    case_p_free(excepts, size);
+                    node_p_free1(tbody.nodes, tbody.size);
+
                     invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                     pres_fail(pres, &error);
                     return tokens;
@@ -2486,7 +2783,7 @@ token_p try_parse(pres_p pres, token_p tokens)
         } while (tokens->type == EXCEPT_TK);
 
         if (size != alloc)
-            heap_shrink(&memory.heap, excepts, alloc * sizeof(case_t), size * sizeof(case_t));
+            excepts = realloc(excepts, size * sizeof(case_t));
     }
 
     body_t fbody;
@@ -2502,7 +2799,11 @@ token_p try_parse(pres_p pres, token_p tokens)
 
             tokens = dollar_func(pres, tokens);
             if (pres->has_error)
+            {
+                case_p_free(excepts, size);
+                node_p_free1(tbody.nodes, tbody.size);
                 return tokens;
+            }
 
             fbody = body_set(pres->nodes);
 
@@ -2512,6 +2813,9 @@ token_p try_parse(pres_p pres, token_p tokens)
         {
             if (tokens->type != LCURLY_T)
             {
+                case_p_free(excepts, size);
+                node_p_free1(tbody.nodes, tbody.size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '{' or ':'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -2519,10 +2823,18 @@ token_p try_parse(pres_p pres, token_p tokens)
 
             tokens = body_gen(&fbody, TRY_BODY_SIZE, pres, ++tokens);
             if (pres->has_error)
+            {
+                case_p_free(excepts, size);
+                node_p_free1(tbody.nodes, tbody.size);
                 return tokens;
+            }
 
             if (tokens->type != RCURLY_T)
             {
+                node_p_free1(fbody.nodes, fbody.size);
+                case_p_free(excepts, size);
+                node_p_free1(tbody.nodes, tbody.size);
+
                 invalid_syntax_t error = invalid_syntax_set("Expected '}'", &tokens->poss, &tokens->pose);
                 pres_fail(pres, &error);
                 return tokens;
@@ -2610,7 +2922,7 @@ token_p properties_gen(char* properties, token_p tokens)
 
 token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens)
 {
-    body->nodes = heap_alloc(&memory.heap, size * sizeof(node_t));
+    body->nodes = malloc(size * sizeof(node_t));
 
     unsigned long long alloc = size;
     body->size = 0;
@@ -2622,11 +2934,14 @@ token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p toke
             break;
 
         if (body->size == alloc)
-            body->nodes = heap_expand(&memory.heap, body->nodes, body->size * sizeof(node_t), (alloc += size) * sizeof(node_t));
+            body->nodes = realloc(body->nodes, (alloc += size) * sizeof(node_t));
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_p_free1(body->nodes, body->size);
             return tokens;
+        }
 
         body->nodes[body->size++] = *pres->nodes;
     } while ((tokens - 1)->type == NEWLINE_T || tokens->type == SEMICOLON_T);
@@ -2636,7 +2951,7 @@ token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p toke
 
 token_p switch_case_body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens)
 {
-    body->nodes = heap_alloc(&memory.heap, size * sizeof(node_t));
+    body->nodes = malloc(size * sizeof(node_t));
 
     unsigned long long alloc = size;
     body->size = 0;
@@ -2648,11 +2963,14 @@ token_p switch_case_body_gen(body_p body, unsigned long long size, pres_p pres, 
             break;
 
         if (body->size == alloc)
-            body->nodes = heap_expand(&memory.heap, body->nodes, body->size * sizeof(node_t), (alloc += size) * sizeof(node_t));
+            body->nodes = realloc(body->nodes, (alloc += size) * sizeof(node_t));
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
+        {
+            node_p_free1(body->nodes, body->size);
             return tokens;
+        }
 
         body->nodes[body->size++] = *pres->nodes;
     } while ((tokens - 1)->type == NEWLINE_T || tokens->type == SEMICOLON_T);

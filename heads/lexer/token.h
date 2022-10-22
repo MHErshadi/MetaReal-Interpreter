@@ -272,6 +272,9 @@ token_t token_set2(unsigned char type, pos_p poss, pos_p pose);
 
 void token_print(FILE* stream, token_p token);
 
+void token_p_free1(token_p tokens, unsigned long long size);
+void token_p_free2(token_p tokens);
+
 unsigned char identifier_type(const char* identifier);
 
 #endif /* __M_TOKEN__ */

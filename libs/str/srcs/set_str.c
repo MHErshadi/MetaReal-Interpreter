@@ -7,13 +7,13 @@
 /*/
 
 #include <str.h>
-#include <memory.h>
+#include <stdlib.h>
 
 str_p str_set_str(const char* src, unsigned long long size)
 {
-    str_p dst = cellular_alloc(&memory.str_cellular);
+    str_p dst = malloc(sizeof(str_t));
 
-    dst->str = heap_alloc(&memory.heap, size + 1);
+    dst->str = malloc(size + 1);
     dst->size = size;
 
     unsigned long long i;

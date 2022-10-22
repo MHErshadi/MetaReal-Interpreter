@@ -22,11 +22,14 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
 ires_t interpret(node_p nodes, context_p context)
 {
     ires_t ires;
+    ires.value.type = NULL_V;
 
     node_p copy = nodes;
 
     while (nodes->type != NULL_N)
     {
+        value_free(&ires.value);
+
         ires = interpret_node(nodes++, context);
         if (ires.has_error)
         {

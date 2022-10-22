@@ -7,11 +7,11 @@
 /*/
 
 #include <complex.h>
-#include <memory.h>
+#include <stdlib.h>
 
 complex_p complex_set(unsigned long long prec, complex_p src)
 {
-    complex_p dst = cellular_alloc(&memory.complex_cellular);
+    complex_p dst = malloc(sizeof(complex_t));
 
     mpc_init3(dst->value, prec, prec);
     mpc_set(dst->value, src->value, MPC_RNDNN);

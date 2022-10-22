@@ -31,18 +31,38 @@ value_t value_set2(unsigned char type, pos_p poss, pos_p pose)
     return value;
 }
 
+void value_free(value_p value)
+{
+    switch (value->type)
+    {
+    case NULL_V:
+        return;
+    case INT_V:
+        int_free(value->ptr);
+        return;
+    case FLOAT_V:
+        float_free(value->ptr);
+        return;
+    case COMPLEX_V:
+        complex_free(value->ptr);
+        return;
+    }
+}
+
 void value_print(value_p value)
 {
     switch (value->type)
     {
+    case NULL_V:
+        return;
     case INT_V:
         int_print(setting.output, value->ptr, "\n");
-        break;
+        return;
     case FLOAT_V:
         float_print(setting.output, value->ptr, setting.float_prec_show, "\n");
-        break;
+        return;
     case COMPLEX_V:
         complex_print(setting.output, value->ptr, setting.complex_prec_show, "\n");
-        break;
+        return;
     }
 }

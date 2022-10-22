@@ -7,11 +7,11 @@
 /*/
 
 #include <float.h>
-#include <memory.h>
+#include <stdlib.h>
 
 float_p float_set(unsigned long long prec, float_p src)
 {
-    float_p dst = cellular_alloc(&memory.float_cellular);
+    float_p dst = malloc(sizeof(float_t));
 
     mpfr_init2(dst->value, prec);
     mpfr_set(dst->value, src->value, MPFR_RNDN);

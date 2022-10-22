@@ -7,7 +7,7 @@ ODIR = .
 SRCS = $(shell find $(SDIR) -name "*.c")
 OUTS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.exe, $(SRCS))
 
-LIBS = ../../libcomplex.a ../../libfloat.a ../../libint.a ../../libmemory.a -lgmp -lmpfr -lmpc
+LIBS = ../../libcomplex.a ../../libfloat.a ../../libint.a -lgmp -lmpfr -lmpc
 
 make: $(OUTS)
 

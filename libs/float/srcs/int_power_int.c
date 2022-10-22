@@ -7,11 +7,11 @@
 /*/
 
 #include <float.h>
-#include <memory.h>
+#include <stdlib.h>
 
 float_p float_int_power_int(int_p num1, int_p num2, unsigned long long prec)
 {
-    float_p res = cellular_alloc(&memory.float_cellular);
+    float_p res = malloc(sizeof(float_t));
 
     mpfr_init2(res->value, prec);
     mpfr_set_z(res->value, num1->value, MPFR_RNDN);

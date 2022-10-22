@@ -7,10 +7,10 @@
 /*/
 
 #include <int.h>
-#include <memory.h>
+#include <stdlib.h>
 
 void int_free(int_p num)
 {
     mpz_clear(num->value);
-    cellular_free(&memory.int_cellular, num);
+    free(num);
 }

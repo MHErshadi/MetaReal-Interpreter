@@ -7,11 +7,11 @@
 /*/
 
 #include <int.h>
-#include <memory.h>
+#include <stdlib.h>
 
 int_p int_set_str(const char* str, unsigned long long size)
 {
-    int_p dst = cellular_alloc(&memory.int_cellular);
+    int_p dst = malloc(sizeof(int_t));
 
     mpz_init_set_str(dst->value, str, 10);
 

@@ -55,8 +55,8 @@ void node_free(node_p node)
     {
     case NULL_N:
     case NONE_N:
-    case CHAR_N:
     case BOOL_N:
+    case CHAR_N:
     case TYPE_N:
     case VAR_ACCESS_N:
     case IMPORT_N:

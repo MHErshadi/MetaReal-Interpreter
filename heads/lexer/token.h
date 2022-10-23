@@ -180,9 +180,9 @@ enum _token_types_
     FLOAT_TT,      // float
     COMPLEX_TT,    // complex
 
-    CHAR_TT,       // char
-
     BOOL_TT,       // bool
+
+    CHAR_TT,       // char
 
     STR_TT,        // str
 
@@ -261,8 +261,8 @@ static const char* token_labels[109] =
 
     "OBJECT_T",
     "INT_T", "FLOAT_T", "COMPLEX_T",
-    "CHAR_T",
     "BOOL_T",
+    "CHAR_T",
     "STR_T",
     "LIST_T", "TUPLE_T", "DICT_T", "SET_T"
 };

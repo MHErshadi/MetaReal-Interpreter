@@ -12,6 +12,7 @@
         "initializer_list": "c",
         "xiosbase": "c",
         "ios": "c",
-        "xlocale": "c"
+        "xlocale": "c",
+        "xmemory": "c"
     }
 }

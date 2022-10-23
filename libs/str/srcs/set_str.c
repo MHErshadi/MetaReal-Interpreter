@@ -9,16 +9,12 @@
 #include <str.h>
 #include <stdlib.h>
 
-str_p str_set_str(const char* src, unsigned long long size)
+str_p str_set_str(char* src, unsigned long long size)
 {
     str_p dst = malloc(sizeof(str_t));
 
-    dst->str = malloc(size + 1);
+    dst->str = src;
     dst->size = size;
-
-    unsigned long long i;
-    for (i = 0; i <= size; i++)
-        dst->str[i] = src[i];
 
     return dst;
 }

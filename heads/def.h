@@ -8,13 +8,8 @@
 #define CMD_FILE_NAME "<stdin>"
 #define CMD_INPUT_SIZE 1025
 
-#define STACK_SIZE 524288 // 512 * 1024
-#define HEAP_SIZE 1048576 // 1024 * 1024
-#define INT_CELLULAR_SIZE 2048
-#define FLOAT_CELLULAR_SIZE 1024
-#define COMPLEX_CELLULAR_SIZE 512
-
 #define ROOT_CONTEXT "<program>"
+#define TABLE_SIZE 64
 
 /* */
 

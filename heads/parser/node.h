@@ -28,9 +28,9 @@ enum _node_types_
     FLOAT_N,
     COMPLEX_N,
 
-    CHAR_N,
-
     BOOL_N,
+
+    CHAR_N,
 
     STR_N,
 
@@ -94,17 +94,17 @@ enum _node_types_
     BREAK_N
 };
 
-union __node_value__
+union __union_value__
 {
     void* ptr;
     unsigned char chr;
 };
-typedef union __node_value__ node_value_t;
+typedef union __union_value__ union_value_t;
 
 struct __node__
 {
     unsigned char type;
-    node_value_t value;
+    union_value_t value;
 
     pos_t poss;
     pos_t pose;

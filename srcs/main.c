@@ -31,7 +31,8 @@ int main(int argc, char** argv)
         pres_t pres;
         ires_t ires;
 
-        context_t context = context_set2(ROOT_CONTEXT, CMD_FILE_NAME);
+        table_t table = table_set(TABLE_SIZE);
+        context_t context = context_set2(ROOT_CONTEXT, &table, CMD_FILE_NAME);
 
         while (1)
         {
@@ -48,6 +49,10 @@ int main(int argc, char** argv)
                 size = strlen(code);
             }
             code[size - 1] = '\0';
+
+            for (; *code == ' ' || *code == '\t' || *code == '\n'; code++, size--);
+            if (!*code)
+                continue;
 
             lres = lex(code, '\0');
             if (lres.has_error)
@@ -70,7 +75,7 @@ int main(int argc, char** argv)
                 continue;
             }
 
-            value_print(&ires.value);
+            value_label(&ires.value, "\n");
             value_free(&ires.value);
         }
 

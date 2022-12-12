@@ -23,6 +23,7 @@ int_p int_set_str(const char* str, unsigned long long size);
 int_p int_set_ull(unsigned long long src);
 
 unsigned long long int_get_ull(int_p src);
+char* int_get_str(int_p src);
 
 void int_free(int_p num);
 

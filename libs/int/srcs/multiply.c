@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_add(int_p num1, int_p num2)
+void int_multiply(int_p num1, int_p num2)
 {
-    mpz_add(num1->value, num1->value, num2->value);
+    mpz_mul(num1->value, num1->value, num2->value);
 }

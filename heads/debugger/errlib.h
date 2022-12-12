@@ -41,6 +41,7 @@ typedef struct __runtime__* runtime_p;
 
 enum _runtime_types_
 {
+    ILLEGAL_OPERATION_E,
     DIV_BY_ZERO_E
 };
 

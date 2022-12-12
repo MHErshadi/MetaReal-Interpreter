@@ -87,9 +87,10 @@ pres_t parse(token_p tokens)
         pres.nodes++;
     } while ((tokens - 1)->type == NEWLINE_T || tokens->type == SEMICOLON_T);
 
+    pres.nodes -= size;
+
     if (tokens->type != EOF_T)
     {
-        pres.nodes -= size;
         node_p_free1(pres.nodes, size);
         token_p_free2(tokens_copy);
 
@@ -98,7 +99,6 @@ pres_t parse(token_p tokens)
         return pres;
     }
 
-    pres.nodes -= size;
     if (size + 1 != alloc)
         pres.nodes = realloc(pres.nodes, (size + 1) * sizeof(node_t));
 

@@ -3,8 +3,6 @@
 /*/
 
 #include <interpreter/value.h>
-#include <int.h>
-#include <float.h>
 #include <complex.h>
 #include <str.h>
 #include <setting.h>

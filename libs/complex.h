@@ -21,6 +21,8 @@ typedef struct _complex__* complex_p;
 complex_p complex_set(unsigned long long prec, complex_p src);
 complex_p complex_set_str(unsigned long long prec, const char* str, unsigned long long size);
 
+char* complex_get_str(complex_p src, unsigned long long prec);
+
 void complex_free(complex_p num);
 
 void complex_print(FILE* stream, complex_p num, unsigned long long prec, const char* end);

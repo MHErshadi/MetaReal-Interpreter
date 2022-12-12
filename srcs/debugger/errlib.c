@@ -9,8 +9,9 @@
 
 unsigned char number_length(unsigned long long number);
 
-const char* runtime_labels[1] =
+const char* runtime_labels[2] =
 {
+    "IllegalOp",
     "DivByZero"
 };
 
@@ -152,7 +153,7 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
         troubleshoot = tail;
     }
 
-    fprintf(setting.error, "\nTroubleshoot (most recent call last):\n%s", troubleshoot);
+    fprintf(setting.error, "\nTroubleshoot (most recent call last):\n%s\n", troubleshoot);
     free(troubleshoot);
 
     if (error->poss.line != error->pose.line)

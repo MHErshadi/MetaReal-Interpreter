@@ -30,6 +30,28 @@ enum _value_types_
     SET_V
 };
 
+static const char* value_labels[13] =
+{
+    "null",
+    "object", "none",
+    "int", "float", "complex",
+    "bool",
+    "char",
+    "str",
+    "list", "tuple", "dict", "set"
+};
+
+static const int value_label_lens[13] =
+{
+    4,
+    6, 4,
+    3, 5, 7,
+    4,
+    4,
+    3,
+    4, 5, 4, 3
+};
+
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context);
 value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context_p context);
 value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context);

@@ -22,6 +22,8 @@ typedef struct __float__* float_p;
 float_p float_set(unsigned long long prec, float_p src);
 float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size);
 
+char* float_get_str(float_p src, unsigned long long prec);
+
 void float_free(float_p num);
 
 void float_print(FILE* stream, float_p num, unsigned long long prec, const char* end);

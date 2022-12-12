@@ -36,4 +36,12 @@ char str_nequal(str_p str1, str_p str2);
 
 char str_contains(str_p str, char chr);
 
+/* */
+
+void str_concat_str(str_p str1, const char* str2);
+void str_str_concat(const char* str1, str_p str2);
+
+void str_concat_char(str_p str, char chr);
+void str_char_concat(char chr, str_p str);
+
 #endif /* __M_STR__ */

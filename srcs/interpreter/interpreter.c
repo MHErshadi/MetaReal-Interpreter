@@ -128,6 +128,8 @@ ires_t interpret_node(node_p node, context_p context)
         return interpret_str(node->value.ptr, &node->poss, &node->pose, context);
     case BINARY_OPERATION_N:
         return interpret_binary_operation(node->value.ptr, &node->poss, &node->pose, context);
+    case UNARY_OPERATION_N:
+        return interpret_unary_operation(node->value.ptr, &node->poss, &node->pose, context);
     default:
         fprintf(stderr, "interpret_node function: invalid node type (#%u)\n", node->type);
         abort();
@@ -241,70 +243,70 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     switch (node->operator)
     {
     case PLUS_T:
-        ires = operate_add(&left, &right);
+        ires = operate_add(&left, &right, poss, pose, context);
         break;
     case MINUS_T:
-        ires = operate_subtract(&left, &right);
+        ires = operate_subtract(&left, &right, poss, pose, context);
         break;
     case MULTIPLY_T:
-        ires = operate_multiply(&left, &right);
+        ires = operate_multiply(&left, &right, poss, pose, context);
         break;
     case DIVIDE_T:
-        ires = operate_divide(&left, &right);
+        ires = operate_divide(&left, &right, poss, pose, context);
         break;
     case MODULO_T:
-        ires = operate_modulo(&left, &right);
+        ires = operate_modulo(&left, &right, poss, pose, context);
         break;
     case QUOTIENT_T:
-        ires = operate_quotient(&left, &right);
+        ires = operate_quotient(&left, &right, poss, pose, context);
         break;
     case POWER_T:
-        ires = operate_power(&left, &right);
+        ires = operate_power(&left, &right, poss, pose, context);
         break;
     case B_AND_T:
-        ires = operate_b_and(&left, &right);
+        ires = operate_b_and(&left, &right, poss, pose, context);
         break;
     case B_OR_T:
-        ires = operate_b_or(&left, &right);
+        ires = operate_b_or(&left, &right, poss, pose, context);
         break;
     case B_XOR_T:
-        ires = operate_b_xor(&left, &right);
+        ires = operate_b_xor(&left, &right, poss, pose, context);
         break;
     case LSHIFT_T:
-        ires = operate_lshift(&left, &right);
+        ires = operate_lshift(&left, &right, poss, pose, context);
         break;
     case RSHIFT_T:
-        ires = operate_rshift(&left, &right);
+        ires = operate_rshift(&left, &right, poss, pose, context);
         break;
     case EQUAL_T:
-        ires = operate_equal(&left, &right);
+        ires = operate_equal(&left, &right, poss, pose, context);
         break;
     case NEQUAL_T:
-        ires = operate_nequal(&left, &right);
+        ires = operate_nequal(&left, &right, poss, pose, context);
         break;
     case LESS_T:
-        ires = operate_less(&left, &right);
+        ires = operate_less(&left, &right, poss, pose, context);
         break;
     case GREATER_T:
-        ires = operate_greater(&left, &right);
+        ires = operate_greater(&left, &right, poss, pose, context);
         break;
     case LESS_EQ_T:
-        ires = operate_less_eq(&left, &right);
+        ires = operate_less_eq(&left, &right, poss, pose, context);
         break;
     case GREATER_EQ_T:
-        ires = operate_greater_eq(&left, &right);
+        ires = operate_greater_eq(&left, &right, poss, pose, context);
         break;
     case AND_T:
     case AND_TK:
-        ires = operate_greater(&left, &right);
+        ires = operate_and(&left, &right, poss, pose, context);
         break;
     case OR_T:
     case OR_TK:
-        ires = operate_less_eq(&left, &right);
+        ires = operate_or(&left, &right, poss, pose, context);
         break;
     case XOR_T:
     case XOR_TK:
-        ires = operate_greater_eq(&left, &right);
+        ires = operate_xor(&left, &right, poss, pose, context);
         break;
     }
 
@@ -313,15 +315,49 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 
     ires.value.poss = *poss;
     ires.value.pose = *pose;
+    ires.value.context = context;
 
 ret:
     free(node);
     return ires;
 }
 
-ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose, context_p context)
+ires_t interpret_unary_operation(unary_operation_np node, pos_p pose, pos_p poss, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t operand = ires_merge(&ires, interpret_node(&node->operand, context));
+    if (ires.has_error)
+        goto ret;
+
+    switch (node->operator)
+    {
+    case PLUS_T:
+        ires.value = operand;
+        break;
+    case MINUS_T:
+        ires = operate_negate(&operand, poss, pose, context);
+        break;
+    case B_NOT_T:
+        ires = operate_b_not(&operand, poss, pose, context);
+        break;
+    case NOT_T:
+    case NOT_TK:
+        ires = operate_not(&operand, poss, pose, context);
+        break;
+    }
+
+    if (ires.has_error)
+        goto ret;
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+ret:
+    free(node);
+    return ires;
 }
 
 ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p pose, context_p context)

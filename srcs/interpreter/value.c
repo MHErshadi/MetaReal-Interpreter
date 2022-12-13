@@ -130,3 +130,27 @@ void value_label(value_p value, const char* end)
         return;
     }
 }
+
+char value_is_true(value_p value)
+{
+    switch (value->type)
+    {
+    case NULL_V:
+    case NONE_V:
+        return 0;
+    case OBJECT_V:
+        return 1;
+    case INT_V:
+        return int_sign(value->value.ptr) != 0;
+    case FLOAT_V:
+        return float_sign(value->value.ptr) != 0;
+    case COMPLEX_V:
+        return !complex_is_zero(value->value.ptr);
+    case BOOL_V:
+        return value->value.chr;
+    case CHAR_V:
+        return value->value.chr != 0;
+    case STR_V:
+        return ((str_p)value->value.ptr)->size != 0;
+    }
+}

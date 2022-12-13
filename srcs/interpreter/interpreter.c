@@ -2,10 +2,9 @@
  * MetaReal version 1.0.0
 /*/
 
-#include <interpreter/interpreter.h>
+#include <interpreter/operation.h>
 #include <complex.h>
 #include <str.h>
-#include <interpreter/operation.h>
 #include <stdlib.h>
 #include <setting.h>
 #include <lexer/token.h>
@@ -298,15 +297,21 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         break;
     case AND_T:
     case AND_TK:
-        ires = operate_and(&left, &right, poss, pose, context);
+        ires = operate_and(&left, &right);
         break;
     case OR_T:
     case OR_TK:
-        ires = operate_or(&left, &right, poss, pose, context);
+        ires = operate_or(&left, &right);
         break;
     case XOR_T:
     case XOR_TK:
-        ires = operate_xor(&left, &right, poss, pose, context);
+        ires = operate_xor(&left, &right);
+        break;
+    case IN_TK:
+        ires = operate_contain(&left, &right, poss, pose, context);
+        break;
+    case IS_TK:
+        ires = operate_type1(&left, &right, poss, pose, context);
         break;
     }
 
@@ -322,7 +327,7 @@ ret:
     return ires;
 }
 
-ires_t interpret_unary_operation(unary_operation_np node, pos_p pose, pos_p poss, context_p context)
+ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose, context_p context)
 {
     ires_t ires;
     ires.has_error = 0;
@@ -344,7 +349,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p pose, pos_p poss
         break;
     case NOT_T:
     case NOT_TK:
-        ires = operate_not(&operand, poss, pose, context);
+        ires = operate_not(&operand);
         break;
     }
 

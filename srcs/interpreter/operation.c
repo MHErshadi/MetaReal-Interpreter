@@ -1479,19 +1479,75 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
     return ires_fail(&error);
 }
 
-ires_t operate_and(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_and(value_p left, value_p right)
 {
+    char res = value_is_true(left) & value_is_true(right);
 
+    value_free(left);
+    value_free(right);
+
+    left->type = BOOL_V;
+    left->value.chr = res;
+
+    return ires_success(left);
 }
 
-ires_t operate_or(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_or(value_p left, value_p right)
 {
+    char res = value_is_true(left) | value_is_true(right);
 
+    value_free(left);
+    value_free(right);
+
+    left->type = BOOL_V;
+    left->value.chr = res;
+
+    return ires_success(left);
 }
 
-ires_t operate_xor(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_xor(value_p left, value_p right)
 {
+    char res = value_is_true(left) ^ value_is_true(right);
 
+    value_free(left);
+    value_free(right);
+
+    left->type = BOOL_V;
+    left->value.chr = res;
+
+    return ires_success(left);
+}
+
+ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+{
+    if (left->type == CHAR_V && right->type == STR_V)
+    {
+        char res = str_contains(right->value.ptr, left->value.chr);
+        str_free(right->value.ptr);
+
+        left->type = BOOL_V;
+        left->value.chr = res;
+
+        return ires_success(left);
+    }
+
+    value_free(left);
+    value_free(right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "in", poss, pose, context);
+    return ires_fail(&error);
+}
+
+ires_t operate_type1(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+{
+    char res = left->type == right->type;
+    value_free(left);
+    value_free(right);
+
+    left->type = BOOL_V;
+    left->value.chr = res;
+
+    return ires_success(left);
 }
 
 ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context)
@@ -1520,20 +1576,37 @@ ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context
 
 ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    if (operand->type == INT_V)
+    {
+        int_not(operand->value.ptr);
 
+        return ires_success(operand);
+    }
+
+    value_free(operand);
+
+    runtime_t error = illegal_operation_unary(operand->type, "~", poss, pose, context);
+    return ires_fail(&error);
 }
 
-ires_t operate_not(value_p operand, pos_p poss, pos_p pose, context_p context)
+ires_t operate_not(value_p operand)
+{
+    char res = !value_is_true(operand);
+
+    value_free(operand);
+
+    operand->type = BOOL_V;
+    operand->value.chr = res;
+
+    return ires_success(operand);
+}
+
+ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
 
 }
 
-ires_t operate_increment(value_p operand)
-{
-
-}
-
-ires_t operate_decrement(value_p operand)
+ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
 
 }

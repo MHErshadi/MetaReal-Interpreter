@@ -21,8 +21,8 @@ ires_t operate_b_xor(value_p left, value_p right, pos_p poss, pos_p pose, contex
 ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 
-ires_t operate_equal(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_nequal(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
+ires_t operate_equal(value_p left, value_p right);
+ires_t operate_nequal(value_p left, value_p right);
 ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);

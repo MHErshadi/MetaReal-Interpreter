@@ -10,5 +10,5 @@
 
 char float_less_int(float_p num1, int_p num2)
 {
-    return mpfr_cmp_z(num1->value, num2->value) == 1;
+    return mpfr_cmp_z(num1->value, num2->value) < 0;
 }

@@ -10,5 +10,5 @@
 
 char int_greater_equal(int_p num1, int_p num2)
 {
-    return mpz_cmp(num1->value, num2->value) != 1;
+    return mpz_cmp(num1->value, num2->value) >= 0;
 }

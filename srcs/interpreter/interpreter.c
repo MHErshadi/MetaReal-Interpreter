@@ -279,10 +279,10 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         ires = operate_rshift(&left, &right, poss, pose, context);
         break;
     case EQUAL_T:
-        ires = operate_equal(&left, &right, poss, pose, context);
+        ires = operate_equal(&left, &right);
         break;
     case NEQUAL_T:
-        ires = operate_nequal(&left, &right, poss, pose, context);
+        ires = operate_nequal(&left, &right);
         break;
     case LESS_T:
         ires = operate_less(&left, &right, poss, pose, context);

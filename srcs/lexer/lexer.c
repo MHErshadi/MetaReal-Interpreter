@@ -101,12 +101,18 @@ lres_t lex(const char* code, char terminator)
             code = gen_str(&tokens[size++], ++code, terminator, &pos);
             break;
         case '.':
+            if (code[1] >= '0' && code[1] <= '9')
+            {
+                code = gen_number(&tokens[size++], code, &pos);
+                break;
+            }
+
             poss = pos;
 
             code++;
             pos.index++;
 
-            if (*code == '.' && *(code + 1) == '.')
+            if (*code == '.' && code[1] == '.')
             {
                 code += 2;
                 pos.index += 2;

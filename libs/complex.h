@@ -67,6 +67,12 @@ char complex_nequal_float(complex_p num1, float_p num2);
 
 /* */
 
+//temporary
 void complex_negate(complex_p num);
+
+/* */
+
+//temporary
+char complex_is_zero(complex_p num);
 
 #endif /* __M_COMPLEX__ */

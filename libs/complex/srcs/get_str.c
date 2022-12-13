@@ -24,7 +24,7 @@ char* complex_get_str(complex_p src, unsigned long long prec)
     if (mpfr_sgn(mpc_realref(src->value)))
     {
         char* format = malloc(13 + length * 2);
-        sprintf(format, "(%%.%lluRg+%%.%lluRgi)", prec, prec);
+        sprintf(format, "(%%.%lluRg%%+.%lluRgi)", prec, prec);
 
         // temporary
         char* str = malloc(prec * 2 + 100);

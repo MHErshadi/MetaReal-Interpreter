@@ -23,7 +23,7 @@ void complex_print(FILE* stream, complex_p num, unsigned long long prec, const c
     if (mpfr_sgn(mpc_realref(num->value)))
     {
         char* format = malloc(15 + length * 2);
-        sprintf(format, "(%%.%lluRg+%%.%lluRgi)%%s", prec, prec);
+        sprintf(format, "(%%.%lluRg%%+.%lluRgi)%%s", prec, prec);
 
         mpfr_fprintf(stream, format, mpc_realref(num->value), mpc_imagref(num->value), end);
 

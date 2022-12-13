@@ -9,9 +9,11 @@
 
 unsigned char number_length(unsigned long long number);
 
-const char* runtime_labels[2] =
+const char* runtime_labels[4] =
 {
     "IllegalOp",
+    "OutRange",
+    "MemOverflow",
     "DivByZero"
 };
 

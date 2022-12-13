@@ -934,7 +934,7 @@ token_p core(pres_p pres, token_p tokens)
 {
     if (tokens->type == LPAREN_T)
     {
-        pos_p poss = &tokens++->poss;
+        pos_t poss = tokens++->poss;
 
         advance_newline(tokens);
 
@@ -951,7 +951,7 @@ token_p core(pres_p pres, token_p tokens)
             return tokens;
         }
 
-        pres->nodes->poss = *poss;
+        pres->nodes->poss = poss;
         pres->nodes->pose = tokens++->pose;
 
         advance_newline(tokens);

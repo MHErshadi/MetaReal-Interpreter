@@ -7,8 +7,13 @@
 #include <str.h>
 #include <setting.h>
 #include <stdlib.h>
+#include <string.h>
 
 runtime_t illegal_operation(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context);
+runtime_t out_of_range(pos_p poss, pos_p pose, context_p context);
+runtime_t mem_overflow(pos_p poss, pos_p pose, context_p context);
+runtime_t division_by_zero(pos_p poss, pos_p pose, context_p context);
+runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_add(value_p left, value_p right)
 {
@@ -204,38 +209,760 @@ ires_t operate_add(value_p left, value_p right)
         break;
     }
 
+    value_free(&left);
+    value_free(&right);
+
     runtime_t error = illegal_operation(left->type, right->type, "+", &left->poss, &right->pose, left->context);
     return ires_fail(&error);
 }
 
 ires_t operate_subtract(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
 
+            int_subtract(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            right->poss = left->poss;
+
+            float_int_subtract(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_int_subtract(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            float_subtract_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            left->pose = right->pose;
+
+            float_subtract(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_float_subtract(left->value.ptr, right->value.ptr);
+            float_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case COMPLEX_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            complex_subtract_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            left->pose = right->pose;
+
+            complex_subtract_float(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            left->pose = right->pose;
+
+            complex_subtract(left->value.ptr, right->value.ptr);
+            complex_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    case STR_V:
+        if (right->type == INT_V)
+        {
+            if (!int_fits_ull(right->value.ptr))
+            {
+                str_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = out_of_range(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            unsigned long long pos = int_get_ull(right->value.ptr);
+
+            if (pos >= ((str_p)left->value.ptr)->size)
+            {
+                str_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = out_of_range(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            str_remove(left->value.ptr, pos);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "-", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_multiply(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
 
+            int_multiply(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            right->poss = left->poss;
+
+            float_multiply_int(right->value.ptr, left->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_multiply_int(right->value.ptr, left->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            float_multiply_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            left->pose = right->pose;
+
+            float_multiply(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_multiply_float(right->value.ptr, left->value.ptr);
+            float_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case COMPLEX_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            complex_multiply_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            left->pose = right->pose;
+
+            complex_multiply_float(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            left->pose = right->pose;
+
+            complex_multiply(left->value.ptr, right->value.ptr);
+            complex_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    case STR_V:
+        if (right->type == INT_V)
+        {
+            if (!int_fits_ull(right->value.ptr))
+            {
+                str_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = mem_overflow(&left->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            unsigned long long count = int_get_ull(right->value.ptr);
+
+            left->pose = right->pose;
+
+            str_repeat(left->value.ptr, count);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "*", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_divide(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                int_free(right->value.ptr);
 
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_p res = float_int_divide_int(left->value.ptr, right->value.ptr, setting.float_prec_bit);
+            int_free(left->value.ptr);
+            int_free(right->value.ptr);
+
+            left->type = FLOAT_V;
+            left->value.ptr = res;
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            right->poss = left->poss;
+
+            float_int_divide(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        case COMPLEX_V:
+            if (complex_is_zero(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                complex_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            right->poss = left->poss;
+
+            complex_int_divide(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_divide_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_divide(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            if (complex_is_zero(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                complex_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            right->poss = left->poss;
+
+            complex_float_divide(left->value.ptr, right->value.ptr);
+            float_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case COMPLEX_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                complex_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            complex_divide_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                complex_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            complex_divide_float(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            if (complex_is_zero(right->value.ptr))
+            {
+                complex_free(left->value.ptr);
+                complex_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            complex_divide(left->value.ptr, right->value.ptr);
+            complex_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "/", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_modulo(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                int_free(right->value.ptr);
 
+                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            int_modulo(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            right->poss = left->poss;
+
+            float_int_modulo(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_modulo_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_modulo(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "%", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_quotient(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                int_free(right->value.ptr);
 
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            int_quotient(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            float_int_quotient(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            right->poss = left->poss;
+
+            float_quotient_int(left->value.ptr, right->value.ptr);
+            float_free(left->value.ptr);
+
+            return ires_success(right);
+        case FLOAT_V:
+            if (!float_sign(right->value.ptr))
+            {
+                float_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            int_p res = float_quotient(left->value.ptr, right->value.ptr);
+            float_free(left->value.ptr);
+            float_free(right->value.ptr);
+
+            left->type = INT_V;
+            left->value.ptr = res;
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "//", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_power(value_p left, value_p right)
 {
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (int_sign(right->value.ptr) < 0)
+            {
+                left->pose = right->pose;
 
+                float_p res = float_int_power_int(left->value.ptr, right->value.ptr, setting.float_prec_bit);
+                int_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                left->type = FLOAT_V;
+                left->value.ptr = res;
+
+                return ires_success(left);
+            }
+
+            if (!int_fits_ul(right->value.ptr))
+            {
+                int_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = mem_overflow(&left->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            left->pose = right->pose;
+
+            int_power(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (int_sign(left->value.ptr) < 0)
+            {
+                left->pose = right->pose;
+
+                complex_p res = complex_int_power_float(left->value.ptr, right->value.ptr, setting.complex_prec_bit);
+                int_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                left->type = COMPLEX_V;
+                left->value.ptr = res;
+
+                return ires_success(left);
+            }
+
+            right->poss = left->poss;
+
+            float_int_power(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_int_power(left->value.ptr, right->value.ptr);
+            int_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            float_power_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            if (float_sign(left->value.ptr) < 0)
+            {
+                left->pose = right->pose;
+
+                complex_p res = complex_float_power_float(left->value.ptr, right->value.ptr, setting.complex_prec_bit);
+                float_free(left->value.ptr);
+                float_free(right->value.ptr);
+
+                left->type = COMPLEX_V;
+                left->value.ptr = res;
+
+                return ires_success(left);
+            }
+
+            left->pose = right->pose;
+
+            float_power(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            right->poss = left->poss;
+
+            complex_float_power(left->value.ptr, right->value.ptr);
+            float_free(left->value.ptr);
+
+            return ires_success(right);
+        }
+
+        break;
+    case COMPLEX_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->pose = right->pose;
+
+            complex_power_int(left->value.ptr, right->value.ptr);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case FLOAT_V:
+            left->pose = right->pose;
+
+            complex_power_float(left->value.ptr, right->value.ptr);
+            float_free(right->value.ptr);
+
+            return ires_success(left);
+        case COMPLEX_V:
+            left->pose = right->pose;
+
+            complex_power(left->value.ptr, right->value.ptr);
+            complex_free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        break;
+    }
+
+    value_free(&left);
+    value_free(&right);
+
+    runtime_t error = illegal_operation(left->type, right->type, "**", &left->poss, &right->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_b_and(value_p left, value_p right)
@@ -253,12 +980,12 @@ ires_t operate_b_xor(value_p left, value_p right)
 
 }
 
-ires_t operate_b_lshift(value_p left, value_p right)
+ires_t operate_lshift(value_p left, value_p right)
 {
 
 }
 
-ires_t operate_b_rshift(value_p left, value_p right)
+ires_t operate_rshift(value_p left, value_p right)
 {
 
 }
@@ -339,4 +1066,36 @@ runtime_t illegal_operation(unsigned char type1, unsigned char type2, const char
     sprintf(detail, "Illegal operation (%s) between <%s> and <%s>", operator, value_labels[type1], value_labels[type2]);
 
     return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
+}
+
+runtime_t out_of_range(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(19);
+    strcpy(detail, "Index out of range");
+
+    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
+}
+
+runtime_t mem_overflow(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(16);
+    strcpy(detail, "Memory overflow");
+
+    return runtime_set(MEM_OVERFLOW_E, detail, poss, pose, context);
+}
+
+runtime_t division_by_zero(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(17);
+    strcpy(detail, "Division by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
+}
+
+runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(15);
+    strcpy(detail, "Modulo by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
 }

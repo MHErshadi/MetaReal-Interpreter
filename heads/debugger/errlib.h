@@ -42,7 +42,9 @@ typedef struct __runtime__* runtime_p;
 enum _runtime_types_
 {
     ILLEGAL_OPERATION_E,
-    DIV_BY_ZERO_E
+    OUT_OF_RANGE_E,
+    MEM_OVERFLOW_E,
+    DIVISION_BY_ZERO_E
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos);

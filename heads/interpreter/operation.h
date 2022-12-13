@@ -18,8 +18,8 @@ ires_t operate_power(value_p left, value_p right);
 ires_t operate_b_and(value_p left, value_p right);
 ires_t operate_b_or(value_p left, value_p right);
 ires_t operate_b_xor(value_p left, value_p right);
-ires_t operate_b_lshift(value_p left, value_p right);
-ires_t operate_b_rshift(value_p left, value_p right);
+ires_t operate_lshift(value_p left, value_p right);
+ires_t operate_rshift(value_p left, value_p right);
 
 ires_t operate_equal(value_p left, value_p right);
 ires_t operate_nequal(value_p left, value_p right);

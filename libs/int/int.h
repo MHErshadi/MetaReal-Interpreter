@@ -65,5 +65,6 @@ char int_sign(int_p num);
 
 // temporary
 char int_fits_ull(int_p num);
+char int_fits_ul(int_p num);
 
 #endif /* __M_INT__ */

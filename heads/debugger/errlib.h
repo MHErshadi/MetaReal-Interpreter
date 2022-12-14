@@ -41,9 +41,10 @@ typedef struct __runtime__* runtime_p;
 
 enum _runtime_types_
 {
+    TYPE_E,
     ILLEGAL_OPERATION_E,
-    OUT_OF_RANGE_E,
     MEM_OVERFLOW_E,
+    OUT_OF_RANGE_E,
     DIVISION_BY_ZERO_E
 };
 
@@ -55,5 +56,12 @@ void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned lon
 
 runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose, context_p context);
 void runtime_print(runtime_p error, const char* code, unsigned long long size);
+
+runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context);
+runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context);
+runtime_t mem_overflow_error(pos_p poss, pos_p pose, context_p context);
+runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context);
+runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context);
+runtime_t modulo_by_zero_error(pos_p poss, pos_p pose, context_p context);
 
 #endif /* __M_ERRLIB__ */

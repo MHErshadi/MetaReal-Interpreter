@@ -6,15 +6,17 @@
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
+#include <interpreter/value.h>
 
 unsigned char number_length(unsigned long long number);
 
-const char* runtime_labels[4] =
+const char* runtime_labels[5] =
 {
-    "IllegalOp",
-    "OutRange",
-    "MemOverflow",
-    "DivByZero"
+    "TypeError",
+    "IllegalOpError",
+    "MemOverflowError",
+    "OutRangeError",
+    "DivByZeroError"
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos)
@@ -200,6 +202,54 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
     for (; i < error->pose.index; i++)
         putc('^', setting.error);
     fputs("\n\n", setting.error);
+}
+
+runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(39 + strlen(operator) + value_label_lens[type1] + value_label_lens[type2]);
+    sprintf(detail, "Illegal operation (%s) between <%s> and <%s>", operator, value_labels[type1], value_labels[type2]);
+
+    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
+}
+
+runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(19);
+    strcpy(detail, "Index out of range");
+
+    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
+}
+
+runtime_t mem_overflow_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(16);
+    strcpy(detail, "Memory overflow");
+
+    return runtime_set(MEM_OVERFLOW_E, detail, poss, pose, context);
+}
+
+runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(17);
+    strcpy(detail, "Division by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
+}
+
+runtime_t modulo_by_zero_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(15);
+    strcpy(detail, "Modulo by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
+}
+
+runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(28 + strlen(operator) + value_label_lens[type]);
+    sprintf(detail, "Illegal operation (%s) for <%s>", operator, value_labels[type]);
+
+    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }
 
 unsigned char number_length(unsigned long long number)

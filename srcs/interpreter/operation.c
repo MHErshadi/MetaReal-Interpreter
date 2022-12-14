@@ -9,13 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-runtime_t illegal_operation(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context);
-runtime_t out_of_range(pos_p poss, pos_p pose, context_p context);
-runtime_t mem_overflow(pos_p poss, pos_p pose, context_p context);
-runtime_t division_by_zero(pos_p poss, pos_p pose, context_p context);
-runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context);
-runtime_t illegal_operation_unary(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context);
-
 ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
     char* str;
@@ -175,7 +168,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "+", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "+", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -254,7 +247,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                 str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = out_of_range(&right->poss, &right->pose, right->context);
+                runtime_t error = out_of_range_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -265,7 +258,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                 str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = out_of_range(&right->poss, &right->pose, right->context);
+                runtime_t error = out_of_range_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -281,7 +274,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "-", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "-", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -360,7 +353,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
                 str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = mem_overflow(poss, pose, context);
+                runtime_t error = mem_overflow_error(poss, pose, context);
                 return ires_fail(&error);
             }
 
@@ -378,7 +371,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "*", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "*", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -395,7 +388,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -413,7 +406,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -427,7 +420,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 int_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -447,7 +440,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -461,7 +454,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -475,7 +468,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 float_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -495,7 +488,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 complex_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -509,7 +502,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 complex_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -523,7 +516,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 complex_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -539,7 +532,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "/", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "/", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -556,7 +549,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = modulo_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -570,7 +563,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = modulo_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -590,7 +583,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = modulo_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -604,7 +597,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = modulo_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = modulo_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -620,7 +613,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "%", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "%", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -637,7 +630,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -651,7 +644,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -671,7 +664,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -685,7 +678,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                runtime_t error = division_by_zero(&right->poss, &right->pose, right->context);
+                runtime_t error = division_by_zero_error(&right->poss, &right->pose, right->context);
                 return ires_fail(&error);
             }
 
@@ -705,7 +698,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "//", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "//", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -734,7 +727,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
                 int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                runtime_t error = mem_overflow(poss, pose, context);
+                runtime_t error = mem_overflow_error(poss, pose, context);
                 return ires_fail(&error);
             }
 
@@ -826,7 +819,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "**", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "**", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -843,7 +836,7 @@ ires_t operate_b_and(value_p left, value_p right, pos_p poss, pos_p pose, contex
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "&", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "&", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -860,7 +853,7 @@ ires_t operate_b_or(value_p left, value_p right, pos_p poss, pos_p pose, context
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "|", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "|", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -877,7 +870,7 @@ ires_t operate_b_xor(value_p left, value_p right, pos_p poss, pos_p pose, contex
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "^", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "^", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -890,7 +883,7 @@ ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
             int_free(left->value.ptr);
             int_free(right->value.ptr);
 
-            runtime_t error = mem_overflow(poss, pose, context);
+            runtime_t error = mem_overflow_error(poss, pose, context);
             return ires_fail(&error);
         }
 
@@ -903,7 +896,7 @@ ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "<<", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "<<", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -916,7 +909,7 @@ ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
             int_free(left->value.ptr);
             int_free(right->value.ptr);
 
-            runtime_t error = mem_overflow(poss, pose, context);
+            runtime_t error = mem_overflow_error(poss, pose, context);
             return ires_fail(&error);
         }
 
@@ -929,7 +922,7 @@ ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, ">>", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, ">>", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1286,7 +1279,7 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "<", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "<", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1349,7 +1342,7 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, ">", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, ">", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1412,7 +1405,7 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "<=", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "<=", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1475,7 +1468,7 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, ">=", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, ">=", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1534,7 +1527,7 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
     value_free(left);
     value_free(right);
 
-    runtime_t error = illegal_operation(left->type, right->type, "in", poss, pose, context);
+    runtime_t error = illegal_operation_error(left->type, right->type, "in", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1570,7 +1563,7 @@ ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context
 
     value_free(operand);
 
-    runtime_t error = illegal_operation_unary(operand->type, "-", poss, pose, context);
+    runtime_t error = illegal_operation_unary_error(operand->type, "-", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1585,7 +1578,7 @@ ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context)
 
     value_free(operand);
 
-    runtime_t error = illegal_operation_unary(operand->type, "~", poss, pose, context);
+    runtime_t error = illegal_operation_unary_error(operand->type, "~", poss, pose, context);
     return ires_fail(&error);
 }
 
@@ -1609,52 +1602,4 @@ ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p cont
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
 
-}
-
-runtime_t illegal_operation(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(39 + strlen(operator) + value_label_lens[type1] + value_label_lens[type2]);
-    sprintf(detail, "Illegal operation (%s) between <%s> and <%s>", operator, value_labels[type1], value_labels[type2]);
-
-    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
-}
-
-runtime_t out_of_range(pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(19);
-    strcpy(detail, "Index out of range");
-
-    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
-}
-
-runtime_t mem_overflow(pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(16);
-    strcpy(detail, "Memory overflow");
-
-    return runtime_set(MEM_OVERFLOW_E, detail, poss, pose, context);
-}
-
-runtime_t division_by_zero(pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(17);
-    strcpy(detail, "Division by zero");
-
-    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
-}
-
-runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(15);
-    strcpy(detail, "Modulo by zero");
-
-    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
-}
-
-runtime_t illegal_operation_unary(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = malloc(28 + strlen(operator) + value_label_lens[type]);
-    sprintf(detail, "Illegal operation (%s) for <%s>", operator, value_labels[type]);
-
-    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }

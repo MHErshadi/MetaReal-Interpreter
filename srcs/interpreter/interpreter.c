@@ -129,6 +129,10 @@ ires_t interpret_node(node_p node, context_p context)
         return interpret_binary_operation(node->value.ptr, &node->poss, &node->pose, context);
     case UNARY_OPERATION_N:
         return interpret_unary_operation(node->value.ptr, &node->poss, &node->pose, context);
+    case TERNARY_CONDITION_N:
+        return interpret_ternary_condition(node->value.ptr, &node->poss, &node->pose, context);
+    case SUBSCRIPT_N:
+        return interpret_subscript(node->value.ptr, &node->poss, &node->pose, context);
     default:
         fprintf(stderr, "interpret_node function: invalid node type (#%u)\n", node->type);
         abort();
@@ -229,14 +233,16 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     if (ires.has_error)
     {
         node_free(&node->right);
-        goto ret;
+        free(node);
+        return ires;
     }
 
     value_t right = ires_merge(&ires, interpret_node(&node->right, context));
     if (ires.has_error)
     {
         value_free(&left);
-        goto ret;
+        free(node);
+        return ires;
     }
 
     switch (node->operator)
@@ -316,13 +322,15 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     }
 
     if (ires.has_error)
-        goto ret;
+    {
+        free(node);
+        return ires;
+    }
 
     ires.value.poss = *poss;
     ires.value.pose = *pose;
     ires.value.context = context;
 
-ret:
     free(node);
     return ires;
 }
@@ -334,7 +342,10 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 
     value_t operand = ires_merge(&ires, interpret_node(&node->operand, context));
     if (ires.has_error)
-        goto ret;
+    {
+        free(node);
+        return ires;
+    }
 
     switch (node->operator)
     {
@@ -354,25 +365,129 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     }
 
     if (ires.has_error)
-        goto ret;
+    {
+        free(node);
+        return ires;
+    }
 
     ires.value.poss = *poss;
     ires.value.pose = *pose;
     ires.value.context = context;
 
-ret:
     free(node);
     return ires;
 }
 
 ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t condition = ires_merge(&ires, interpret_node(&node->condition, context));
+    if (ires.has_error)
+    {
+        node_free(&node->left);
+        node_free(&node->right);
+        free(node);
+        return ires;
+    }
+
+    value_t res;
+
+    if (value_is_true(&condition))
+    {
+        node_free(&node->right);
+
+        res = ires_merge(&ires, interpret_node(&node->left, context));
+        if (ires.has_error)
+        {
+            value_free(&condition);
+            free(node);
+            return ires;
+        }
+    }
+    else
+    {
+        node_free(&node->left);
+
+        res = ires_merge(&ires, interpret_node(&node->right, context));
+        if (ires.has_error)
+        {
+            value_free(&condition);
+            free(node);
+            return ires;
+        }
+    }
+
+    ires.value = res;
+
+    value_free(&condition);
+
+    free(node);
+    return ires;
 }
 
 ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t value = ires_merge(&ires, interpret_node(&node->value, context));
+    if (ires.has_error)
+    {
+        node_free(&node->pos);
+        free(node);
+        return ires;
+    }
+
+    if (value.type != STR_V)
+    {
+        char* detail = malloc(19 + value_label_lens[value.type]);
+        sprintf(detail, "<%s> is not iterable", value_labels[value.type]);
+
+        runtime_t error = runtime_set(TYPE_E, detail, &value.poss, &value.pose, value.context);
+        return ires_fail(&error);
+    }
+
+    value_t pos = ires_merge(&ires, interpret_node(&node->pos, context));
+    if (ires.has_error)
+    {
+        value_free(&value);
+        free(node);
+        return ires;
+    }
+
+    if (pos.type != INT_V)
+    {
+        char* detail = malloc(29 + value_label_lens[pos.type]);
+        sprintf(detail, "Index must be <int> (not <%s>)", value_labels[pos.type]);
+
+        runtime_t error = runtime_set(TYPE_E, detail, &pos.poss, &pos.pose, pos.context);
+        return ires_fail(&error);
+    }
+
+    if (!int_fits_ull(pos.value.ptr))
+    {
+        runtime_t error = out_of_range_error(&pos.poss, &pos.pose, pos.context);
+        return ires_fail(&error);
+    }
+
+    unsigned long long index = int_get_ull(pos.value.ptr);
+
+    if (index >= ((str_p)value.value.ptr)->size)
+    {
+        runtime_t error = out_of_range_error(&pos.poss, &pos.pose, pos.context);
+        return ires_fail(&error);
+    }
+
+    char chr = ((str_p)value.value.ptr)->str[index];
+
+    ires.value = value_set2(CHAR_V, chr, poss, pose, context);
+
+    str_free(value.value.ptr);
+    int_free(pos.value.ptr);
+    free(node);
+    return ires;
 }
 
 ires_t interpret_access(access_np node, pos_p poss, pos_p pose, context_p context)

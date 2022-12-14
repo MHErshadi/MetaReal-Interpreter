@@ -13,6 +13,7 @@
         "xiosbase": "c",
         "ios": "c",
         "xlocale": "c",
-        "xmemory": "c"
+        "xmemory": "c",
+        "stdexcept": "c"
     }
 }

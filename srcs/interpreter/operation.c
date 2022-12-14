@@ -5,6 +5,7 @@
 #include <interpreter/interpreter.h>
 #include <complex.h>
 #include <str.h>
+#include <array/tuple.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1062,6 +1063,22 @@ ires_t operate_equal(value_p left, value_p right)
 
             return ires_success(left);
         }
+
+        break;
+    case TUPLE_V:
+        if (right->type == TUPLE_V)
+        {
+            res = tuple_equal(left->value.ptr, right->value.ptr);
+            tuple_free(left->value.ptr);
+            tuple_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
     }
 
     value_free(left);
@@ -1209,6 +1226,22 @@ ires_t operate_nequal(value_p left, value_p right)
 
             return ires_success(left);
         }
+
+        break;
+    case TUPLE_V:
+        if (right->type == TUPLE_V)
+        {
+            res = tuple_nequal(left->value.ptr, right->value.ptr);
+            tuple_free(left->value.ptr);
+            tuple_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
     }
 
     value_free(left);
@@ -1602,4 +1635,69 @@ ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p cont
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
 
+}
+
+char operate_compare(value_p left, value_p right)
+{
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return int_equal(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_equal_int(right->value.ptr, left->value.ptr);
+        case COMPLEX_V:
+            return complex_equal_int(right->value.ptr, left->value.ptr);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return float_equal_int(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_equal(left->value.ptr, right->value.ptr);
+        case COMPLEX_V:
+            return complex_equal_float(right->value.ptr, left->value.ptr);
+        }
+
+        break;
+    case COMPLEX_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return complex_equal_int(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return complex_equal_float(left->value.ptr, right->value.ptr);
+        case COMPLEX_V:
+            return complex_equal(left->value.ptr, right->value.ptr);
+        }
+
+        break;
+    case BOOL_V:
+        if (right->type == BOOL_V)
+            return left->value.chr ^ ~right->value.chr;
+
+        break;
+    case CHAR_V:
+        if (right->type == CHAR_V)
+            return left->value.chr == right->value.chr;
+
+        break;
+    case STR_V:
+        if (right->type == STR_V)
+            return str_equal(left->value.ptr, right->value.ptr);
+
+        break;
+    case TUPLE_V:
+        if (right->type == TUPLE_V)
+            return tuple_equal(left->value.ptr, right->value.ptr);
+
+        break;
+    }
+
+    return 0;
 }

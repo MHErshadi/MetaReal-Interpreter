@@ -241,9 +241,9 @@ token_p tuple(pres_p pres, token_p tokens)
 
     if (tokens->type == COMMA_T)
     {
-        pos_p pose;
+        pos_t pose;
 
-        node_p elements = malloc(TUPLE_SIZE);
+        node_p elements = malloc(TUPLE_SIZE * sizeof(node_t));
         *elements = *pres->nodes;
 
         unsigned long long alloc = TUPLE_SIZE;
@@ -252,7 +252,7 @@ token_p tuple(pres_p pres, token_p tokens)
         token_p new;
         do
         {
-            pose = &tokens++->pose;
+            pose = tokens++->pose;
 
             advance_newline(tokens);
 
@@ -265,7 +265,7 @@ token_p tuple(pres_p pres, token_p tokens)
                     elements = realloc(elements, size * sizeof(node_t));
 
                 tuple_np node = tuple_n_set(elements, size);
-                *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, pose);
+                *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, &pose);
                 return tokens;
             }
             tokens = new;

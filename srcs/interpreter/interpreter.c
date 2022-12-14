@@ -5,6 +5,7 @@
 #include <interpreter/operation.h>
 #include <complex.h>
 #include <str.h>
+#include <array/tuple.h>
 #include <stdlib.h>
 #include <setting.h>
 #include <lexer/token.h>
@@ -125,6 +126,8 @@ ires_t interpret_node(node_p node, context_p context)
         return interpret_char(node->value.chr, &node->poss, &node->pose, context);
     case STR_N:
         return interpret_str(node->value.ptr, &node->poss, &node->pose, context);
+    case TUPLE_N:
+        return interpret_tuple(node->value.ptr, &node->poss, &node->pose, context);
     case BINARY_OPERATION_N:
         return interpret_binary_operation(node->value.ptr, &node->poss, &node->pose, context);
     case UNARY_OPERATION_N:
@@ -206,7 +209,40 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_p elements = malloc(node->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < node->size; i++)
+    {
+        value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context));
+        if (ires.has_error)
+        {
+            i++;
+            while (node->size > i)
+                node_free(&node->elements[--node->size]);
+            free(node->elements);
+            i--;
+
+            while (i)
+                value_free(&elements[--i]);
+            free(elements);
+            free(node);
+
+            return ires;
+        }
+
+        elements[i] = element;
+    }
+
+    tuple_p ptr = tuple_set(elements, i);
+    ires.value = value_set1(TUPLE_V, ptr, poss, pose, context);
+
+    free(node->elements);
+    free(node);
+    return ires;
 }
 
 ires_t interpret_dict(list_np node, pos_p poss, pos_p pose, context_p context)

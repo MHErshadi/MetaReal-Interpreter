@@ -5,6 +5,7 @@
 #include <interpreter/value.h>
 #include <complex.h>
 #include <str.h>
+#include <array/tuple.h>
 #include <setting.h>
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context)
@@ -67,6 +68,8 @@ void value_free(value_p value)
     case STR_V:
         str_free(value->value.ptr);
         return;
+    case TUPLE_V:
+        tuple_free(value->value.ptr);
     }
 }
 
@@ -128,6 +131,9 @@ void value_label(value_p value, const char* end)
     case STR_V:
         str_label(setting.output, value->value.ptr, end);
         return;
+    case TUPLE_V:
+        tuple_print(setting.output, value->value.ptr, end);
+        return;
     }
 }
 
@@ -152,5 +158,7 @@ char value_is_true(value_p value)
         return value->value.chr != 0;
     case STR_V:
         return ((str_p)value->value.ptr)->size != 0;
+    case TUPLE_V:
+        return ((tuple_p)value->value.ptr)->size != 0;
     }
 }

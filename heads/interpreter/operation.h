@@ -46,4 +46,8 @@ ires_t operate_not(value_p operand);
 ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context);
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context);
 
+/* */
+
+char operate_compare(value_p left, value_p right);
+
 #endif /* __M_OPERATION__ */

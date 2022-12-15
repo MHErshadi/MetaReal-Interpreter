@@ -1,20 +1,20 @@
 /*/
  * MetaReal version 1.0.0
  *
- * Integer Library version 1.0.0
+ * Float Library version 1.0.0
  *
  * Converts (src) into integer
 /*/
 
-#include <int.h>
+#include <float.h>
 #include <stdlib.h>
 
-int_p int_set_ull(unsigned long long src)
+int_p float_get_int(const float_p src)
 {
     int_p dst = malloc(sizeof(int_t));
 
     mpz_init(dst->value);
-    mpz_import(dst->value, 1, -1, sizeof(unsigned long long), 0, 0, &src);
+    mpfr_get_z(dst->value, src->value, MPFR_RNDN);
 
     return dst;
 }

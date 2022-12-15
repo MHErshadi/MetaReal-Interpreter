@@ -171,7 +171,7 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p context)
 {
-    complex_p ptr = complex_set_str(setting.complex_prec_bit, node->value, node->size);
+    complex_p ptr = complex_set_str(node->value, node->size, setting.complex_prec_bit);
     value_t value = value_set1(COMPLEX_V, ptr, poss, pose, context);
 
     free(node->value);

@@ -10,5 +10,5 @@
 
 void float_modulo(float_p num1, const float_p num2)
 {
-    mpfr_fmod(num1->value, num1->value, num2->value, MPFR_RNDN);
+    mpfr_remainder(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

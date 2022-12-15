@@ -20,8 +20,10 @@ typedef struct __float__* float_p;
 
 float_p float_set(const float_p src, unsigned long long prec);
 float_p float_set_str(const char* str, unsigned long long size, unsigned long long prec);
+float_p float_set_ul(unsigned long src, unsigned long long prec);
 
 char* float_get_str(const float_p src, unsigned long long prec);
+int_p float_get_int(const float_p src);
 
 void float_free(float_p num);
 
@@ -51,6 +53,7 @@ void float_divide_ul(float_p num1, unsigned long num2);
 void float_ul_divide(unsigned long num1, float_p num2);
 float_p float_int_divide_ul(const int_p num1, unsigned long num2, unsigned long long prec);
 float_p float_ul_divide_int(unsigned long num1, const int_p num2, unsigned long long prec);
+float_p float_ul_divide_ul(unsigned long num1, unsigned long num2, unsigned long long prec);
 
 void float_modulo(float_p num1, const float_p num2);
 void float_modulo_int(float_p num1, const int_p num2);

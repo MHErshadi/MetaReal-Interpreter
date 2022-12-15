@@ -20,6 +20,7 @@ typedef struct _complex__* complex_p;
 
 complex_p complex_set(const complex_p src, unsigned long long prec);
 complex_p complex_set_str(const char* str, unsigned long long size, unsigned long long prec);
+complex_p complex_set_ul(unsigned long src, unsigned long long prec);
 
 char* complex_get_str(const complex_p src, unsigned long long prec);
 

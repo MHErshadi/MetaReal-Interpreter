@@ -9,7 +9,7 @@
 #include <str.h>
 #include <stdlib.h>
 
-str_p str_set(str_p src)
+str_p str_set(const str_p src)
 {
     str_p dst = malloc(sizeof(str_t));
 

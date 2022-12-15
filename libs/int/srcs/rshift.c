@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_rshift(int_p num1, int_p num2)
+void int_rshift(int_p num1, const int_p num2)
 {
     mpz_fdiv_q_2exp(num1->value, num1->value, mpz_get_ui(num2->value));
 }

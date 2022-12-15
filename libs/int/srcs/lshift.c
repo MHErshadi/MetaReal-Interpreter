@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_lshift(int_p num1, int_p num2)
+void int_lshift(int_p num1, const int_p num2)
 {
     mpz_mul_2exp(num1->value, num1->value, mpz_get_ui(num2->value));
 }

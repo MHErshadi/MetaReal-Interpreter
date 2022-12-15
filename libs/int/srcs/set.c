@@ -9,7 +9,7 @@
 #include <int.h>
 #include <stdlib.h>
 
-int_p int_set(int_p src)
+int_p int_set(const int_p src)
 {
     int_p dst = malloc(sizeof(int_t));
 

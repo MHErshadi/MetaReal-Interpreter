@@ -8,7 +8,7 @@
 
 #include <str.h>
 
-char str_equal(str_p str1, str_p str2)
+char str_equal(const str_p str1, const str_p str2)
 {
     if (str1->size != str2->size)
         return 0;

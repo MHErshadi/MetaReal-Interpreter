@@ -8,7 +8,7 @@
 
 #include <str.h>
 
-void str_label(FILE* stream, str_p str, const char* end)
+void str_label(FILE* stream, const str_p str, const char* end)
 {
     fputc('"', stream);
 

@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_xor(int_p num1, int_p num2)
+void int_xor(int_p num1, const int_p num2)
 {
     mpz_xor(num1->value, num1->value, num2->value);
 }

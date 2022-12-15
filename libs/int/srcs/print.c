@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-void int_print(FILE* stream, int_p num, const char* end)
+void int_print(FILE* stream, const int_p num, const char* end)
 {
     gmp_fprintf(stream, "%Zd%s", num->value, end);
 }

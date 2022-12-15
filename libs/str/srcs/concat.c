@@ -9,7 +9,7 @@
 #include <str.h>
 #include <stdlib.h>
 
-void str_concat(str_p str1, str_p str2)
+void str_concat(str_p str1, const str_p str2)
 {
     unsigned long long bsize = str1->size;
 

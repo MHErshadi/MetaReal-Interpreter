@@ -8,7 +8,7 @@
 
 #include <str.h>
 
-void str_print(FILE* stream, str_p str, const char* end)
+void str_print(FILE* stream, const str_p str, const char* end)
 {
     fprintf(stream, "%s%s", str->str, end);
 }

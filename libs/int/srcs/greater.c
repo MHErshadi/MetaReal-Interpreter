@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-char int_greater(int_p num1, int_p num2)
+char int_greater(const int_p num1, const int_p num2)
 {
     return mpz_cmp(num1->value, num2->value) > 0;
 }

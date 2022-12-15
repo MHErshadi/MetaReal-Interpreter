@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-char int_fits_ull(int_p num)
+char int_fits_ull(const int_p num)
 {
     return mpz_size(num->value) <= 1;
 }

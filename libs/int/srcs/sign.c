@@ -9,7 +9,7 @@
 
 #include <int.h>
 
-char int_sign(int_p num)
+char int_sign(const int_p num)
 {
     return mpz_sgn(num->value);
 }

@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-char complex_nequal_int(complex_p num1, int_p num2)
+char complex_nequal_int(const complex_p num1, const int_p num2)
 {
     mpc_t num2c;
     mpc_init3(num2c, mpfr_get_prec(mpc_realref(num1->value)), mpfr_get_prec(mpc_imagref(num1->value)));

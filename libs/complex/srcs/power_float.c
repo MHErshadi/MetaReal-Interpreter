@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_power_float(complex_p num1, float_p num2)
+void complex_power_float(complex_p num1, const float_p num2)
 {
     mpc_pow_fr(num1->value, num1->value, num2->value, MPC_RNDNN);
 }

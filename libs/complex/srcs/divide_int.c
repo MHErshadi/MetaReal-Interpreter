@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_divide_int(complex_p num1, int_p num2)
+void complex_divide_int(complex_p num1, const int_p num2)
 {
     mpfr_t num2f;
     mpfr_init2(num2f, mpfr_get_prec(mpc_realref(num1->value)));

@@ -9,7 +9,7 @@
 #include <complex.h>
 #include <stdlib.h>
 
-void complex_print(FILE* stream, complex_p num, unsigned long long prec, const char* end)
+void complex_print(FILE* stream, const complex_p num, unsigned long long prec, const char* end)
 {
     unsigned long long prec_c = prec;
     unsigned char length = 0;

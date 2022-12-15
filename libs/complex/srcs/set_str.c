@@ -9,7 +9,7 @@
 #include <complex.h>
 #include <stdlib.h>
 
-complex_p complex_set_str(unsigned long long prec, const char* str, unsigned long long size)
+complex_p complex_set_str(const char* str, unsigned long long size, unsigned long long prec)
 {
     complex_p dst = malloc(sizeof(complex_t));
 

@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_add(complex_p num1, const complex_p num2)
+void complex_add_ul(complex_p num1, unsigned long num2)
 {
-    mpc_add(num1->value, num1->value, num2->value, MPC_RNDNN);
+    mpc_add_ui(num1->value, num1->value, num2, MPC_RNDNN);
 }

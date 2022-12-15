@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-void complex_int_subtract(int_p num1, complex_p num2)
+void complex_int_subtract(const int_p num1, complex_p num2)
 {
     mpfr_t num1f;
     mpfr_init2(num1f, mpfr_get_prec(mpc_realref(num2->value)));

@@ -9,7 +9,7 @@
 #include <complex.h>
 #include <stdlib.h>
 
-complex_p complex_float_power_float(float_p num1, float_p num2, unsigned long long prec)
+complex_p complex_float_power_float(const float_p num1, const float_p num2, unsigned long long prec)
 {
     complex_p res = malloc(sizeof(complex_t));
 

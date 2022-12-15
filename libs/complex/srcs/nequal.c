@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-char complex_nequal(complex_p num1, complex_p num2)
+char complex_nequal(const complex_p num1, const complex_p num2)
 {
     return mpc_cmp(num1->value, num2->value) != 0;
 }

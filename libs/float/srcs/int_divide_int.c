@@ -9,7 +9,7 @@
 #include <float.h>
 #include <stdlib.h>
 
-float_p float_int_divide_int(int_p num1, int_p num2, unsigned long long prec)
+float_p float_int_divide_int(const int_p num1, const int_p num2, unsigned long long prec)
 {
     float_p res = malloc(sizeof(float_t));
 

@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-char float_nequal_int(float_p num1, int_p num2)
+char float_nequal_int(const float_p num1, const int_p num2)
 {
     return mpfr_cmp_z(num1->value, num2->value) != 0;
 }

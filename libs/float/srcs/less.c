@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-char float_less(float_p num1, float_p num2)
+char float_less(const float_p num1, const float_p num2)
 {
     return mpfr_less_p(num1->value, num2->value);
 }

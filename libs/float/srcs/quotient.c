@@ -9,7 +9,7 @@
 #include <float.h>
 #include <stdlib.h>
 
-int_p float_quotient(float_p num1, float_p num2)
+int_p float_quotient(float_p num1, const float_p num2)
 {
     mpfr_div(num1->value, num1->value, num2->value, MPFR_RNDN);
 

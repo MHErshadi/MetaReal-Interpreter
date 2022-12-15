@@ -24,7 +24,6 @@ char* float_get_str(float_p src, unsigned long long prec)
     char* format = malloc(5 + length);
     sprintf(format, "%%.%lluRg", prec);
 
-    // temporary
     char* str = malloc(prec + 100);
     mpfr_sprintf(str, format, src->value);
 

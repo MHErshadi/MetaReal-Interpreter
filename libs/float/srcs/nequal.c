@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-char float_nequal(float_p num1, float_p num2)
+char float_nequal(const float_p num1, const float_p num2)
 {
     return mpfr_equal_p(num1->value, num2->value);
 }

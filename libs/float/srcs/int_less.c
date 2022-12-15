@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-char float_int_less(int_p num1, float_p num2)
+char float_int_less(const int_p num1, const float_p num2)
 {
     return mpfr_cmp_z(num2->value, num1->value) > 0;
 }

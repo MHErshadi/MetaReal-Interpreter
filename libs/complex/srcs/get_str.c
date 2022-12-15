@@ -26,7 +26,6 @@ char* complex_get_str(complex_p src, unsigned long long prec)
         char* format = malloc(13 + length * 2);
         sprintf(format, "(%%.%lluRg%%+.%lluRgi)", prec, prec);
 
-        // temporary
         char* str = malloc(prec * 2 + 100);
         mpfr_sprintf(str, format, mpc_realref(src->value), mpc_imagref(src->value));
 
@@ -40,7 +39,6 @@ char* complex_get_str(complex_p src, unsigned long long prec)
         char* format = malloc(6 + length);
         sprintf(format, "%%.%lluRgi", prec);
 
-        // temporary
         char* str = malloc(prec + 100);
         mpfr_sprintf(str, format, mpc_imagref(src->value));
 

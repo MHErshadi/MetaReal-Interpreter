@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_add_int(float_p num1, int_p num2)
+void float_add_int(float_p num1, const int_p num2)
 {
     mpfr_add_z(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

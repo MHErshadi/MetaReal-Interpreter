@@ -7,7 +7,6 @@
 #ifndef __M_INT__
 #define __M_INT__
 
-// temporary
 #include <stdio.h>
 #include <C:/MinGW/include/gmp.h>
 

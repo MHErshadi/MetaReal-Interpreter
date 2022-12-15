@@ -161,7 +161,7 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context)
 {
-    float_p ptr = float_set_str(setting.float_prec_bit, node->value, node->size);
+    float_p ptr = float_set_str(node->value, node->size, setting.float_prec_bit);
     value_t value = value_set1(FLOAT_V, ptr, poss, pose, context);
 
     free(node->value);

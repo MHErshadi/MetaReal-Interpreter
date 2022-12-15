@@ -9,7 +9,7 @@
 #include <float.h>
 #include <stdlib.h>
 
-float_p float_set_str(unsigned long long prec, const char* str, unsigned long long size)
+float_p float_set_str(const char* str, unsigned long long size, unsigned long long prec)
 {
     float_p dst = malloc(sizeof(float_t));
 

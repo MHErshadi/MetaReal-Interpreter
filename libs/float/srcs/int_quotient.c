@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-void float_int_quotient(int_p num1, float_p num2)
+void float_int_quotient(int_p num1, const float_p num2)
 {
     mpfr_t num1f;
     mpfr_init2(num1f, mpfr_get_prec(num2->value));

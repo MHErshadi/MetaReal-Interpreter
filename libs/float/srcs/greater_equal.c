@@ -8,7 +8,7 @@
 
 #include <float.h>
 
-char float_greater_equal(float_p num1, float_p num2)
+char float_greater_equal(const float_p num1, const float_p num2)
 {
     return mpfr_greaterequal_p(num1->value, num2->value);
 }

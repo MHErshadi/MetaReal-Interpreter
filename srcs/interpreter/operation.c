@@ -10,6 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context);
+runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context);
+runtime_t mem_overflow_error(pos_p poss, pos_p pose, context_p context);
+runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context);
+runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context);
+runtime_t modulo_by_zero_error(pos_p poss, pos_p pose, context_p context);
+
 ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
     char* str;
@@ -2121,6 +2128,11 @@ ires_t operate_equal(value_p left, value_p right)
 
     switch (left->type)
     {
+    case NULL_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type == NULL_V;
+
+        return ires_success(left);
     case NONE_V:
         left->type = BOOL_V;
         left->value.chr = right->type == NONE_V;
@@ -2412,6 +2424,11 @@ ires_t operate_nequal(value_p left, value_p right)
 
     switch (left->type)
     {
+    case NULL_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type != NULL_V;
+
+        return ires_success(left);
     case NONE_V:
         left->type = BOOL_V;
         left->value.chr = right->type != NONE_V;
@@ -3242,6 +3259,12 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
     case STR_V:
         switch (left->type)
         {
+        case NULL_V:
+            str_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = 1;
+            return ires_success(left);
         case NONE_V:
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, "none");
@@ -3921,4 +3944,52 @@ char operate_compare(const value_p left, const value_p right)
     }
 
     return 0;
+}
+
+runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(39 + strlen(operator) + value_label_lens[type1] + value_label_lens[type2]);
+    sprintf(detail, "Illegal operation (%s) between <%s> and <%s>", operator, value_labels[type1], value_labels[type2]);
+
+    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
+}
+
+runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(19);
+    strcpy(detail, "Index out of range");
+
+    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
+}
+
+runtime_t mem_overflow_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(16);
+    strcpy(detail, "Memory overflow");
+
+    return runtime_set(MEM_OVERFLOW_E, detail, poss, pose, context);
+}
+
+runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(17);
+    strcpy(detail, "Division by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
+}
+
+runtime_t modulo_by_zero_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(15);
+    strcpy(detail, "Modulo by zero");
+
+    return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
+}
+
+runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(28 + strlen(operator) + value_label_lens[type]);
+    sprintf(detail, "Illegal operation (%s) for <%s>", operator, value_labels[type]);
+
+    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }

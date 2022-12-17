@@ -165,6 +165,16 @@ void list_repeat(list_p array, unsigned long long count)
     unsigned long long size = array->size * count;
     array->elements = realloc(array->elements, size * sizeof(value_t));
 
+    if (array->size == 1)
+    {
+        unsigned long long i;
+        for (i = 1; i < size; i++)
+            array->elements[i] = value_copy(array->elements);
+
+        array->size = size;
+        return;
+    }
+
     unsigned long long i, j;
     for (i = array->size; i < size;)
         for (j = 0; j < array->size; i++, j++)

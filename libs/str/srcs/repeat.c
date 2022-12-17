@@ -8,6 +8,7 @@
 
 #include <str.h>
 #include <stdlib.h>
+#include <string.h>
 
 void str_repeat(str_p str, unsigned long long count)
 {
@@ -31,9 +32,8 @@ void str_repeat(str_p str, unsigned long long count)
     str->size *= count;
     str->str = realloc(str->str, str->size + 1);
 
-    unsigned long long i, j;
-    for (i = bsize; i < str->size;)
-        for (j = 0; j < bsize; i++, j++)
-            str->str[i] = str->str[j];
+    unsigned long long i;
+    for (i = bsize; i < str->size; i += bsize)
+        memcpy(str->str + i, str->str, bsize);
     str->str[i] = '\0';
 }

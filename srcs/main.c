@@ -14,6 +14,8 @@
 #include <info.h>
 #include <def.h>
 
+//#include <time.h>
+
 int main(int argc, char** argv)
 {
     if (argc == 1)
@@ -68,12 +70,16 @@ int main(int argc, char** argv)
                 continue;
             }
 
+            //clock_t s = clock();
+
             ires = interpret(pres.nodes, &context);
             if (ires.has_error)
             {
                 runtime_print(&ires.error, code, size);
                 continue;
             }
+
+            //printf("time: %ld milliseconds\n", clock() - s);
 
             value_label(&ires.value, "\n");
             value_free(&ires.value);

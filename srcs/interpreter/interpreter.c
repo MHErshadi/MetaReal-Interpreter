@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <setting.h>
 #include <lexer/token.h>
+#include <string.h>
 
 value_t ires_merge(ires_p ires, ires_t other);
 
@@ -140,6 +141,10 @@ ires_t interpret_node(node_p node, context_p context)
         return interpret_ternary_condition(node->value.ptr, &node->poss, &node->pose, context);
     case SUBSCRIPT_N:
         return interpret_subscript(node->value.ptr, &node->poss, &node->pose, context);
+    case VAR_ASSIGN_N:
+        return interpret_var_assign(node->value.ptr, &node->poss, &node->pose, context);
+    case VAR_ACCESS_N:
+        return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context);
     default:
         fprintf(stderr, "interpret_node function: invalid node type (#%u)\n", node->type);
         abort();
@@ -302,7 +307,7 @@ ires_t interpret_set(list_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context)
 {
-    value_t value = value_set2(TYPE_V, node + OBJECT_V, poss, pose, context);
+    value_t value = value_set2(TYPE_V, node - OBJECT_TT + OBJECT_V, poss, pose, context);
 
     return ires_success(&value);
 }
@@ -557,7 +562,65 @@ ires_t interpret_access(access_np node, pos_p poss, pos_p pose, context_p contex
 
 ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t value = ires_merge(&ires, interpret_node(&node->value, context));
+    if (ires.has_error)
+    {
+        free(node->name);
+        free(node);
+        return ires;
+    }
+
+    if (node->type)
+        node->type -= OBJECT_TT - OBJECT_V;
+
+    if (node->type != NULL_V && node->type != value.type)
+    {
+        value_free(&value);
+        free(node->name);
+        free(node);
+
+        char* detail = malloc(59 + value_label_lens[node->type] + value_label_lens[value.type]);
+        sprintf(detail, "Type of variable and type of value do not match (<%s> and <%s>)", value_labels[node->type], value_labels[value.type]);
+
+        runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    char res = table_var_set(&context->table, node->properties, node->name, node->type, &value);
+    if (res == -1)
+    {
+        value_free(&value);
+
+        char* detail = malloc(26 + strlen(node->name));
+        sprintf(detail, "'%s' is a constant variable", node->name);
+
+        free(node->name);
+        free(node);
+
+        runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+    if (res)
+    {
+        value_free(&value);
+
+        char* detail = malloc(45 + strlen(node->name) + value_label_lens[res]);
+        sprintf(detail, "'%s' is a type-specified variable (type is <%s>)", node->name, value_labels[res]);
+
+        free(node->name);
+        free(node);
+
+        runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires.value = value_copy(&value);
+
+    free(node);
+    return ires;
 }
 
 ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p pose, context_p context)
@@ -572,7 +635,25 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
 
 ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t value = context_var_get(context, node);
+    if (value.type == NULL_V)
+    {
+        char* detail = malloc(45 + strlen(node));
+        sprintf(detail, "'%s' is not defined", node);
+
+        free(node);
+
+        runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires.value = value_copy(&value);
+
+    free(node);
+    return ires;
 }
 
 ires_t interpret_func_def(func_def_np node, pos_p poss, pos_p pose, context_p context)

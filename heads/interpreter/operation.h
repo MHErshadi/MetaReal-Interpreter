@@ -33,7 +33,8 @@ ires_t operate_or(value_p left, value_p right);
 ires_t operate_xor(value_p left, value_p right);
 
 ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_type1(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
+ires_t operate_is(value_p left, value_p right);
+ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_subscript(value_p left, value_p right);
 

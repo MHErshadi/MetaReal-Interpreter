@@ -2337,15 +2337,59 @@ ires_t operate_equal(value_p left, value_p right)
         }
 
         break;
-    case TUPLE_V:
-        if (right->type == TUPLE_V)
+    case LIST_V:
+        switch (right->type)
         {
+        case LIST_V:
+            res = list_equal(left->value.ptr, right->value.ptr);
+            list_free(left->value.ptr);
+            list_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        case TUPLE_V:
+            res = list_equal_tuple(left->value.ptr, right->value.ptr);
+            list_free(left->value.ptr);
+            tuple_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
+    case TUPLE_V:
+        switch (right->type)
+        {
+        case LIST_V:
+            res = list_equal_tuple(right->value.ptr, left->value.ptr);
+            tuple_free(left->value.ptr);
+            list_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        case TUPLE_V:
             res = tuple_equal(left->value.ptr, right->value.ptr);
             tuple_free(left->value.ptr);
             tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
+    case TYPE_V:
+        if (right->type == TYPE_V)
+        {
+            left->type = BOOL_V;
+            left->value.chr = left->value.chr == right->value.chr;
 
             return ires_success(left);
         }
@@ -2584,15 +2628,59 @@ ires_t operate_nequal(value_p left, value_p right)
         }
 
         break;
-    case TUPLE_V:
-        if (right->type == TUPLE_V)
+    case LIST_V:
+        switch (right->type)
         {
+        case LIST_V:
+            res = list_nequal(left->value.ptr, right->value.ptr);
+            list_free(left->value.ptr);
+            list_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        case TUPLE_V:
+            res = list_nequal_tuple(left->value.ptr, right->value.ptr);
+            list_free(left->value.ptr);
+            tuple_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
+    case TUPLE_V:
+        switch (right->type)
+        {
+        case LIST_V:
+            res = list_nequal_tuple(right->value.ptr, left->value.ptr);
+            tuple_free(left->value.ptr);
+            list_free(right->value.ptr);
+
+            left->type = BOOL_V;
+            left->value.chr = res;
+
+            return ires_success(left);
+        case TUPLE_V:
             res = tuple_nequal(left->value.ptr, right->value.ptr);
             tuple_free(left->value.ptr);
             tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
+
+            return ires_success(left);
+        }
+
+        break;
+    case TYPE_V:
+        if (right->type == TYPE_V)
+        {
+            left->type = BOOL_V;
+            left->value.chr = left->value.chr != right->value.chr;
 
             return ires_success(left);
         }
@@ -3213,6 +3301,15 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
         }
 
         break;
+    case LIST_V:
+        res = list_contains(right->value.ptr, left);
+        list_free(right->value.ptr);
+        value_free(left);
+
+        left->type = BOOL_V;
+        left->value.chr = res;
+
+        return ires_success(left);
     case TUPLE_V:
         res = tuple_contains(right->value.ptr, left);
         tuple_free(right->value.ptr);
@@ -3231,16 +3328,94 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
     return ires_fail(&error);
 }
 
-ires_t operate_type1(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_is(value_p left, value_p right)
 {
-    char res = left->type == right->type;
-    value_free(left);
-    value_free(right);
+    char res;
+
+    if (left->type == TYPE_V)
+    {
+        res = right->type == left->value.chr;
+
+        value_free(right);
+    }
+    else if (right->type == TYPE_V)
+    {
+        res = left->type == right->value.chr;
+
+        value_free(left);
+    }
+    else
+    {
+        res = left->type == right->type;
+
+        value_free(left);
+        value_free(right);
+    }
 
     left->type = BOOL_V;
     left->value.chr = res;
 
     return ires_success(left);
+}
+
+ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+{
+    char type;
+    unsigned long long i;
+
+    switch (left->type)
+    {
+    case LIST_V:
+        type = right->type == TYPE_V ? right->value.chr : right->type;
+
+        for (i = 0; i < ((list_p)left->value.ptr)->size; i++)
+            if (((list_p)left->value.ptr)->elements[i].type != type)
+            {
+                list_free(left->value.ptr);
+                value_free(right);
+
+                left->type = BOOL_V;
+                left->value.chr = 0;
+
+                return ires_success(left);
+            }
+
+        list_free(left->value.ptr);
+        value_free(right);
+
+        left->type = BOOL_V;
+        left->value.chr = 1;
+
+        return ires_success(left);
+    case TUPLE_V:
+        type = right->type == TYPE_V ? right->value.chr : right->type;
+
+        for (i = 0; i < ((tuple_p)left->value.ptr)->size; i++)
+            if (((tuple_p)left->value.ptr)->elements[i].type != type)
+            {
+                tuple_free(left->value.ptr);
+                value_free(right);
+
+                left->type = BOOL_V;
+                left->value.chr = 0;
+
+                return ires_success(left);
+            }
+
+        tuple_free(left->value.ptr);
+        value_free(right);
+
+        left->type = BOOL_V;
+        left->value.chr = 1;
+
+        return ires_success(left);
+    }
+
+    char* detail = malloc(81 + value_label_lens[left->type]);
+    sprintf(detail, "<%s> is not iterable data structure (iterable data structures: <list> and <tuple>)", value_labels[left->type]);
+
+    runtime_t error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
+    return ires_fail(&error);
 }
 
 ires_t operate_subscript(value_p left, value_p right)
@@ -3310,6 +3485,60 @@ ires_t operate_subscript(value_p left, value_p right)
         str_free(left->value.ptr);
         value_free(right);
         goto index_err;
+    case LIST_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_fits_ull(right->value.ptr))
+            {
+                list_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            index = int_get_ull(right->value.ptr);
+
+            if (int_sign(right->value.ptr) < 0)
+                index = ((list_p)left->value.ptr)->size - index;
+
+            if (index >= ((list_p)left->value.ptr)->size)
+            {
+                list_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            value = ((list_p)left->value.ptr)->elements[index];
+
+            list_free_exception(left->value.ptr, index);
+            int_free(right->value.ptr);
+
+            return ires_success(&value);
+        case BOOL_V:
+            right->type = CHAR_V;
+        case CHAR_V:
+            if (right->value.chr >= ((list_p)left->value.ptr)->size)
+            {
+                list_free(left->value.ptr);
+
+                error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            value = ((list_p)left->value.ptr)->elements[right->value.chr];
+
+            list_free_exception(left->value.ptr, right->value.chr);
+
+            return ires_success(&value);
+        }
+
+        list_free(left->value.ptr);
+        value_free(right);
+        goto index_err;
     case TUPLE_V:
         switch (right->type)
         {
@@ -3366,8 +3595,8 @@ ires_t operate_subscript(value_p left, value_p right)
         goto index_err;
     }
 
-    detail = malloc(58 + value_label_lens[left->type]);
-    sprintf(detail, "<%s> is not iterable (iterable types are <str> and <tuple>)", value_labels[left->type]);
+    detail = malloc(63 + value_label_lens[left->type]);
+    sprintf(detail, "<%s> is not iterable (iterable types: <str>, <list> and <tuple>)", value_labels[left->type]);
 
     error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
     return ires_fail(&error);
@@ -3386,17 +3615,24 @@ ires_t operate_positive(value_p operand)
 
     switch (operand->type)
     {
+    case NULL_V:
     case NONE_V:
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(0);
 
-        break;
+        return ires_success(operand);
+    case OBJECT_V:
+        operand->type = INT_V;
+        operand->value.ptr = int_set_ull(1);
+
+        return ires_success(operand);
     case BOOL_V:
     case CHAR_V:
+    case TYPE_V:
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(operand->value.chr);
 
-        break;
+        return ires_success(operand);
     case STR_V:
         size = str_size(operand->value.ptr);
         str_free(operand->value.ptr);
@@ -3404,7 +3640,15 @@ ires_t operate_positive(value_p operand)
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(size);
 
-        break;
+        return ires_success(operand);
+    case LIST_V:
+        size = list_size(operand->value.ptr);
+        list_free(operand->value.ptr);
+
+        operand->type = INT_V;
+        operand->value.ptr = int_set_ull(size);
+
+        return ires_success(operand);
     case TUPLE_V:
         size = tuple_size(operand->value.ptr);
         str_free(operand->value.ptr);
@@ -3412,7 +3656,7 @@ ires_t operate_positive(value_p operand)
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(size);
 
-        break;
+        return ires_success(operand);
     }
 
     return ires_success(operand);
@@ -3444,6 +3688,10 @@ ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context
         return ires_success(operand);
     case STR_V:
         str_reverse(operand->value.ptr);
+
+        return ires_success(operand);
+    case LIST_V:
+        list_reverse(operand->value.ptr);
 
         return ires_success(operand);
     }
@@ -3557,8 +3805,12 @@ char operate_compare(const value_p left, const value_p right)
 {
     switch (left->type)
     {
+    case NULL_V:
+        return right->type == NULL_V;
     case NONE_V:
         return right->type == NONE_V;
+    case OBJECT_V:
+        return left == right;
     case INT_V:
         switch (right->type)
         {
@@ -3646,9 +3898,24 @@ char operate_compare(const value_p left, const value_p right)
         }
 
         break;
+    case LIST_V:
+        switch (right->type)
+        {
+        case LIST_V:
+            return list_equal(left->value.ptr, right->value.ptr);
+        case TUPLE_V:
+            return list_equal_tuple(left->value.ptr, right->value.ptr);
+        }
+
+        break;
     case TUPLE_V:
-        if (right->type == TUPLE_V)
+        switch (right->type)
+        {
+        case LIST_V:
+            return list_equal_tuple(right->value.ptr, left->value.ptr);
+        case TUPLE_V:
             return tuple_equal(left->value.ptr, right->value.ptr);
+        }
 
         break;
     }

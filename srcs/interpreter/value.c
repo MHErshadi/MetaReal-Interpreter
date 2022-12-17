@@ -54,22 +54,22 @@ value_t value_copy(const value_p value)
     {
     case INT_V:
         copy.value.ptr = int_set(copy.value.ptr);
-        break;
+        return copy;
     case FLOAT_V:
         copy.value.ptr = float_set(copy.value.ptr, setting.float_prec_bit);
-        break;
+        return copy;
     case COMPLEX_V:
         copy.value.ptr = complex_set(copy.value.ptr, setting.complex_prec_bit);
-        break;
+        return copy;
     case STR_V:
         copy.value.ptr = str_set(copy.value.ptr);
-        break;
+        return copy;
     case LIST_V:
         copy.value.ptr = list_copy(copy.value.ptr);
-        break;
+        return copy;
     case TUPLE_V:
         copy.value.ptr = tuple_copy(copy.value.ptr);
-        break;
+        return copy;
     }
 
     return copy;
@@ -202,6 +202,8 @@ char value_is_true(value_p value)
         return ((list_p)value->value.ptr)->size != 0;
     case TUPLE_V:
         return ((tuple_p)value->value.ptr)->size != 0;
+    case TYPE_V:
+        return value->value.chr >= OBJECT_V;
     }
 
     return 0;

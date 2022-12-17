@@ -302,7 +302,7 @@ ires_t interpret_set(list_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context)
 {
-    value_t value = value_set2(TYPE_V, node, poss, pose, context);
+    value_t value = value_set2(TYPE_V, node + OBJECT_V, poss, pose, context);
 
     return ires_success(&value);
 }
@@ -400,7 +400,10 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         ires = operate_contain(&left, &right, poss, pose, context);
         break;
     case IS_TK:
-        ires = operate_type1(&left, &right, poss, pose, context);
+        ires = operate_is(&left, &right);
+        break;
+    case ARE_TK:
+        ires = operate_are(&left, &right, poss, pose, context);
         break;
     }
 

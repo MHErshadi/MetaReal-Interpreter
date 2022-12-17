@@ -18,12 +18,19 @@ typedef struct __tuple__* tuple_p;
 tuple_p tuple_set(value_p elements, unsigned long long size);
 
 void tuple_free(tuple_p array);
+void tuple_free_exception(tuple_p array, unsigned long long exception);
 
-void tuple_print(FILE* stream, tuple_p array, const char* end);
+void tuple_print(FILE* stream, const tuple_p array, const char* end);
 
 /* */
 
-char tuple_equal(tuple_p array1, tuple_p array2);
-char tuple_nequal(tuple_p array1, tuple_p array2);
+char tuple_equal(const tuple_p array1, const tuple_p array2);
+char tuple_nequal(const tuple_p array1, const tuple_p array2);
+
+char tuple_contains(const tuple_p array, const value_p value);
+
+/* */
+
+unsigned long long tuple_size(const tuple_p array);
 
 #endif /* __M_TUPLE__ */

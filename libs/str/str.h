@@ -49,6 +49,10 @@ char str_contains_char(const str_p str, char chr);
 
 /* */
 
+void str_reverse(str_p str);
+
+/* */
+
 unsigned long long str_size(const str_p str);
 
 #endif /* __M_STR__ */

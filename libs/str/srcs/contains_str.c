@@ -15,6 +15,9 @@ char str_contains_str(const str_p str1, const char* str2)
     if (!str2_size)
         return 1;
 
+    if (str1->size < str2_size)
+        return 0;
+
     unsigned long long i, j;
     for (i = 0; i < str1->size; i++)
     {

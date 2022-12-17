@@ -23,7 +23,19 @@ void tuple_free(tuple_p array)
     free(array);
 }
 
-void tuple_print(FILE* stream, tuple_p array, const char* end)
+void tuple_free_exception(tuple_p array, unsigned long long exception)
+{
+    while (array->size)
+    {
+        if (--array->size == exception)
+            continue;
+        value_free(&array->elements[array->size]);
+    }
+
+    free(array);
+}
+
+void tuple_print(FILE* stream, const tuple_p array, const char* end)
 {
     if (!array->size)
     {
@@ -44,7 +56,7 @@ void tuple_print(FILE* stream, tuple_p array, const char* end)
     fprintf(stream, ")%s", end);
 }
 
-char tuple_equal(tuple_p array1, tuple_p array2)
+char tuple_equal(const tuple_p array1, const tuple_p array2)
 {
     if (array1->size != array2->size)
         return 0;
@@ -57,7 +69,7 @@ char tuple_equal(tuple_p array1, tuple_p array2)
     return 1;
 }
 
-char tuple_nequal(tuple_p array1, tuple_p array2)
+char tuple_nequal(const tuple_p array1, const tuple_p array2)
 {
     if (array1->size != array2->size)
         return 1;
@@ -68,4 +80,22 @@ char tuple_nequal(tuple_p array1, tuple_p array2)
             return 1;
 
     return 0;
+}
+
+char tuple_contains(const tuple_p array, const value_p value)
+{
+    if (!array->size)
+        return 0;
+
+    unsigned long long i;
+    for (i = 0; i < array->size; i++)
+        if (operate_compare(&array->elements[i], value))
+            return 1;
+
+    return 0;
+}
+
+unsigned long long tuple_size(const tuple_p array)
+{
+    return array->size;
 }

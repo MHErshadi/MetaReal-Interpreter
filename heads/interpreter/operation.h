@@ -35,8 +35,11 @@ ires_t operate_xor(value_p left, value_p right);
 ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 ires_t operate_type1(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 
+ires_t operate_subscript(value_p left, value_p right);
+
 /* */
 
+ires_t operate_positive(value_p operand);
 ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context);
@@ -48,6 +51,6 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
 
 /* */
 
-char operate_compare(value_p left, value_p right);
+char operate_compare(const value_p left, const value_p right);
 
 #endif /* __M_OPERATION__ */

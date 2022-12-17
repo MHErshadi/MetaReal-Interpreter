@@ -386,7 +386,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     switch (node->operator)
     {
     case PLUS_T:
-        ires.value = operand;
+        ires = operate_positive(&operand);
         break;
     case MINUS_T:
         ires = operate_negate(&operand, poss, pose, context);
@@ -476,15 +476,6 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
         return ires;
     }
 
-    if (value.type != STR_V)
-    {
-        char* detail = malloc(19 + value_label_lens[value.type]);
-        sprintf(detail, "<%s> is not iterable", value_labels[value.type]);
-
-        runtime_t error = runtime_set(TYPE_E, detail, &value.poss, &value.pose, value.context);
-        return ires_fail(&error);
-    }
-
     value_t pos = ires_merge(&ires, interpret_node(&node->pos, context));
     if (ires.has_error)
     {
@@ -493,35 +484,18 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
         return ires;
     }
 
-    if (pos.type != INT_V)
-    {
-        char* detail = malloc(29 + value_label_lens[pos.type]);
-        sprintf(detail, "Index must be <int> (not <%s>)", value_labels[pos.type]);
+    ires = operate_subscript(&value, &pos);
 
-        runtime_t error = runtime_set(TYPE_E, detail, &pos.poss, &pos.pose, pos.context);
-        return ires_fail(&error);
+    if (ires.has_error)
+    {
+        free(node);
+        return ires;
     }
 
-    if (!int_fits_ull(pos.value.ptr))
-    {
-        runtime_t error = out_of_range_error(&pos.poss, &pos.pose, pos.context);
-        return ires_fail(&error);
-    }
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
 
-    unsigned long long index = int_get_ull(pos.value.ptr);
-
-    if (index >= ((str_p)value.value.ptr)->size)
-    {
-        runtime_t error = out_of_range_error(&pos.poss, &pos.pose, pos.context);
-        return ires_fail(&error);
-    }
-
-    char chr = ((str_p)value.value.ptr)->str[index];
-
-    ires.value = value_set2(CHAR_V, chr, poss, pose, context);
-
-    str_free(value.value.ptr);
-    int_free(pos.value.ptr);
     free(node);
     return ires;
 }

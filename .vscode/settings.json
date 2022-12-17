@@ -14,6 +14,7 @@
         "ios": "c",
         "xlocale": "c",
         "xmemory": "c",
-        "stdexcept": "c"
+        "stdexcept": "c",
+        "iterator": "c"
     }
 }

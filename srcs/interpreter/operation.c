@@ -5,7 +5,7 @@
 #include <interpreter/interpreter.h>
 #include <complex.h>
 #include <str.h>
-#include <array/tuple.h>
+#include <array/list.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -218,6 +218,24 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         }
 
         break;
+    case LIST_V:
+        switch (right->type)
+        {
+        case LIST_V:
+            list_concat(left->value.ptr, right->value.ptr);
+            free(right->value.ptr);
+
+            return ires_success(left);
+        case TUPLE_V:
+            list_concat_tuple(left->value.ptr, right->value.ptr);
+            free(right->value.ptr);
+
+            return ires_success(left);
+        }
+
+        list_append(left->value.ptr, right);
+
+        return ires_success(left);
     }
 
     value_free(left);
@@ -405,6 +423,53 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         }
 
         break;
+    case LIST_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_fits_ull(right->value.ptr))
+            {
+                list_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            unsigned long long index = int_get_ull(right->value.ptr);
+
+            if (int_sign(right->value.ptr) < 0)
+                index = ((list_p)left->value.ptr)->size - index;
+
+            if (index >= ((list_p)left->value.ptr)->size)
+            {
+                list_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            list_remove(left->value.ptr, index);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case BOOL_V:
+        case CHAR_V:
+            if (right->value.chr >= ((list_p)left->value.ptr)->size)
+            {
+                list_free(left->value.ptr);
+
+                runtime_t error = out_of_range_error(&right->poss, &right->pose, right->context);
+                return ires_fail(&error);
+            }
+
+            list_remove(left->value.ptr, right->value.chr);
+
+            return ires_success(left);
+        }
+
+        break;
     }
 
     value_free(left);
@@ -570,6 +635,36 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
         case BOOL_V:
         case CHAR_V:
             str_repeat(left->value.ptr, right->value.chr);
+
+            return ires_success(left);
+        }
+
+        break;
+    case LIST_V:
+        switch (right->type)
+        {
+        case INT_V:
+            if (!int_fits_ull(right->value.ptr))
+            {
+                list_free(left->value.ptr);
+                int_free(right->value.ptr);
+
+                runtime_t error = mem_overflow_error(poss, pose, context);
+                return ires_fail(&error);
+            }
+
+            if (int_sign(right->value.ptr) < 0)
+                list_reverse(left->value.ptr);
+
+            unsigned long long count = int_get_ull(right->value.ptr);
+
+            list_repeat(left->value.ptr, count);
+            int_free(right->value.ptr);
+
+            return ires_success(left);
+        case BOOL_V:
+        case CHAR_V:
+            list_repeat(left->value.ptr, right->value.chr);
 
             return ires_success(left);
         }
@@ -3396,12 +3491,66 @@ ires_t operate_not(value_p operand)
 
 ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    switch (operand->type)
+    {
+    case INT_V:
+        int_add_ul(operand->value.ptr, 1);
 
+        return ires_success(operand);
+    case FLOAT_V:
+        float_add_ul(operand->value.ptr, 1);
+
+        return ires_success(operand);
+    case COMPLEX_V:
+        complex_add_ul(operand->value.ptr, 1);
+
+        return ires_success(operand);
+    case BOOL_V:
+        operand->value.chr = !operand->value.chr;
+
+        return ires_success(operand);
+    case CHAR_V:
+        operand->value.chr++;
+
+        return ires_success(operand);
+    }
+
+    value_free(operand);
+
+    runtime_t error = illegal_operation_unary_error(operand->type, "++", poss, pose, context);
+    return ires_fail(&error);
 }
 
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    switch (operand->type)
+    {
+    case INT_V:
+        int_subtract_ul(operand->value.ptr, 1);
 
+        return ires_success(operand);
+    case FLOAT_V:
+        float_subtract_ul(operand->value.ptr, 1);
+
+        return ires_success(operand);
+    case COMPLEX_V:
+        complex_subtract_ul(operand->value.ptr, 1);
+
+        return ires_success(operand);
+    case BOOL_V:
+        operand->value.chr = !operand->value.chr;
+
+        return ires_success(operand);
+    case CHAR_V:
+        operand->value.chr--;
+
+        return ires_success(operand);
+    }
+
+    value_free(operand);
+
+    runtime_t error = illegal_operation_unary_error(operand->type, "--", poss, pose, context);
+    return ires_fail(&error);
 }
 
 char operate_compare(const value_p left, const value_p right)
@@ -3482,6 +3631,8 @@ char operate_compare(const value_p left, const value_p right)
         case BOOL_V:
         case CHAR_V:
             return left->value.chr == right->value.chr;
+        case STR_V:
+            return str_equal_char(right->value.ptr, left->value.chr);
         }
 
         break;

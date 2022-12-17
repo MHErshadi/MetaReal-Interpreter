@@ -5,7 +5,7 @@
 #include <interpreter/operation.h>
 #include <complex.h>
 #include <str.h>
-#include <array/tuple.h>
+#include <array/list.h>
 #include <stdlib.h>
 #include <setting.h>
 #include <lexer/token.h>
@@ -24,7 +24,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_dict(list_np node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_set(list_np node, pos_p poss, pos_p pose, context_p context);
-ires_t interpret_type(unsigned char node, pos_p poss, pos_p pose, context_p context);
+ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose, context_p context);
 ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p pose, context_p context);
@@ -126,8 +126,12 @@ ires_t interpret_node(node_p node, context_p context)
         return interpret_char(node->value.chr, &node->poss, &node->pose, context);
     case STR_N:
         return interpret_str(node->value.ptr, &node->poss, &node->pose, context);
+    case LIST_N:
+        return interpret_list(node->value.ptr, &node->poss, &node->pose, context);
     case TUPLE_N:
         return interpret_tuple(node->value.ptr, &node->poss, &node->pose, context);
+    case TYPE_N:
+        return interpret_type(node->value.chr, &node->poss, &node->pose, context);
     case BINARY_OPERATION_N:
         return interpret_binary_operation(node->value.ptr, &node->poss, &node->pose, context);
     case UNARY_OPERATION_N:
@@ -204,7 +208,48 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context)
 
 ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    if (!node)
+    {
+        list_p ptr = list_set(NULL, 0);
+        ires.value = value_set1(LIST_V, ptr, poss, pose, context);
+
+        return ires;
+    }
+
+    value_p elements = malloc(node->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < node->size; i++)
+    {
+        value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context));
+        if (ires.has_error)
+        {
+            i++;
+            while (node->size > i)
+                node_free(&node->elements[--node->size]);
+            free(node->elements);
+            i--;
+
+            while (i)
+                value_free(&elements[--i]);
+            free(elements);
+            free(node);
+
+            return ires;
+        }
+
+        elements[i] = element;
+    }
+
+    list_p ptr = list_set(elements, i);
+    ires.value = value_set1(LIST_V, ptr, poss, pose, context);
+
+    free(node->elements);
+    free(node);
+    return ires;
 }
 
 ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context)
@@ -255,9 +300,11 @@ ires_t interpret_set(list_np node, pos_p poss, pos_p pose, context_p context)
 
 }
 
-ires_t interpret_type(unsigned char node, pos_p poss, pos_p pose, context_p context)
+ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context)
 {
+    value_t value = value_set2(TYPE_V, node, poss, pose, context);
 
+    return ires_success(&value);
 }
 
 ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p pose, context_p context)

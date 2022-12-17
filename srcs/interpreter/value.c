@@ -5,7 +5,7 @@
 #include <interpreter/value.h>
 #include <complex.h>
 #include <str.h>
-#include <array/tuple.h>
+#include <array/list.h>
 #include <setting.h>
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context)
@@ -46,15 +46,45 @@ value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context
     return value;
 }
 
+value_t value_copy(const value_p value)
+{
+    value_t copy = *value;
+
+    switch (value->type)
+    {
+    case INT_V:
+        copy.value.ptr = int_set(copy.value.ptr);
+        break;
+    case FLOAT_V:
+        copy.value.ptr = float_set(copy.value.ptr, setting.float_prec_bit);
+        break;
+    case COMPLEX_V:
+        copy.value.ptr = complex_set(copy.value.ptr, setting.complex_prec_bit);
+        break;
+    case STR_V:
+        copy.value.ptr = str_set(copy.value.ptr);
+        break;
+    case LIST_V:
+        copy.value.ptr = list_copy(copy.value.ptr);
+        break;
+    case TUPLE_V:
+        copy.value.ptr = tuple_copy(copy.value.ptr);
+        break;
+    }
+
+    return copy;
+}
+
 void value_free(value_p value)
 {
     switch (value->type)
     {
     case NULL_V:
-    case OBJECT_V:
     case NONE_V:
+    case OBJECT_V:
     case BOOL_V:
     case CHAR_V:
+    case TYPE_V:
         return;
     case INT_V:
         int_free(value->value.ptr);
@@ -68,8 +98,12 @@ void value_free(value_p value)
     case STR_V:
         str_free(value->value.ptr);
         return;
+    case LIST_V:
+        list_free(value->value.ptr);
+        return;
     case TUPLE_V:
         tuple_free(value->value.ptr);
+        return;
     }
 }
 
@@ -79,11 +113,11 @@ void value_label(value_p value, const char* end)
     {
     case NULL_V:
         return;
-    case OBJECT_V:
-        fprintf(setting.output, "<object at 0X%p>%s", value, end);
-        return;
     case NONE_V:
         fprintf(setting.output, "none%s", end);
+        return;
+    case OBJECT_V:
+        fprintf(setting.output, "<object at 0X%p>%s", value, end);
         return;
     case INT_V:
         int_print(setting.output, value->value.ptr, end);
@@ -131,8 +165,14 @@ void value_label(value_p value, const char* end)
     case STR_V:
         str_label(setting.output, value->value.ptr, end);
         return;
+    case LIST_V:
+        list_print(setting.output, value->value.ptr, end);
+        return;
     case TUPLE_V:
         tuple_print(setting.output, value->value.ptr, end);
+        return;
+    case TYPE_V:
+        fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
         return;
     }
 }
@@ -158,7 +198,11 @@ char value_is_true(value_p value)
         return value->value.chr != 0;
     case STR_V:
         return ((str_p)value->value.ptr)->size != 0;
+    case LIST_V:
+        return ((list_p)value->value.ptr)->size != 0;
     case TUPLE_V:
         return ((tuple_p)value->value.ptr)->size != 0;
     }
+
+    return 0;
 }

@@ -1048,7 +1048,7 @@ token_p core(pres_p pres, token_p tokens)
 
     if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
     {
-        *pres->nodes = node_set2(TYPE_N, tokens->type, &tokens->poss, &tokens->pose);
+        *pres->nodes = node_set2(TYPE_N, tokens->type - OBJECT_TT + 2, &tokens->poss, &tokens->pose);
 
         tokens++;
         advance_newline(tokens);

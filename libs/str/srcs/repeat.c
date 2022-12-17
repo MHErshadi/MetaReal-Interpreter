@@ -11,7 +11,19 @@
 
 void str_repeat(str_p str, unsigned long long count)
 {
+    if (!count)
+    {
+        str->str = realloc(str->str, 1);
+        *str->str = '\0';
+
+        str->size = 0;
+        return;
+    }
+
     if (count == 1)
+        return;
+
+    if (!str->size)
         return;
 
     unsigned long long bsize = str->size;

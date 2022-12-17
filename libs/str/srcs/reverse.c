@@ -11,7 +11,7 @@
 
 void str_reverse(str_p str)
 {
-    if (!str->size)
+    if (str->size <= 1)
         return;
 
     char* start = str->str;

@@ -10,9 +10,9 @@
 enum _value_types_
 {
     NULL_V,
+    NONE_V,
 
     OBJECT_V,
-    NONE_V,
 
     INT_V,
     FLOAT_V,
@@ -27,34 +27,40 @@ enum _value_types_
     LIST_V,
     TUPLE_V,
     DICT_V,
-    SET_V
+    SET_V,
+
+    TYPE_V
 };
 
-static const char* value_labels[13] =
+static const char* value_labels[14] =
 {
-    "null",
-    "object", "none",
+    "null", "none",
+    "object",
     "int", "float", "complex",
     "bool",
     "char",
     "str",
-    "list", "tuple", "dict", "set"
+    "list", "tuple", "dict", "set",
+    "type"
 };
 
-static const int value_label_lens[13] =
+static const int value_label_lens[14] =
 {
-    4,
-    6, 4,
+    4, 4,
+    6,
     3, 5, 7,
     4,
     4,
     3,
-    4, 5, 4, 3
+    4, 5, 4, 3,
+    4
 };
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context);
 value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context_p context);
 value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context);
+
+value_t value_copy(const value_p value);
 
 void value_free(value_p value);
 

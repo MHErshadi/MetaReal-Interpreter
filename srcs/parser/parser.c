@@ -3,7 +3,6 @@
 /*/
 
 #include <parser/parser.h>
-#include <stdlib.h>
 #include <def.h>
 
 #define advance_newline(t) if (t->type == NEWLINE_T) t++
@@ -61,7 +60,7 @@ pres_t parse(token_p tokens)
 
     token_p tokens_copy = tokens;
 
-    pres.nodes = malloc(NODES_SIZE * sizeof(node_t));
+    pres.nodes = m_alloc(NODES_SIZE * sizeof(node_t));
 
     unsigned long long alloc = NODES_SIZE;
     unsigned long long size = 0;
@@ -72,7 +71,7 @@ pres_t parse(token_p tokens)
             break;
 
         if (size == alloc)
-            pres.nodes = realloc(pres.nodes, (alloc += NODES_SIZE) * sizeof(node_t));
+            pres.nodes = m_realloc(pres.nodes, (alloc += NODES_SIZE) * sizeof(node_t));
 
         tokens = dollar_func(&pres, tokens);
         if (pres.has_error)
@@ -100,11 +99,11 @@ pres_t parse(token_p tokens)
     }
 
     if (size + 1 != alloc)
-        pres.nodes = realloc(pres.nodes, (size + 1) * sizeof(node_t));
+        pres.nodes = m_realloc(pres.nodes, (size + 1) * sizeof(node_t));
 
     pres.nodes[size] = node_set3(NULL_N, &tokens->poss, &tokens->pose);
 
-    free(tokens_copy);
+    m_free(tokens_copy);
     return pres;
 }
 
@@ -149,7 +148,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
         if (pres->has_error)
             return tokens;
 
-        node_p args = malloc(DOLLAR_FUNC_ARGS_SIZE * sizeof(node_t));
+        node_p args = m_alloc(DOLLAR_FUNC_ARGS_SIZE * sizeof(node_t));
         *args = *pres->nodes;
 
         unsigned long long alloc = DOLLAR_FUNC_ARGS_SIZE;
@@ -170,7 +169,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
             }
 
             if (size == alloc)
-                args = realloc(args, (alloc += DOLLAR_FUNC_ARGS_SIZE) * sizeof(node_t));
+                args = m_realloc(args, (alloc += DOLLAR_FUNC_ARGS_SIZE) * sizeof(node_t));
 
             args[size++] = *pres->nodes;
 
@@ -178,7 +177,7 @@ token_p dollar_func(pres_p pres, token_p tokens)
         }
 
         if (size != alloc)
-            args = realloc(args, size * sizeof(node_t));
+            args = m_realloc(args, size * sizeof(node_t));
 
         dollar_func_call_np node = dollar_func_call_n_set(name, args, size);
         *pres->nodes = node_set1(DOLLAR_FUNC_CALL_N, node, poss, pose);
@@ -243,7 +242,7 @@ token_p tuple(pres_p pres, token_p tokens)
     {
         pos_t pose;
 
-        node_p elements = malloc(TUPLE_SIZE * sizeof(node_t));
+        node_p elements = m_alloc(TUPLE_SIZE * sizeof(node_t));
         *elements = *pres->nodes;
 
         unsigned long long alloc = TUPLE_SIZE;
@@ -262,7 +261,7 @@ token_p tuple(pres_p pres, token_p tokens)
                 pres->has_error = 0;
 
                 if (size != alloc)
-                    elements = realloc(elements, size * sizeof(node_t));
+                    elements = m_realloc(elements, size * sizeof(node_t));
 
                 tuple_np node = tuple_n_set(elements, size);
                 *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, &pose);
@@ -271,13 +270,13 @@ token_p tuple(pres_p pres, token_p tokens)
             tokens = new;
 
             if (size == alloc)
-                elements = realloc(elements, (alloc += TUPLE_SIZE) * sizeof(node_t));
+                elements = m_realloc(elements, (alloc += TUPLE_SIZE) * sizeof(node_t));
 
             elements[size++] = *pres->nodes;
         } while (tokens->type == COMMA_T);
 
         if (size != alloc)
-            elements = realloc(elements, size * sizeof(node_t));
+            elements = m_realloc(elements, size * sizeof(node_t));
 
         tuple_np node = tuple_n_set(elements, size);
         *pres->nodes = node_set1(TUPLE_N, node, &elements->poss, &elements[size - 1].pose);
@@ -909,12 +908,12 @@ check:
     {
         unsigned char operator = tokens->type;
 
-        pos_p poss = &tokens++->poss;
+        pos_p pose = &tokens++->pose;
 
         advance_newline(tokens);
 
         var_fixed_assign_np node = var_fixed_assign_n_set(VFA_PROP(1), operator, pres->nodes);
-        *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, poss, &pres->nodes->pose);
+        *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, &pres->nodes->poss, pose);
         goto check;
     }
 
@@ -1152,7 +1151,7 @@ token_p list_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    node_p elements = malloc(LIST_SIZE * sizeof(node_t));
+    node_p elements = m_alloc(LIST_SIZE * sizeof(node_t));
 
     unsigned long long alloc = LIST_SIZE;
     unsigned long long size = 0;
@@ -1167,7 +1166,7 @@ token_p list_parse(pres_p pres, token_p tokens)
         }
 
         if (size == alloc)
-            elements = realloc(elements, (alloc += LIST_SIZE) * sizeof(node_t));
+            elements = m_realloc(elements, (alloc += LIST_SIZE) * sizeof(node_t));
 
         elements[size++] = *pres->nodes;
 
@@ -1188,7 +1187,7 @@ token_p list_parse(pres_p pres, token_p tokens)
     }
 
     if (size != alloc)
-        elements = realloc(elements, size * sizeof(node_t));
+        elements = m_realloc(elements, size * sizeof(node_t));
 
     list_np node = list_n_set(elements, size);
     *pres->nodes = node_set1(LIST_N, node, poss, &tokens++->pose);
@@ -1226,7 +1225,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
     }
     if (tokens->type == RCURLY_T)
     {
-        node_p elements = malloc(sizeof(node_t));
+        node_p elements = m_alloc(sizeof(node_t));
         *elements = *pres->nodes;
 
         set_np node = set_n_set(elements, 1);
@@ -1237,13 +1236,13 @@ token_p dict_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    pair_p elements = malloc(DICT_SIZE * sizeof(pair_t));
+    pair_p elements = m_alloc(DICT_SIZE * sizeof(pair_t));
     elements->key = *pres->nodes;
 
     if (tokens->type != COLON_T)
     {
         node_free(&elements->key);
-        free(elements);
+        m_free(elements);
 
         invalid_syntax_t error = invalid_syntax_set("Expected ':'", &tokens->poss, &tokens->pose);
         pres_fail(pres, &error);
@@ -1257,7 +1256,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
     if (pres->has_error)
     {
         node_free(&elements->key);
-        free(elements);
+        m_free(elements);
         return tokens;
     }
 
@@ -1281,7 +1280,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
             }
 
             if (size == alloc)
-                elements = realloc(elements, (alloc += DICT_SIZE) * sizeof(pair_t));
+                elements = m_realloc(elements, (alloc += DICT_SIZE) * sizeof(pair_t));
 
             elements[size].key = *pres->nodes;
 
@@ -1326,7 +1325,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
     }
 
     if (size != alloc)
-        elements = realloc(elements, size * sizeof(pair_t));
+        elements = m_realloc(elements, size * sizeof(pair_t));
 
     dict_np node = dict_n_set(elements, size);
     *pres->nodes = node_set1(DICT_N, node, poss, &tokens++->pose);
@@ -1338,7 +1337,7 @@ token_p dict_parse(pres_p pres, token_p tokens)
 
 token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
 {
-    node_p elements = malloc(SET_SIZE * sizeof(node_t));
+    node_p elements = m_alloc(SET_SIZE * sizeof(node_t));
     *elements = *pres->nodes;
 
     unsigned long long alloc = SET_SIZE;
@@ -1354,7 +1353,7 @@ token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
         }
 
         if (size == alloc)
-            elements = realloc(elements, (alloc += SET_SIZE) * sizeof(node_t));
+            elements = m_realloc(elements, (alloc += SET_SIZE) * sizeof(node_t));
 
         elements[size++] = *pres->nodes;
 
@@ -1375,7 +1374,7 @@ token_p set_parse(pres_p pres, token_p tokens, pos_p poss)
     }
 
     if (size != alloc)
-        elements = realloc(elements, size * sizeof(node_t));
+        elements = m_realloc(elements, size * sizeof(node_t));
 
     set_np node = set_n_set(elements, size);
     *pres->nodes = node_set1(SET_N, node, poss, &tokens->pose);
@@ -1412,26 +1411,29 @@ token_p var_parse(pres_p pres, token_p tokens)
         return tokens;
     }
 
-    char* name = tokens++->value;
+    char* name = tokens->value;
+    pos_p pose = &tokens++->pose;
 
     advance_newline(tokens);
 
-    if (tokens->type != ASSIGN_T)
+    node_t value;
+    if (tokens->type == ASSIGN_T)
     {
-        invalid_syntax_t error = invalid_syntax_set("Expected '='", &tokens->poss, &tokens->pose);
-        pres_fail(pres, &error);
-        return tokens;
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = tuple(pres, tokens);
+        if (pres->has_error)
+            return tokens;
+
+        value = *pres->nodes;
+        pose = &value.pose;
     }
+    else
+        value.type = NULL_N;
 
-    tokens++;
-    advance_newline(tokens);
-
-    tokens = tuple(pres, tokens);
-    if (pres->has_error)
-        return tokens;
-
-    var_assign_np node = var_assign_n_set(properties, name, type, pres->nodes);
-    *pres->nodes = node_set1(VAR_ASSIGN_N, node, poss, &pres->nodes->pose);
+    var_assign_np node = var_assign_n_set(properties, name, type, &value);
+    *pres->nodes = node_set1(VAR_ASSIGN_N, node, poss, pose);
     return tokens;
 }
 
@@ -1480,14 +1482,14 @@ token_p func_def_parse(pres_p pres, token_p tokens)
 
     if (tokens->type != RPAREN_T)
     {
-        args = malloc(FUNC_DEF_SIZE * sizeof(arg_t));
+        args = m_alloc(FUNC_DEF_SIZE * sizeof(arg_t));
 
         unsigned long long alloc = FUNC_DEF_SIZE;
 
         do
         {
             if (size == alloc)
-                args = realloc(args, (alloc += FUNC_DEF_SIZE) * sizeof(arg_t));
+                args = m_realloc(args, (alloc += FUNC_DEF_SIZE) * sizeof(arg_t));
 
             if (tokens->type >= OBJECT_TT && tokens->type <= SET_TT)
             {
@@ -1545,7 +1547,7 @@ token_p func_def_parse(pres_p pres, token_p tokens)
         }
 
         if (size != alloc)
-            args = realloc(args, size * sizeof(arg_t));
+            args = m_realloc(args, size * sizeof(arg_t));
     }
 
     tokens++;
@@ -1631,7 +1633,7 @@ token_p func_call_parse(pres_p pres, token_p tokens)
     }
     else
     {
-        arg_access_p args = malloc(FUNC_CALL_SIZE * sizeof(arg_access_t));
+        arg_access_p args = m_alloc(FUNC_CALL_SIZE * sizeof(arg_access_t));
 
         unsigned long long alloc = FUNC_CALL_SIZE;
         unsigned long long size = 0;
@@ -1639,7 +1641,7 @@ token_p func_call_parse(pres_p pres, token_p tokens)
         do
         {
             if (size == alloc)
-                args = realloc(args, (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
+                args = m_realloc(args, (alloc += FUNC_CALL_SIZE) * sizeof(arg_access_t));
 
             if (tokens->type == IDENTIFIER_T)
             {
@@ -1689,7 +1691,7 @@ token_p func_call_parse(pres_p pres, token_p tokens)
         }
 
         if (size != alloc)
-            args = realloc(args, size * sizeof(arg_access_t));
+            args = m_realloc(args, size * sizeof(arg_access_t));
 
         func_call_np node = func_call_n_set(&func, args, size);
         *pres->nodes = node_set1(FUNC_CALL_N, node, &func.poss, &tokens++->pose);
@@ -1857,7 +1859,7 @@ token_p if_parse(pres_p pres, token_p tokens)
 
     advance_newline(tokens);
 
-    case_p cases = malloc(IF_CASE_SIZE * sizeof(case_t));
+    case_p cases = m_alloc(IF_CASE_SIZE * sizeof(case_t));
 
     unsigned long long alloc = IF_CASE_SIZE;
     unsigned long long size = 0;
@@ -1874,7 +1876,7 @@ token_p if_parse(pres_p pres, token_p tokens)
         }
 
         if (size == alloc)
-            cases = realloc(cases, (alloc += IF_CASE_SIZE) * sizeof(case_t));
+            cases = m_realloc(cases, (alloc += IF_CASE_SIZE) * sizeof(case_t));
 
         cases[size].condition = *pres->nodes;
 
@@ -2031,7 +2033,7 @@ token_p switch_parse(pres_p pres, token_p tokens)
 
     if (tokens->type == CASE_TK)
     {
-        cases = malloc(SWITCH_CASE_SIZE * sizeof(case_t));
+        cases = m_alloc(SWITCH_CASE_SIZE * sizeof(case_t));
 
         unsigned long long alloc = SWITCH_CASE_SIZE;
 
@@ -2063,7 +2065,7 @@ token_p switch_parse(pres_p pres, token_p tokens)
             advance_newline(tokens);
 
             if (size == alloc)
-                cases = realloc(cases, (alloc += SWITCH_CASE_SIZE) * sizeof(case_t));
+                cases = m_realloc(cases, (alloc += SWITCH_CASE_SIZE) * sizeof(case_t));
 
             cases[size].condition = *pres->nodes;
 
@@ -2080,7 +2082,7 @@ token_p switch_parse(pres_p pres, token_p tokens)
         } while (tokens->type == CASE_TK);
 
         if (size != alloc)
-            cases = realloc(cases, size * sizeof(case_t));
+            cases = m_realloc(cases, size * sizeof(case_t));
     }
 
     body_t dbody;
@@ -2702,7 +2704,7 @@ token_p try_parse(pres_p pres, token_p tokens)
 
     if (tokens->type == EXCEPT_TK)
     {
-        excepts = malloc(TRY_EXCEPT_SIZE * sizeof(case_t));
+        excepts = m_alloc(TRY_EXCEPT_SIZE * sizeof(case_t));
 
         unsigned long long alloc = TRY_EXCEPT_SIZE;
 
@@ -2720,7 +2722,7 @@ token_p try_parse(pres_p pres, token_p tokens)
             }
 
             if (size == alloc)
-                excepts = realloc(excepts, (alloc += TRY_EXCEPT_SIZE) * sizeof(case_t));
+                excepts = m_realloc(excepts, (alloc += TRY_EXCEPT_SIZE) * sizeof(case_t));
 
             excepts[size].condition = *pres->nodes;
 
@@ -2783,7 +2785,7 @@ token_p try_parse(pres_p pres, token_p tokens)
         } while (tokens->type == EXCEPT_TK);
 
         if (size != alloc)
-            excepts = realloc(excepts, size * sizeof(case_t));
+            excepts = m_realloc(excepts, size * sizeof(case_t));
     }
 
     body_t fbody;
@@ -2922,7 +2924,7 @@ token_p properties_gen(char* properties, token_p tokens)
 
 token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens)
 {
-    body->nodes = malloc(size * sizeof(node_t));
+    body->nodes = m_alloc(size * sizeof(node_t));
 
     unsigned long long alloc = size;
     body->size = 0;
@@ -2934,7 +2936,7 @@ token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p toke
             break;
 
         if (body->size == alloc)
-            body->nodes = realloc(body->nodes, (alloc += size) * sizeof(node_t));
+            body->nodes = m_realloc(body->nodes, (alloc += size) * sizeof(node_t));
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)
@@ -2951,7 +2953,7 @@ token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p toke
 
 token_p switch_case_body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens)
 {
-    body->nodes = malloc(size * sizeof(node_t));
+    body->nodes = m_alloc(size * sizeof(node_t));
 
     unsigned long long alloc = size;
     body->size = 0;
@@ -2963,7 +2965,7 @@ token_p switch_case_body_gen(body_p body, unsigned long long size, pres_p pres, 
             break;
 
         if (body->size == alloc)
-            body->nodes = realloc(body->nodes, (alloc += size) * sizeof(node_t));
+            body->nodes = m_realloc(body->nodes, (alloc += size) * sizeof(node_t));
 
         tokens = dollar_func(pres, tokens);
         if (pres->has_error)

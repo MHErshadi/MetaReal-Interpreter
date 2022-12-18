@@ -3,7 +3,7 @@
 /*/
 
 #include <lexer/token.h>
-#include <stdlib.h>
+#include <def.h>
 #include <string.h>
 
 #define KEYWORDS_PAD PRIVATE_TK
@@ -164,14 +164,14 @@ void token_print(FILE* stream, token_p token)
 void token_p_free1(token_p tokens, unsigned long long size)
 {
     while (size)
-        free(tokens[--size].value);
-    free(tokens);
+        m_free(tokens[--size].value);
+    m_free(tokens);
 }
 
 void token_p_free2(token_p tokens)
 {
     while (tokens->type != EOF_T)
-        free(tokens++->value);
+        m_free(tokens++->value);
 }
 
 unsigned char identifier_type(const char* identifier)

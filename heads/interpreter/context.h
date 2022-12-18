@@ -62,6 +62,7 @@ context_t context_set1(const char* name, context_p parent, pos_p parent_pos, tab
 context_t context_set2(const char* name, table_p table, const char* fname);
 
 value_t context_var_get(context_p context, const char* name);
+value_p context_ptr_get(context_p context, const char* name, char* flag);
 
 /* */
 
@@ -70,6 +71,8 @@ table_t table_set(unsigned long long alloc);
 void table_free(table_p table);
 
 value_t table_var_get(table_p table, const char* name);
+value_p table_ptr_get(table_p table, const char* name, char* flag);
 char table_var_set(table_p table, unsigned char properties, char* name, unsigned char type, value_p value);
+value_p table_ptr_set(table_p table, unsigned char properties, char* name, unsigned char type, value_p value, char* flag);
 
 #endif /* __M_CONTEXT__ */

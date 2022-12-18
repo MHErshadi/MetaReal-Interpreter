@@ -48,6 +48,7 @@ enum _runtime_types_
     DIVISION_BY_ZERO_E,
     NOT_DEFINED_E,
     CONST_E,
+    ACCESS_E
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos);

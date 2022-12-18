@@ -4,11 +4,11 @@
 
 #include <array/tuple.h>
 #include <interpreter/operation.h>
-#include <stdlib.h>
+#include <def.h>
 
 tuple_p tuple_set(value_p elements, unsigned long long size)
 {
-    tuple_p array = malloc(sizeof(tuple_t));
+    tuple_p array = m_alloc(sizeof(tuple_t));
 
     array->elements = elements;
     array->size = size;
@@ -18,9 +18,9 @@ tuple_p tuple_set(value_p elements, unsigned long long size)
 
 tuple_p tuple_copy(const tuple_p array)
 {
-    tuple_p copy = malloc(sizeof(tuple_t));
+    tuple_p copy = m_alloc(sizeof(tuple_t));
 
-    copy->elements = malloc(array->size * sizeof(value_t));
+    copy->elements = m_alloc(array->size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < array->size; i++)
@@ -35,7 +35,7 @@ void tuple_free(tuple_p array)
 {
     while (array->size)
         value_free(&array->elements[--array->size]);
-    free(array);
+    m_free(array);
 }
 
 void tuple_free_exception(tuple_p array, unsigned long long exception)
@@ -47,7 +47,7 @@ void tuple_free_exception(tuple_p array, unsigned long long exception)
         value_free(&array->elements[array->size]);
     }
 
-    free(array);
+    m_free(array);
 }
 
 void tuple_print(FILE* stream, const tuple_p array, const char* end)

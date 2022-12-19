@@ -620,6 +620,9 @@ void node_print(FILE* stream, node_p node)
 
 void node_p_free1(node_p nodes, unsigned long long size)
 {
+    if (!size)
+        return;
+
     while (size)
         node_free(nodes + --size);
     free(nodes);
@@ -661,6 +664,9 @@ void arg_p_free(arg_p args, unsigned long long size)
 
 void arg_access_p_free(arg_access_p args, unsigned long long size)
 {
+    if (!size)
+        return;
+
     while (size)
         node_free(&args[--size].value);
     free(args);

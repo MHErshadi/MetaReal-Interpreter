@@ -20,6 +20,8 @@
 value_t ires_merge(ires_p ires, ires_t other);
 
 ires_t interpret_node(node_p node, context_p context, char properties);
+ires_t interpret_body(body_p body, context_p context, char properties);
+
 ires_t interpret_none(pos_p poss, pos_p pose, context_p context, char properties);
 ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, char properties);
 ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context, char properties);
@@ -155,10 +157,37 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ACCESS_N:
         return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case IF_N:
+        return interpret_if(node->value.ptr, &node->poss, &node->pose, context, properties);
     default:
         fprintf(stderr, "interpret_node function: invalid node type (#%u)\n", node->type);
         abort();
     }
+}
+
+ires_t interpret_body(body_p body, context_p context, char properties)
+{
+    ires_t ires;
+    ires.has_error = 0;
+    ires.value.type = NULL_V;
+
+    unsigned long long i = 0;
+    while (i < body->size)
+    {
+        value_free(&ires.value);
+
+        ires.value = ires_merge(&ires, interpret_node(&body->nodes[i++], context, properties));
+        if (ires.has_error)
+        {
+            while (body->size > i)
+                node_free(body->nodes + --body->size);
+            free(body->nodes);
+            return ires;
+        }
+    }
+
+    free(body->nodes);
+    return ires;
 }
 
 ires_t interpret_none(pos_p poss, pos_p pose, context_p context, char properties)
@@ -181,6 +210,9 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
+        free(node->value);
+        free(node);
+
         char* detail = malloc(49);
         strcpy(detail, "<int> object can not be accessed like a variable");
 
@@ -200,6 +232,9 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
 {
     if (IPROP_PTR(properties))
     {
+        free(node->value);
+        free(node);
+
         char* detail = malloc(51);
         strcpy(detail, "<float> object can not be accessed like a variable");
 
@@ -219,6 +254,9 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
 {
     if (IPROP_PTR(properties))
     {
+        free(node->value);
+        free(node);
+
         char* detail = malloc(53);
         strcpy(detail, "<complex> object can not be accessed like a variable");
 
@@ -270,6 +308,9 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
+        free(node->value);
+        free(node);
+
         char* detail = malloc(49);
         strcpy(detail, "<str> object can not be accessed like a variable");
 
@@ -288,6 +329,12 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
 {
     if (IPROP_PTR(properties))
     {
+        if (node)
+        {
+            node_p_free1(node->elements, node->size);
+            free(node);
+        }
+
         char* detail = malloc(50);
         strcpy(detail, "<list> object can not be accessed like a variable");
 
@@ -316,7 +363,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
         {
             i++;
             while (node->size > i)
-                node_free(&node->elements[--node->size]);
+                node_free(node->elements + --node->size);
             free(node->elements);
             i--;
 
@@ -343,6 +390,9 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
 {
     if (IPROP_PTR(properties))
     {
+        node_p_free1(node->elements, node->size);
+        free(node);
+
         char* detail = malloc(51);
         strcpy(detail, "<tuple> object can not be accessed like a variable");
 
@@ -363,12 +413,12 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
         {
             i++;
             while (node->size > i)
-                node_free(&node->elements[--node->size]);
+                node_free(node->elements + --node->size);
             free(node->elements);
             i--;
 
             while (i)
-                value_free(&elements[--i]);
+                value_free(elements + --i);
             free(elements);
             free(node);
 
@@ -416,6 +466,10 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 {
     if (IPROP_PTR(properties))
     {
+        node_free(&node->left);
+        node_free(&node->right);
+        free(node);
+
         char* detail = malloc(63);
         strcpy(detail, "Result of binary operation can not be accessed like a variable");
 
@@ -539,6 +593,9 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 {
     if (IPROP_PTR(properties))
     {
+        node_free(&node->operand);
+        free(node);
+
         char* detail = malloc(62);
         strcpy(detail, "Result of unary operation can not be accessed like a variable");
 
@@ -758,9 +815,9 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         {
             value_free(&value);
 
-            char* detail = malloc(45 + strlen(node->name) + value_label_lens[res]);
+            char* detail = malloc(45 + strlen(node->name) + value_label_lens[(unsigned)res]);
             sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
-                node->name, value_labels[res]);
+                node->name, value_labels[(unsigned)res]);
 
             free(node->name);
             free(node);
@@ -791,9 +848,9 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         {
             value_free(&value);
 
-            char* detail = malloc(45 + strlen(node->name) + value_label_lens[res]);
+            char* detail = malloc(45 + strlen(node->name) + value_label_lens[(unsigned)res]);
             sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
-                node->name, value_labels[res]);
+                node->name, value_labels[(unsigned)res]);
 
             free(node->name);
             free(node);
@@ -1122,7 +1179,95 @@ ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p po
 
 ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        node_p_free1(node->ebody.nodes, node->ebody.size);
+        case_p_free(node->cases, node->size);
+        free(node);
 
+        char* detail = malloc(59);
+        strcpy(detail, "Result of if statement can not be accessed like a variable");
+
+        runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+
+    unsigned long long i = 0;
+    while (i < node->size)
+    {
+        value_t condition = ires_merge(&ires, interpret_node(&node->cases[i++].condition, context, 0));
+        if (ires.has_error)
+        {
+            node_p_free1(node->ebody.nodes, node->ebody.size);
+
+            while (node->size > i)
+            {
+                node->size--;
+                node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
+                node_free(&node->cases[node->size].condition);
+            }
+            free(node->cases);
+
+            free(node);
+            return ires;
+        }
+
+        if (value_is_true(&condition))
+        {
+            value_free(&condition);
+
+            ires.value = ires_merge(&ires, interpret_body(&node->cases[i - 1].body, context, 0));
+
+            node_p_free1(node->ebody.nodes, node->ebody.size);
+
+            while (node->size > i)
+            {
+                node->size--;
+                node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
+                node_free(&node->cases[node->size].condition);
+            }
+            free(node->cases);
+
+            free(node);
+
+            if (ires.has_error)
+                return ires;
+
+            ires.value.poss = *poss;
+            ires.value.pose = *pose;
+            ires.value.context = context;
+
+            return ires;
+        }
+
+        value_free(&condition);
+
+        node_p_free1(node->cases[i - 1].body.nodes, node->cases[i - 1].body.size);
+    }
+
+    free(node->cases);
+
+    if (node->ebody.size)
+    {
+        ires.value = ires_merge(&ires, interpret_body(&node->ebody, context, 0));
+        if (ires.has_error)
+        {
+            free(node);
+            return ires;
+        }
+    }
+    else
+        ires.value.type = NULL_V;
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+    free(node);
+    return ires;
 }
 
 ires_t interpret_switch(switch_np node, pos_p poss, pos_p pose, context_p context, char properties)

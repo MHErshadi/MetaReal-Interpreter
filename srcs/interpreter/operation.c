@@ -7,7 +7,7 @@
 #include <str.h>
 #include <array/list.h>
 #include <setting.h>
-#include <def.h>
+#include <stdlib.h>
 #include <string.h>
 
 runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context);
@@ -50,7 +50,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = int_get_str(left->value.ptr);
 
             str_str_concat(str, right->value.ptr);
-            m_free(str);
+            free(str);
             int_free(left->value.ptr);
 
             return ires_success(right);
@@ -84,7 +84,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = float_get_str(left->value.ptr, setting.float_prec_show);
 
             str_str_concat(str, right->value.ptr);
-            m_free(str);
+            free(str);
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -118,7 +118,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = complex_get_str(left->value.ptr, setting.complex_prec_show);
 
             str_str_concat(str, right->value.ptr);
-            m_free(str);
+            free(str);
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -189,7 +189,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = int_get_str(right->value.ptr);
 
             str_concat_str(left->value.ptr, str);
-            m_free(str);
+            free(str);
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -197,7 +197,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = float_get_str(right->value.ptr, setting.float_prec_show);
 
             str_concat_str(left->value.ptr, str);
-            m_free(str);
+            free(str);
             float_free(right->value.ptr);
 
             return ires_success(left);
@@ -205,7 +205,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = complex_get_str(right->value.ptr, setting.complex_prec_show);
 
             str_concat_str(left->value.ptr, str);
-            m_free(str);
+            free(str);
             complex_free(right->value.ptr);
 
             return ires_success(left);
@@ -230,12 +230,12 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         {
         case LIST_V:
             list_concat(left->value.ptr, right->value.ptr);
-            m_free(right->value.ptr);
+            free(right->value.ptr);
 
             return ires_success(left);
         case TUPLE_V:
             list_concat_tuple(left->value.ptr, right->value.ptr);
-            m_free(right->value.ptr);
+            free(right->value.ptr);
 
             return ires_success(left);
         }
@@ -3278,7 +3278,7 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
             str_free(right->value.ptr);
-            m_free(str);
+            free(str);
 
             return ires_success(left);
         case FLOAT_V:
@@ -3288,7 +3288,7 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
             str_free(right->value.ptr);
-            m_free(str);
+            free(str);
 
             return ires_success(left);
         case COMPLEX_V:
@@ -3298,7 +3298,7 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
             str_free(right->value.ptr);
-            m_free(str);
+            free(str);
 
             return ires_success(left);
         case BOOL_V:
@@ -3434,7 +3434,7 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
         return ires_success(left);
     }
 
-    char* detail = m_alloc(81 + value_label_lens[left->type]);
+    char* detail = malloc(81 + value_label_lens[left->type]);
     sprintf(detail, "<%s> is not iterable data structure (iterable data structures: <list> and <tuple>)", value_labels[left->type]);
 
     runtime_t error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
@@ -3615,14 +3615,14 @@ ires_t operate_subscript(value_p left, value_p right)
         goto index_err;
     }
 
-    detail = m_alloc(63 + value_label_lens[left->type]);
+    detail = malloc(63 + value_label_lens[left->type]);
     sprintf(detail, "<%s> is not iterable (iterable types: <str>, <list> and <tuple>)", value_labels[left->type]);
 
     error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
     return ires_fail(&error);
 
 index_err:
-    detail = m_alloc(47 + value_label_lens[right->type]);
+    detail = malloc(47 + value_label_lens[right->type]);
     sprintf(detail, "Index must be <int>, <bool> or <char> (not <%s>)", value_labels[right->type]);
 
     error = runtime_set(TYPE_E, detail, &right->poss, &right->pose, right->context);
@@ -3663,11 +3663,10 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
                 return ires_fail(&error);
             }
 
-            ptr = ((str_p)left->value.ptr)->str + index;
-
             int_free(right->value.ptr);
 
-            right->value.ptr = ptr;
+            right->type = CHAR_PTR_V;
+            right->value.ptr = ((str_p)left->value.ptr)->str + index;
 
             return ires_success(right);
         case BOOL_V:
@@ -3678,6 +3677,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
                 return ires_fail(&error);
             }
 
+            right->type = CHAR_PTR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + right->value.chr;
 
             return ires_success(right);
@@ -3783,14 +3783,14 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
         goto index_err;
     }
 
-    detail = m_alloc(63 + value_label_lens[left->type]);
+    detail = malloc(63 + value_label_lens[left->type]);
     sprintf(detail, "<%s> is not iterable (iterable types: <str>, <list> and <tuple>)", value_labels[left->type]);
 
     error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
     return ires_fail(&error);
 
 index_err:
-    detail = m_alloc(47 + value_label_lens[right->type]);
+    detail = malloc(47 + value_label_lens[right->type]);
     sprintf(detail, "Index must be <int>, <bool> or <char> (not <%s>)", value_labels[right->type]);
 
     error = runtime_set(TYPE_E, detail, &right->poss, &right->pose, right->context);
@@ -3949,6 +3949,10 @@ ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p cont
         operand->value.chr++;
 
         return ires_success(operand);
+    case CHAR_PTR_V:
+        (*(char*)operand->value.ptr)++;
+
+        return ires_success(operand);
     }
 
     runtime_t error = illegal_operation_unary_error(operand->type, "++", poss, pose, context);
@@ -3977,6 +3981,10 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
         return ires_success(operand);
     case CHAR_V:
         operand->value.chr--;
+
+        return ires_success(operand);
+    case CHAR_PTR_V:
+        (*(char*)operand->value.ptr)--;
 
         return ires_success(operand);
     }
@@ -4109,31 +4117,40 @@ char operate_compare(const value_p left, const value_p right)
 
 runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = m_alloc(39 + strlen(operator) + value_label_lens[type1] + value_label_lens[type2]);
-    sprintf(detail, "Illegal operation (%s) between <%s> and <%s>", operator, value_labels[type1], value_labels[type2]);
+    char* detail = malloc(39 + strlen(operator) + value_label_lens[type1] + value_label_lens[type2]);
+    sprintf(detail, "Illegal operation (%s) between <%s> and <%s>",
+        operator, value_labels[type1], value_labels[type2]);
 
     return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }
 
-runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context)
+runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = m_alloc(19);
-    strcpy(detail, "Index out of range");
+    char* detail = malloc(28 + strlen(operator) + value_label_lens[type]);
+    sprintf(detail, "Illegal operation (%s) for <%s>", operator, value_labels[type]);
 
-    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
+    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }
 
 runtime_t mem_overflow_error(pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = m_alloc(16);
+    char* detail = malloc(16);
     strcpy(detail, "Memory overflow");
 
     return runtime_set(MEM_OVERFLOW_E, detail, poss, pose, context);
 }
 
+runtime_t out_of_range_error(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(19);
+    strcpy(detail, "Index out of range");
+
+    return runtime_set(OUT_OF_RANGE_E, detail, poss, pose, context);
+}
+
 runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = m_alloc(17);
+    char* detail = malloc(17);
     strcpy(detail, "Division by zero");
 
     return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
@@ -4141,16 +4158,8 @@ runtime_t division_by_zero_error(pos_p poss, pos_p pose, context_p context)
 
 runtime_t modulo_by_zero_error(pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = m_alloc(15);
+    char* detail = malloc(15);
     strcpy(detail, "Modulo by zero");
 
     return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
-}
-
-runtime_t illegal_operation_unary_error(unsigned char type, const char* operator, pos_p poss, pos_p pose, context_p context)
-{
-    char* detail = m_alloc(28 + strlen(operator) + value_label_lens[type]);
-    sprintf(detail, "Illegal operation (%s) for <%s>", operator, value_labels[type]);
-
-    return runtime_set(ILLEGAL_OPERATION_E, detail, poss, pose, context);
 }

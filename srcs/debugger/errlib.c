@@ -4,7 +4,7 @@
 
 #include <debugger/errlib.h>
 #include <setting.h>
-#include <def.h>
+#include <stdlib.h>
 #include <string.h>
 #include <interpreter/value.h>
 
@@ -134,7 +134,7 @@ runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose, 
 void runtime_print(runtime_p error, const char* code, unsigned long long size)
 {
     fprintf(setting.error, "\nRuntime Error: %s\n", error->detail);
-    m_free(error->detail);
+    free(error->detail);
 
     fprintf(setting.error, "Error Type: %s (#id=%u)\n", runtime_labels[error->type], error->type);
 
@@ -143,7 +143,7 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
 
     unsigned long long length = strlen(context->fname) + strlen(context->name) + number_length(pos->line) + 23;
 
-    char* troubleshoot = m_alloc(length);
+    char* troubleshoot = malloc(length);
     sprintf(troubleshoot, "  File \"%s\", line %llu, in %s\n", context->fname, pos->line, context->name);
 
     while (context->parent)
@@ -153,15 +153,15 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
 
         length += strlen(context->fname) + strlen(context->name) + number_length(pos->line) + 23;
 
-        char* tail = m_alloc(length);
+        char* tail = malloc(length);
         sprintf(tail, "  File \"%s\", line %llu, in %s\n%s", context->fname, pos->line + 1, context->name, troubleshoot);
 
-        m_free(troubleshoot);
+        free(troubleshoot);
         troubleshoot = tail;
     }
 
     fprintf(setting.error, "\nTroubleshoot (most recent call last):\n%s\n", troubleshoot);
-    m_free(troubleshoot);
+    free(troubleshoot);
 
     if (error->poss.line != error->pose.line)
     {

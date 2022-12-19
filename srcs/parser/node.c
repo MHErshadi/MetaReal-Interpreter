@@ -4,7 +4,7 @@
 
 #include <parser/node.h>
 #include <lexer/token.h>
-#include <def.h>
+#include <stdlib.h>
 
 void body_print(FILE* stream, body_p body);
 
@@ -68,7 +68,7 @@ void node_free(node_p node)
     case FLOAT_N:
     case COMPLEX_N:
     case STR_N:
-        m_free(node->value.ptr);
+        free(node->value.ptr);
         return;
     case LIST_N:
         list_n_free(node->value.ptr);
@@ -622,7 +622,7 @@ void node_p_free1(node_p nodes, unsigned long long size)
 {
     while (size)
         node_free(nodes + --size);
-    m_free(nodes);
+    free(nodes);
 }
 
 void node_p_free2(node_p nodes)
@@ -635,7 +635,7 @@ body_t body_set(node_p node)
 {
     body_t body;
 
-    body.nodes = m_alloc(sizeof(node_t));
+    body.nodes = malloc(sizeof(node_t));
     *body.nodes = *node;
     body.size = 1;
 
@@ -649,21 +649,21 @@ void pair_p_free(pair_p pairs, unsigned long long size)
         node_free(&pairs[--size].value);
         node_free(&pairs[size].key);
     }
-    m_free(pairs);
+    free(pairs);
 }
 
 void arg_p_free(arg_p args, unsigned long long size)
 {
     while (size)
         node_free(&args[--size].value);
-    m_free(args);
+    free(args);
 }
 
 void arg_access_p_free(arg_access_p args, unsigned long long size)
 {
     while (size)
         node_free(&args[--size].value);
-    m_free(args);
+    free(args);
 }
 
 void case_p_free(case_p cases, unsigned long long size)
@@ -675,12 +675,12 @@ void case_p_free(case_p cases, unsigned long long size)
         node_p_free1(cases[size].body.nodes, cases[size].body.size);
         node_free(&cases[size].condition);
     }
-    m_free(cases);
+    free(cases);
 }
 
 int_np int_n_set(char* value, unsigned long long size)
 {
-    int_np int_n = m_alloc(sizeof(int_nt));
+    int_np int_n = malloc(sizeof(int_nt));
 
     int_n->value = value;
     int_n->size = size;
@@ -690,7 +690,7 @@ int_np int_n_set(char* value, unsigned long long size)
 
 float_np float_n_set(char* value, unsigned long long size)
 {
-    float_np float_n = m_alloc(sizeof(float_nt));
+    float_np float_n = malloc(sizeof(float_nt));
 
     float_n->value = value;
     float_n->size = size;
@@ -700,7 +700,7 @@ float_np float_n_set(char* value, unsigned long long size)
 
 complex_np complex_n_set(char* value, unsigned long long size)
 {
-    complex_np complex_n = m_alloc(sizeof(complex_nt));
+    complex_np complex_n = malloc(sizeof(complex_nt));
 
     complex_n->value = value;
     complex_n->size = size;
@@ -710,7 +710,7 @@ complex_np complex_n_set(char* value, unsigned long long size)
 
 str_np str_n_set(char* value, unsigned long long size)
 {
-    str_np str_n = m_alloc(sizeof(str_nt));
+    str_np str_n = malloc(sizeof(str_nt));
 
     str_n->value = value;
     str_n->size = size;
@@ -720,7 +720,7 @@ str_np str_n_set(char* value, unsigned long long size)
 
 list_np list_n_set(node_p elements, unsigned long long size)
 {
-    list_np list_n = m_alloc(sizeof(list_nt));
+    list_np list_n = malloc(sizeof(list_nt));
 
     list_n->elements = elements;
     list_n->size = size;
@@ -731,12 +731,12 @@ list_np list_n_set(node_p elements, unsigned long long size)
 void list_n_free(list_np node)
 {
     node_p_free1(node->elements, node->size);
-    m_free(node);
+    free(node);
 }
 
 tuple_np tuple_n_set(node_p elements, unsigned long long size)
 {
-    tuple_np tuple_n = m_alloc(sizeof(tuple_nt));
+    tuple_np tuple_n = malloc(sizeof(tuple_nt));
 
     tuple_n->elements = elements;
     tuple_n->size = size;
@@ -747,12 +747,12 @@ tuple_np tuple_n_set(node_p elements, unsigned long long size)
 void tuple_n_free(tuple_np node)
 {
     node_p_free1(node->elements, node->size);
-    m_free(node);
+    free(node);
 }
 
 dict_np dict_n_set(pair_p elements, unsigned long long size)
 {
-    dict_np dict_n = m_alloc(sizeof(dict_nt));
+    dict_np dict_n = malloc(sizeof(dict_nt));
 
     dict_n->elements = elements;
     dict_n->size = size;
@@ -763,12 +763,12 @@ dict_np dict_n_set(pair_p elements, unsigned long long size)
 void dict_n_free(dict_np node)
 {
     pair_p_free(node->elements, node->size);
-    m_free(node);
+    free(node);
 }
 
 set_np set_n_set(node_p elements, unsigned long long size)
 {
-    set_np set_n = m_alloc(sizeof(set_nt));
+    set_np set_n = malloc(sizeof(set_nt));
 
     set_n->elements = elements;
     set_n->size = size;
@@ -779,12 +779,12 @@ set_np set_n_set(node_p elements, unsigned long long size)
 void set_n_free(set_np node)
 {
     node_p_free1(node->elements, node->size);
-    m_free(node);
+    free(node);
 }
 
 binary_operation_np binary_operation_n_set(unsigned char operator, node_p left, node_p right)
 {
-    binary_operation_np binary_operation_n = m_alloc(sizeof(binary_operation_nt));
+    binary_operation_np binary_operation_n = malloc(sizeof(binary_operation_nt));
 
     binary_operation_n->operator = operator;
     binary_operation_n->left = *left;
@@ -797,12 +797,12 @@ void binary_operation_n_free(binary_operation_np node)
 {
     node_free(&node->right);
     node_free(&node->left);
-    m_free(node);
+    free(node);
 }
 
 unary_operation_np unary_operation_n_set(unsigned char operator, node_p operand)
 {
-    unary_operation_np unary_operation_n = m_alloc(sizeof(unary_operation_nt));
+    unary_operation_np unary_operation_n = malloc(sizeof(unary_operation_nt));
 
     unary_operation_n->operator = operator;
     unary_operation_n->operand = *operand;
@@ -813,12 +813,12 @@ unary_operation_np unary_operation_n_set(unsigned char operator, node_p operand)
 void unary_operation_n_free(unary_operation_np node)
 {
     node_free(&node->operand);
-    m_free(node);
+    free(node);
 }
 
 ternary_condition_np ternary_condition_n_set(node_p condition, node_p left, node_p right)
 {
-    ternary_condition_np ternary_condition_n = m_alloc(sizeof(ternary_condition_nt));
+    ternary_condition_np ternary_condition_n = malloc(sizeof(ternary_condition_nt));
 
     ternary_condition_n->condition = *condition;
     ternary_condition_n->left = *left;
@@ -832,12 +832,12 @@ void ternary_condition_n_free(ternary_condition_np node)
     node_free(&node->right);
     node_free(&node->left);
     node_free(&node->condition);
-    m_free(node);
+    free(node);
 }
 
 subscript_np subscript_n_set(node_p value, node_p pos)
 {
-    subscript_np subscript_n = m_alloc(sizeof(subscript_nt));
+    subscript_np subscript_n = malloc(sizeof(subscript_nt));
 
     subscript_n->value = *value;
     subscript_n->pos = *pos;
@@ -849,12 +849,12 @@ void subscript_n_free(subscript_np node)
 {
     node_free(&node->pos);
     node_free(&node->value);
-    m_free(node);
+    free(node);
 }
 
 access_np access_n_set(node_p value, node_p property)
 {
-    access_np access_n = m_alloc(sizeof(access_nt));
+    access_np access_n = malloc(sizeof(access_nt));
 
     access_n->value = *value;
     access_n->property = *property;
@@ -866,12 +866,12 @@ void access_n_free(access_np node)
 {
     node_free(&node->property);
     node_free(&node->value);
-    m_free(node);
+    free(node);
 }
 
 var_assign_np var_assign_n_set(char properties, char* name, unsigned char type, node_p value)
 {
-    var_assign_np var_assign_n = m_alloc(sizeof(var_assign_nt));
+    var_assign_np var_assign_n = malloc(sizeof(var_assign_nt));
 
     var_assign_n->properties = properties;
     var_assign_n->name = name;
@@ -884,12 +884,12 @@ var_assign_np var_assign_n_set(char properties, char* name, unsigned char type, 
 void var_assign_n_free(var_assign_np node)
 {
     node_free(&node->value);
-    m_free(node);
+    free(node);
 }
 
 var_fixed_assign_np var_fixed_assign_n_set(char properties, unsigned char operator, node_p var)
 {
-    var_fixed_assign_np var_fixed_assign_n = m_alloc(sizeof(var_fixed_assign_nt));
+    var_fixed_assign_np var_fixed_assign_n = malloc(sizeof(var_fixed_assign_nt));
 
     var_fixed_assign_n->properties = properties;
     var_fixed_assign_n->operator = operator;
@@ -901,12 +901,12 @@ var_fixed_assign_np var_fixed_assign_n_set(char properties, unsigned char operat
 void var_fixed_assign_n_free(var_fixed_assign_np node)
 {
     node_free(&node->var);
-    m_free(node);
+    free(node);
 }
 
 var_reassign_np var_reassign_n_set(unsigned char operator, node_p var, node_p value)
 {
-    var_reassign_np var_reassign_n = m_alloc(sizeof(var_reassign_nt));
+    var_reassign_np var_reassign_n = malloc(sizeof(var_reassign_nt));
 
     var_reassign_n->operator = operator;
     var_reassign_n->var = *var;
@@ -919,12 +919,12 @@ void var_reassign_n_free(var_reassign_np node)
 {
     node_free(&node->value);
     node_free(&node->var);
-    m_free(node);
+    free(node);
 }
 
 func_def_np func_def_n_set(char properties, char* name, arg_p args, unsigned long long size, unsigned char type, body_p body)
 {
-    func_def_np func_def_n = m_alloc(sizeof(func_def_nt));
+    func_def_np func_def_n = malloc(sizeof(func_def_nt));
 
     func_def_n->properties = properties;
     func_def_n->name = name;
@@ -940,12 +940,12 @@ void func_def_n_free(func_def_np node)
 {
     node_p_free1(node->body.nodes, node->body.size);
     arg_p_free(node->args, node->size);
-    m_free(node);
+    free(node);
 }
 
 func_call_np func_call_n_set(node_p func, arg_access_p args, unsigned long long size)
 {
-    func_call_np func_call_n = m_alloc(sizeof(func_call_nt));
+    func_call_np func_call_n = malloc(sizeof(func_call_nt));
 
     func_call_n->func = *func;
     func_call_n->args = args;
@@ -958,12 +958,12 @@ void func_call_n_free(func_call_np node)
 {
     arg_access_p_free(node->args, node->size);
     node_free(&node->func);
-    m_free(node);
+    free(node);
 }
 
 class_def_np class_def_n_set(char properties, char* name, body_p body)
 {
-    class_def_np class_def_n = m_alloc(sizeof(class_def_nt));
+    class_def_np class_def_n = malloc(sizeof(class_def_nt));
 
     class_def_n->properties = properties;
     class_def_n->name = name;
@@ -975,12 +975,12 @@ class_def_np class_def_n_set(char properties, char* name, body_p body)
 void class_def_n_free(class_def_np node)
 {
     node_p_free1(node->body.nodes, node->body.size);
-    m_free(node);
+    free(node);
 }
 
 struct_def_np struct_def_n_set(char properties, char* name, body_p body)
 {
-    struct_def_np struct_def_n = m_alloc(sizeof(struct_def_nt));
+    struct_def_np struct_def_n = malloc(sizeof(struct_def_nt));
 
     struct_def_n->properties = properties;
     struct_def_n->name = name;
@@ -992,12 +992,12 @@ struct_def_np struct_def_n_set(char properties, char* name, body_p body)
 void struct_def_n_free(struct_def_np node)
 {
     node_p_free1(node->body.nodes, node->body.size);
-    m_free(node);
+    free(node);
 }
 
 dollar_func_call_np dollar_func_call_n_set(char* name, node_p args, unsigned long long size)
 {
-    dollar_func_call_np dollar_func_call_n = m_alloc(sizeof(dollar_func_call_nt));
+    dollar_func_call_np dollar_func_call_n = malloc(sizeof(dollar_func_call_nt));
 
     dollar_func_call_n->name = name;
     dollar_func_call_n->args = args;
@@ -1009,12 +1009,12 @@ dollar_func_call_np dollar_func_call_n_set(char* name, node_p args, unsigned lon
 void dollar_func_call_n_free(dollar_func_call_np node)
 {
     node_p_free1(node->args, node->size);
-    m_free(node);
+    free(node);
 }
 
 if_np if_n_set(case_p cases, unsigned long long size, body_p ebody)
 {
-    if_np if_n = m_alloc(sizeof(if_nt));
+    if_np if_n = malloc(sizeof(if_nt));
 
     if_n->cases = cases;
     if_n->size = size;
@@ -1027,12 +1027,12 @@ void if_n_free(if_np node)
 {
     node_p_free1(node->ebody.nodes, node->ebody.size);
     case_p_free(node->cases, node->size);
-    m_free(node);
+    free(node);
 }
 
 switch_np switch_n_set(node_p value, case_p cases, unsigned long long size, body_p dbody)
 {
-    switch_np switch_n = m_alloc(sizeof(switch_nt));
+    switch_np switch_n = malloc(sizeof(switch_nt));
 
     switch_n->value = *value;
     switch_n->cases = cases;
@@ -1047,12 +1047,12 @@ void switch_n_free(switch_np node)
     node_p_free1(node->dbody.nodes, node->dbody.size);
     case_p_free(node->cases, node->size);
     node_free(&node->value);
-    m_free(node);
+    free(node);
 }
 
 for_np for_n_set(char* iterator, node_p start, node_p end, node_p step, body_p body)
 {
-    for_np for_n = m_alloc(sizeof(for_nt));
+    for_np for_n = malloc(sizeof(for_nt));
 
     for_n->iterator = iterator;
     for_n->start = *start;
@@ -1069,12 +1069,12 @@ void for_n_free(for_np node)
     node_free(&node->step);
     node_free(&node->end);
     node_free(&node->start);
-    m_free(node);
+    free(node);
 }
 
 foreach_np foreach_n_set(char* iterator, node_p iterable, body_p body)
 {
-    foreach_np foreach_n = m_alloc(sizeof(foreach_nt));
+    foreach_np foreach_n = malloc(sizeof(foreach_nt));
 
     foreach_n->iterator = iterator;
     foreach_n->iterable = *iterable;
@@ -1087,12 +1087,12 @@ void foreach_n_free(foreach_np node)
 {
     node_p_free1(node->body.nodes, node->body.size);
     node_free(&node->iterable);
-    m_free(node);
+    free(node);
 }
 
 loop_np loop_n_set(node_p init, node_p condition, node_p step, body_p body)
 {
-    loop_np loop_n = m_alloc(sizeof(loop_nt));
+    loop_np loop_n = malloc(sizeof(loop_nt));
 
     loop_n->init = *init;
     loop_n->condition = *condition;
@@ -1108,12 +1108,12 @@ void loop_n_free(loop_np node)
     node_free(&node->step);
     node_free(&node->condition);
     node_free(&node->init);
-    m_free(node);
+    free(node);
 }
 
 do_while_np do_while_n_set(body_p body, node_p condition)
 {
-    do_while_np do_while_n = m_alloc(sizeof(do_while_nt));
+    do_while_np do_while_n = malloc(sizeof(do_while_nt));
 
     do_while_n->body = *body;
     do_while_n->condition = *condition;
@@ -1125,12 +1125,12 @@ void do_while_n_free(do_while_np node)
 {
     node_free(&node->condition);
     node_p_free1(node->body.nodes, node->body.size);
-    m_free(node);
+    free(node);
 }
 
 while_np while_n_set(node_p condition, body_p body)
 {
-    while_np while_n = m_alloc(sizeof(while_nt));
+    while_np while_n = malloc(sizeof(while_nt));
 
     while_n->condition = *condition;
     while_n->body = *body;
@@ -1142,12 +1142,12 @@ void while_n_free(while_np node)
 {
     node_p_free1(node->body.nodes, node->body.size);
     node_free(&node->condition);
-    m_free(node);
+    free(node);
 }
 
 try_np try_n_set(body_p tbody, case_p excepts, unsigned long long size, body_p fbody)
 {
-    try_np try_n = m_alloc(sizeof(try_nt));
+    try_np try_n = malloc(sizeof(try_nt));
 
     try_n->tbody = *tbody;
     try_n->excepts = excepts;
@@ -1162,12 +1162,12 @@ void try_n_free(try_np node)
     node_p_free1(node->fbody.nodes, node->fbody.size);
     case_p_free(node->excepts, node->size);
     node_p_free1(node->tbody.nodes, node->tbody.size);
-    m_free(node);
+    free(node);
 }
 
 return_np return_n_set(node_p value)
 {
-    return_np return_n = m_alloc(sizeof(return_nt));
+    return_np return_n = malloc(sizeof(return_nt));
 
     return_n->value = *value;
 
@@ -1177,7 +1177,7 @@ return_np return_n_set(node_p value)
 void return_n_free(return_np node)
 {
     node_free(&node->value);
-    m_free(node);
+    free(node);
 }
 
 void body_print(FILE* stream, body_p body)

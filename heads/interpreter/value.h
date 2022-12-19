@@ -29,7 +29,11 @@ enum _value_types_
     DICT_V,
     SET_V,
 
-    TYPE_V
+    TYPE_V,
+
+    /* */
+
+    CHAR_PTR_V
 };
 
 static const char* value_labels[14] =
@@ -53,7 +57,7 @@ static const int value_label_lens[14] =
     4,
     3,
     4, 5, 4, 3,
-    4
+    4,
 };
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context);

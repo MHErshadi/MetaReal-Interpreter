@@ -3,6 +3,7 @@
 /*/
 
 #include <lexer/lexer.h>
+#include <stdlib.h>
 #include <def.h>
 
 lres_t lres_fail(illegal_char_p error);
@@ -30,7 +31,7 @@ const char* hand_nequal(token_p token, const char* code, pos_p pos);
 
 lres_t lex(const char* code, char terminator)
 {
-    token_p tokens = m_alloc(TOKENS_SIZE * sizeof(token_t));
+    token_p tokens = malloc(TOKENS_SIZE * sizeof(token_t));
 
     unsigned long long size = 0;
     unsigned long long alloc = TOKENS_SIZE;
@@ -48,7 +49,7 @@ lres_t lex(const char* code, char terminator)
         }
 
         if (size == alloc)
-            tokens = m_realloc(tokens, (alloc += TOKENS_SIZE) * sizeof(token_t));
+            tokens = realloc(tokens, (alloc += TOKENS_SIZE) * sizeof(token_t));
 
         if (*code == '\n')
         {
@@ -255,7 +256,7 @@ lres_t lex(const char* code, char terminator)
     }
 
     if (size + 1 != alloc)
-        tokens = m_realloc(tokens, (size + 1) * sizeof(token_t));
+        tokens = realloc(tokens, (size + 1) * sizeof(token_t));
 
     poss = pos;
     pos.index++;
@@ -336,7 +337,7 @@ const char* gen_identifier(token_p token, const char* code, pos_p pos)
 {
     pos_t poss = *pos;
 
-    char* identifier = m_alloc(IDENTIFIER_SIZE);
+    char* identifier = malloc(IDENTIFIER_SIZE);
 
     unsigned long long size = 0;
     unsigned long long alloc = IDENTIFIER_SIZE;
@@ -344,27 +345,27 @@ const char* gen_identifier(token_p token, const char* code, pos_p pos)
     do
     {
         if (size == alloc)
-            identifier = m_realloc(identifier, alloc += IDENTIFIER_SIZE);
+            identifier = realloc(identifier, alloc += IDENTIFIER_SIZE);
 
         identifier[size++] = *code++;
         pos->index++;
     } while ((*code >= 'a' && *code <= 'z') || (*code >= 'A' && *code <= 'Z') || (*code >= '0' && *code <= '9') || *code == '_');
 
     if (size == alloc)
-        identifier = m_realloc(identifier, alloc++);
+        identifier = realloc(identifier, alloc++);
     identifier[size++] = '\0';
 
     unsigned char type = identifier_type(identifier);
     if (type)
     {
-        m_free(identifier);
+        free(identifier);
 
         *token = token_set2(type, &poss, pos);
         return code;
     }
 
     if (size != alloc)
-        identifier = m_realloc(identifier, size);
+        identifier = realloc(identifier, size);
 
     *token = token_set1(IDENTIFIER_T, identifier, 0, &poss, pos);
     return code;
@@ -374,7 +375,7 @@ const char* gen_number(token_p token, const char* code, pos_p pos)
 {
     pos_t poss = *pos;
 
-    char* number = m_alloc(NUMBER_SIZE);
+    char* number = malloc(NUMBER_SIZE);
 
     unsigned long long size = 0;
     unsigned long long alloc = NUMBER_SIZE;
@@ -383,7 +384,7 @@ const char* gen_number(token_p token, const char* code, pos_p pos)
     do
     {
         if (size == alloc)
-            number = m_realloc(number, alloc += NUMBER_SIZE);
+            number = realloc(number, alloc += NUMBER_SIZE);
 
         if (*code == '.')
         {
@@ -398,7 +399,7 @@ const char* gen_number(token_p token, const char* code, pos_p pos)
     } while ((*code >= '0' && *code <= '9') || *code == '.');
 
     if (size + 1 != alloc)
-        number = m_realloc(number, size + 1);
+        number = realloc(number, size + 1);
     number[size] = '\0';
 
     if (*code == 'i')
@@ -495,7 +496,7 @@ const char* gen_str(token_p token, const char* code, char terminator, pos_p pos)
     pos_t poss = *pos;
     pos->index++;
 
-    char* str = m_alloc(STRING_SIZE);
+    char* str = malloc(STRING_SIZE);
 
     unsigned long long size = 0;
     unsigned long long alloc = STRING_SIZE;
@@ -504,7 +505,7 @@ const char* gen_str(token_p token, const char* code, char terminator, pos_p pos)
     while ((*code != '"' || escape) && *code != terminator)
     {
         if (size == alloc)
-            str = m_realloc(str, alloc += STRING_SIZE);
+            str = realloc(str, alloc += STRING_SIZE);
 
         if (escape)
         {
@@ -572,7 +573,7 @@ const char* gen_str(token_p token, const char* code, char terminator, pos_p pos)
     }
 
     if (size + 1 != alloc)
-        str = m_realloc(str, size + 1);
+        str = realloc(str, size + 1);
     str[size] = '\0';
 
     *token = token_set1(STR_T, str, size, &poss, pos);

@@ -6,15 +6,16 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <def.h>
+#include <stdlib.h>
 #include <setting.h>
 #include <lexer/token.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define IPROP_PTR(x) (x & 1)
+#define IPROP_SET(ptr, assign) ((ptr) | ((assign) << 1))
 
-#define APROP_PTR(x) (x | 1)
+#define IPROP_PTR(x) (x & 1)
+#define IPROP_ASSIGN(x) (x >> 1 & 1)
 
 value_t ires_merge(ires_p ires, ires_t other);
 
@@ -74,12 +75,12 @@ ires_t interpret(node_p nodes, context_p context)
         if (ires.has_error)
         {
             node_p_free2(nodes);
-            m_free(nodes_copy);
+            free(nodes_copy);
             return ires;
         }
     }
 
-    m_free(nodes_copy);
+    free(nodes_copy);
     return ires;
 }
 
@@ -150,6 +151,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_var_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_FIXED_ASSIGN_N:
         return interpret_var_fixed_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case VAR_REASSIGN_N:
+        return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ACCESS_N:
         return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context, properties);
     default:
@@ -162,7 +165,7 @@ ires_t interpret_none(pos_p poss, pos_p pose, context_p context, char properties
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(50);
+        char* detail = malloc(50);
         strcpy(detail, "<none> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -178,7 +181,7 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(49);
+        char* detail = malloc(49);
         strcpy(detail, "<int> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -188,8 +191,8 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
     int_p ptr = int_set_str(node->value, node->size);
     value_t value = value_set1(INT_V, ptr, poss, pose, context);
 
-    m_free(node->value);
-    m_free(node);
+    free(node->value);
+    free(node);
     return ires_success(&value);
 }
 
@@ -197,7 +200,7 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(51);
+        char* detail = malloc(51);
         strcpy(detail, "<float> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -207,8 +210,8 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
     float_p ptr = float_set_str(node->value, node->size, setting.float_prec_bit);
     value_t value = value_set1(FLOAT_V, ptr, poss, pose, context);
 
-    m_free(node->value);
-    m_free(node);
+    free(node->value);
+    free(node);
     return ires_success(&value);
 }
 
@@ -216,7 +219,7 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(53);
+        char* detail = malloc(53);
         strcpy(detail, "<complex> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -226,8 +229,8 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
     complex_p ptr = complex_set_str(node->value, node->size, setting.complex_prec_bit);
     value_t value = value_set1(COMPLEX_V, ptr, poss, pose, context);
 
-    m_free(node->value);
-    m_free(node);
+    free(node->value);
+    free(node);
     return ires_success(&value);
 }
 
@@ -235,7 +238,7 @@ ires_t interpret_bool(char node, pos_p poss, pos_p pose, context_p context, char
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(50);
+        char* detail = malloc(50);
         strcpy(detail, "<bool> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -251,7 +254,7 @@ ires_t interpret_char(char node, pos_p poss, pos_p pose, context_p context, char
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(50);
+        char* detail = malloc(50);
         strcpy(detail, "<char> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -267,7 +270,7 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(49);
+        char* detail = malloc(49);
         strcpy(detail, "<str> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -277,7 +280,7 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
     str_p ptr = str_set_str(node->value, node->size);
     value_t value = value_set1(STR_V, ptr, poss, pose, context);
 
-    m_free(node);
+    free(node);
     return ires_success(&value);
 }
 
@@ -285,7 +288,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(50);
+        char* detail = malloc(50);
         strcpy(detail, "<list> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -303,7 +306,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
         return ires;
     }
 
-    value_p elements = m_alloc(node->size * sizeof(value_t));
+    value_p elements = malloc(node->size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < node->size; i++)
@@ -314,13 +317,13 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
             i++;
             while (node->size > i)
                 node_free(&node->elements[--node->size]);
-            m_free(node->elements);
+            free(node->elements);
             i--;
 
             while (i)
                 value_free(&elements[--i]);
-            m_free(elements);
-            m_free(node);
+            free(elements);
+            free(node);
 
             return ires;
         }
@@ -331,8 +334,8 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
     list_p ptr = list_set(elements, i);
     ires.value = value_set1(LIST_V, ptr, poss, pose, context);
 
-    m_free(node->elements);
-    m_free(node);
+    free(node->elements);
+    free(node);
     return ires;
 }
 
@@ -340,7 +343,7 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(51);
+        char* detail = malloc(51);
         strcpy(detail, "<tuple> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -350,7 +353,7 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
     ires_t ires;
     ires.has_error = 0;
 
-    value_p elements = m_alloc(node->size * sizeof(value_t));
+    value_p elements = malloc(node->size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < node->size; i++)
@@ -361,13 +364,13 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
             i++;
             while (node->size > i)
                 node_free(&node->elements[--node->size]);
-            m_free(node->elements);
+            free(node->elements);
             i--;
 
             while (i)
                 value_free(&elements[--i]);
-            m_free(elements);
-            m_free(node);
+            free(elements);
+            free(node);
 
             return ires;
         }
@@ -378,8 +381,8 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
     tuple_p ptr = tuple_set(elements, i);
     ires.value = value_set1(TUPLE_V, ptr, poss, pose, context);
 
-    m_free(node->elements);
-    m_free(node);
+    free(node->elements);
+    free(node);
     return ires;
 }
 
@@ -397,7 +400,7 @@ ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context, char
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(49);
+        char* detail = malloc(49);
         strcpy(detail, "<type> object can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -413,7 +416,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(63);
+        char* detail = malloc(63);
         strcpy(detail, "Result of binary operation can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -427,7 +430,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     if (ires.has_error)
     {
         node_free(&node->right);
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -435,7 +438,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     if (ires.has_error)
     {
         value_free(&left);
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -520,7 +523,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 
     if (ires.has_error)
     {
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -528,7 +531,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     ires.value.pose = *pose;
     ires.value.context = context;
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
@@ -536,7 +539,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 {
     if (IPROP_PTR(properties))
     {
-        char* detail = m_alloc(62);
+        char* detail = malloc(62);
         strcpy(detail, "Result of unary operation can not be accessed like a variable");
 
         runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
@@ -549,7 +552,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     value_t operand = ires_merge(&ires, interpret_node(&node->operand, context, 0));
     if (ires.has_error)
     {
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -572,7 +575,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 
     if (ires.has_error)
     {
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -580,7 +583,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     ires.value.pose = *pose;
     ires.value.context = context;
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
@@ -594,7 +597,7 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
     {
         node_free(&node->left);
         node_free(&node->right);
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -608,7 +611,7 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (ires.has_error)
         {
             value_free(&condition);
-            m_free(node);
+            free(node);
             return ires;
         }
     }
@@ -620,7 +623,7 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (ires.has_error)
         {
             value_free(&condition);
-            m_free(node);
+            free(node);
             return ires;
         }
     }
@@ -632,7 +635,7 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
 
     value_free(&condition);
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
@@ -645,7 +648,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
     if (ires.has_error)
     {
         node_free(&node->pos);
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -654,7 +657,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
     {
         if (!IPROP_PTR(properties))
             value_free(&value);
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -664,7 +667,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
 
         if (ires.has_error)
         {
-            m_free(node);
+            free(node);
             return ires;
         }
     }
@@ -674,7 +677,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
 
         if (ires.has_error)
         {
-            m_free(node);
+            free(node);
             return ires;
         }
 
@@ -683,7 +686,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
         ires.value.context = context;
     }
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
@@ -706,19 +709,20 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         value = ires_merge(&ires, interpret_node(&node->value, context, 0));
         if (ires.has_error)
         {
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
             return ires;
         }
 
         if (node->type != NULL_V && node->type != value.type)
         {
             value_free(&value);
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
 
-            char* detail = m_alloc(59 + value_label_lens[node->type] + value_label_lens[value.type]);
-            sprintf(detail, "Type of variable and type of value do not match (<%s> and <%s>)", value_labels[node->type], value_labels[value.type]);
+            char* detail = malloc(59 + value_label_lens[node->type] + value_label_lens[value.type]);
+            sprintf(detail, "Type of variable and type of value do not match (<%s> and <%s>)",
+                value_labels[node->type], value_labels[value.type]);
 
             runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -736,16 +740,16 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
     char res = 0;
     if (IPROP_PTR(properties))
     {
-        value_p ptr = table_ptr_set(&copy->table, node->properties, node->name, node->type, &value, &res);
+        value_p ptr = table_ptr_set(&copy->table, &ires.value.type, node->properties, node->name, node->type, &value, &res);
         if (res == -1)
         {
             value_free(&value);
 
-            char* detail = m_alloc(26 + strlen(node->name));
+            char* detail = malloc(26 + strlen(node->name));
             sprintf(detail, "'%s' is a constant variable", node->name);
 
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -754,11 +758,12 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         {
             value_free(&value);
 
-            char* detail = m_alloc(45 + strlen(node->name) + value_label_lens[res]);
-            sprintf(detail, "'%s' is a type-specified variable (type is <%s>)", node->name, value_labels[res]);
+            char* detail = malloc(45 + strlen(node->name) + value_label_lens[res]);
+            sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
+                node->name, value_labels[res]);
 
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
 
             runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -773,11 +778,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         {
             value_free(&value);
 
-            char* detail = m_alloc(26 + strlen(node->name));
+            char* detail = malloc(26 + strlen(node->name));
             sprintf(detail, "'%s' is a constant variable", node->name);
 
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -786,11 +791,12 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         {
             value_free(&value);
 
-            char* detail = m_alloc(45 + strlen(node->name) + value_label_lens[res]);
-            sprintf(detail, "'%s' is a type-specified variable (type is <%s>)", node->name, value_labels[res]);
+            char* detail = malloc(45 + strlen(node->name) + value_label_lens[res]);
+            sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
+                node->name, value_labels[res]);
 
-            m_free(node->name);
-            m_free(node);
+            free(node->name);
+            free(node);
 
             runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -802,7 +808,7 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         ires.value.context = context;
     }
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
@@ -811,10 +817,10 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     ires_t ires;
     ires.has_error = 0;
 
-    value_t var = ires_merge(&ires, interpret_node(&node->var, context, APROP_PTR(properties)));
+    value_t var = ires_merge(&ires, interpret_node(&node->var, context, properties | IPROP_SET(1, 0)));
     if (ires.has_error)
     {
-        m_free(node);
+        free(node);
         return ires;
     }
 
@@ -822,36 +828,78 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     if (PROP_POST(node->properties))
     {
         if (IPROP_PTR(properties))
-            res.value.ptr = var.value.ptr;
+        {
+            if (var.type != CHAR_PTR_V)
+            {
+                res.type = var.type;
+                res.value.ptr = var.value.ptr;
+            }
+            else
+            {
+                res.type = CHAR_V;
+                res.value.chr = *(char*)var.value.ptr;
+            }
+        }
         else
-            res = value_copy(var.value.ptr);
+        {
+            if (var.type != CHAR_PTR_V)
+                res = value_copy(var.value.ptr);
+            else
+            {
+                res.type = CHAR_V;
+                res.value.chr = *(char*)var.value.ptr;
+            }
+        }
     }
-    else
-        res.type = NULL_V;
 
     switch (node->operator)
     {
     case INCREMENT_T:
-        ires = operate_increment(var.value.ptr, poss, pose, context);
+        if (var.type != CHAR_PTR_V)
+            ires = operate_increment(var.value.ptr, poss, pose, context);
+        else
+            ires = operate_increment(&var, poss, pose, context);
         break;
     case DECREMENT_T:
-        ires = operate_decrement(var.value.ptr, poss, pose, context);
+        if (var.type != CHAR_PTR_V)
+            ires = operate_decrement(var.value.ptr, poss, pose, context);
+        else
+            ires = operate_decrement(&var, poss, pose, context);
         break;
     }
 
     if (ires.has_error)
     {
         value_free(&res);
-        m_free(node);
+        free(node);
         return ires;
     }
 
-    if (res.type == NULL_V)
+    if (!PROP_POST(node->properties))
     {
         if (IPROP_PTR(properties))
-            res.value.ptr = var.value.ptr;
+        {
+            if (var.type != CHAR_PTR_V)
+            {
+                res.type = var.type;
+                res.value.ptr = var.value.ptr;
+            }
+            else
+            {
+                res.type = CHAR_V;
+                res.value.chr = *(char*)var.value.ptr;
+            }
+        }
         else
-            res = value_copy(var.value.ptr);
+        {
+            if (var.type != CHAR_PTR_V)
+                res = value_copy(var.value.ptr);
+            else
+            {
+                res.type = CHAR_V;
+                res.value.chr = *(char*)var.value.ptr;
+            }
+        }
     }
 
     ires.value = res;
@@ -859,13 +907,125 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     ires.value.pose = *pose;
     ires.value.context = context;
 
-    m_free(node);
+    free(node);
     return ires;
 }
 
 ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    ires_t ires;
+    ires.has_error = 0;
 
+    value_t var = ires_merge(&ires, interpret_node(&node->var, context, properties | IPROP_SET(1, node->operator == ASSIGN_T)));
+    if (ires.has_error)
+    {
+        node_free(&node->value);
+        free(node);
+        return ires;
+    }
+
+    value_t value = ires_merge(&ires, interpret_node(&node->value, context, 0));
+    if (ires.has_error)
+    {
+        free(node);
+        return ires;
+    }
+
+    value_t copy = value_copy(var.value.ptr);
+
+    switch (node->operator)
+    {
+    case ASSIGN_T:
+        if (var.type != NULL_V && var.type != ires.value.type)
+        {
+            free(node);
+
+            char* detail = malloc(60 + value_label_lens[ires.value.type] + value_label_lens[var.type]);
+            sprintf(detail, "Can not assign <%s> to a type-specified variable (type is <%s>)",
+                value_labels[ires.value.type], value_labels[var.type]);
+
+            runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+            return ires_fail(&error);
+        }
+
+        value_free(var.value.ptr);
+        *(value_p)var.value.ptr = value;
+
+        break;
+    case PLUS_EQ_T:
+        ires = operate_add(var.value.ptr, &value, poss, pose, context);
+        break;
+    case MINUS_EQ_T:
+        ires = operate_subtract(var.value.ptr, &value, poss, pose, context);
+        break;
+    case MULTIPLY_EQ_T:
+        ires = operate_multiply(var.value.ptr, &value, poss, pose, context);
+        break;
+    case DIVIDE_EQ_T:
+        ires = operate_divide(var.value.ptr, &value, poss, pose, context);
+        break;
+    case MODULO_EQ_T:
+        ires = operate_modulo(var.value.ptr, &value, poss, pose, context);
+        break;
+    case QUOTIENT_EQ_T:
+        ires = operate_quotient(var.value.ptr, &value, poss, pose, context);
+        break;
+    case POWER_EQ_T:
+        ires = operate_power(var.value.ptr, &value, poss, pose, context);
+        break;
+    case B_AND_EQ_T:
+        ires = operate_b_and(var.value.ptr, &value, poss, pose, context);
+        break;
+    case B_OR_EQ_T:
+        ires = operate_b_or(var.value.ptr, &value, poss, pose, context);
+        break;
+    case B_XOR_EQ_T:
+        ires = operate_b_xor(var.value.ptr, &value, poss, pose, context);
+        break;
+    case LSHIFT_EQ_T:
+        ires = operate_lshift(var.value.ptr, &value, poss, pose, context);
+        break;
+    case RSHIFT_EQ_T:
+        ires = operate_rshift(var.value.ptr, &value, poss, pose, context);
+        break;
+    }
+
+    if (ires.has_error)
+    {
+        *(value_p)var.value.ptr = copy;
+
+        free(node);
+        return ires;
+    }
+
+    if (node->operator != ASSIGN_T)
+    {
+        if (var.type != NULL_V && var.type != ires.value.type)
+        {
+            *(value_p)var.value.ptr = copy;
+
+            free(node);
+
+            char* detail = malloc(60 + value_label_lens[ires.value.type] + value_label_lens[var.type]);
+            sprintf(detail, "Can not assign <%s> to a type-specified variable (type is <%s>)",
+                value_labels[ires.value.type], value_labels[var.type]);
+
+            runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+            return ires_fail(&error);
+        }
+
+        *(value_p)var.value.ptr = ires.value;
+    }
+
+    value_free(&copy);
+
+    ires.value = value_copy(var.value.ptr);
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+    free(node);
+    return ires;
 }
 
 ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -876,27 +1036,36 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
     if (IPROP_PTR(properties))
     {
         char flag = 0;
-        value_p value = context_ptr_get(context, node, &flag);
+        value_p value = context_ptr_get(context, &ires.value.type, node, &flag);
 
         if (flag)
         {
-            char* detail = m_alloc(26 + strlen(node));
+            char* detail = malloc(26 + strlen(node));
             sprintf(detail, "'%s' is a constant variable", node);
 
-            m_free(node);
+            free(node);
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
         }
-        if (value == NULL)
+        if (!value)
         {
-            char* detail = m_alloc(45 + strlen(node));
-            sprintf(detail, "'%s' is not defined", node);
+            if (IPROP_ASSIGN(properties))
+            {
+                ires.value.type = NULL_V;
+                ires.value.value.ptr = table_ptr_add(&context->table, node);
+                return ires;
+            }
+            else
+            {
+                char* detail = malloc(45 + strlen(node));
+                sprintf(detail, "'%s' is not defined", node);
 
-            m_free(node);
+                free(node);
 
-            runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
-            return ires_fail(&error);
+                runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
+                return ires_fail(&error);
+            }
         }
 
         ires.value.value.ptr = value;
@@ -906,10 +1075,10 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
         value_t value = context_var_get(context, node);
         if (value.type == NULL_V)
         {
-            char* detail = m_alloc(45 + strlen(node));
+            char* detail = malloc(45 + strlen(node));
             sprintf(detail, "'%s' is not defined", node);
 
-            m_free(node);
+            free(node);
 
             runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -922,7 +1091,7 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
         ires.value.context = context;
     }
 
-    m_free(node);
+    free(node);
     return ires;
 }
 

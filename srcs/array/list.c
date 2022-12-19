@@ -4,11 +4,11 @@
 
 #include <array/list.h>
 #include <interpreter/operation.h>
-#include <def.h>
+#include <stdlib.h>
 
 list_p list_set(value_p elements, unsigned long long size)
 {
-    list_p array = m_alloc(sizeof(list_t));
+    list_p array = malloc(sizeof(list_t));
 
     array->elements = elements;
     array->size = size;
@@ -18,9 +18,9 @@ list_p list_set(value_p elements, unsigned long long size)
 
 list_p list_copy(const list_p array)
 {
-    list_p copy = m_alloc(sizeof(list_t));
+    list_p copy = malloc(sizeof(list_t));
 
-    copy->elements = m_alloc(array->size * sizeof(value_t));
+    copy->elements = malloc(array->size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < array->size; i++)
@@ -35,7 +35,7 @@ void list_free(list_p array)
 {
     while (array->size)
         value_free(&array->elements[--array->size]);
-    m_free(array);
+    free(array);
 }
 
 void list_free_exception(list_p array, unsigned long long exception)
@@ -47,7 +47,7 @@ void list_free_exception(list_p array, unsigned long long exception)
         value_free(&array->elements[array->size]);
     }
 
-    m_free(array);
+    free(array);
 }
 
 void list_print(FILE* stream, const list_p array, const char* end)
@@ -76,14 +76,14 @@ void list_append(list_p array1, value_p value)
     if (!array1->size)
     {
         array1->size = 1;
-        array1->elements = m_alloc(sizeof(value_t));
+        array1->elements = malloc(sizeof(value_t));
 
         *array1->elements = *value;
         return;
     }
 
     array1->size++;
-    array1->elements = m_realloc(array1->elements, array1->size * sizeof(value_t));
+    array1->elements = realloc(array1->elements, array1->size * sizeof(value_t));
 
     array1->elements[array1->size - 1] = *value;
 }
@@ -98,7 +98,7 @@ void list_concat(list_p array1, const list_p array2)
     }
 
     unsigned long long size = array1->size + array2->size;
-    array1->elements = m_realloc(array1->elements, size * sizeof(value_t));
+    array1->elements = realloc(array1->elements, size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < array2->size; i++)
@@ -117,7 +117,7 @@ void list_concat_tuple(list_p array1, const tuple_p array2)
     }
 
     unsigned long long size = array1->size + array2->size;
-    array1->elements = m_realloc(array1->elements, size * sizeof(value_t));
+    array1->elements = realloc(array1->elements, size * sizeof(value_t));
 
     unsigned long long i;
     for (i = 0; i < array2->size; i++)
@@ -130,7 +130,7 @@ void list_remove(list_p array, unsigned long long pos)
 {
     if (array->size == 1)
     {
-        m_free(array->elements);
+        free(array->elements);
         array->size = 0;
         return;
     }
@@ -141,7 +141,7 @@ void list_remove(list_p array, unsigned long long pos)
     for (i = pos; i < array->size; i++)
         array->elements[i] = array->elements[i + 1];
 
-    array->elements = m_realloc(array->elements, array->size * sizeof(value_t));
+    array->elements = realloc(array->elements, array->size * sizeof(value_t));
 }
 
 void list_repeat(list_p array, unsigned long long count)
@@ -150,7 +150,7 @@ void list_repeat(list_p array, unsigned long long count)
     {
         if (array->size)
         {
-            m_free(array->elements);
+            free(array->elements);
             array->size = 0;
         }
         return;
@@ -163,7 +163,7 @@ void list_repeat(list_p array, unsigned long long count)
         return;
 
     unsigned long long size = array->size * count;
-    array->elements = m_realloc(array->elements, size * sizeof(value_t));
+    array->elements = realloc(array->elements, size * sizeof(value_t));
 
     if (array->size == 1)
     {

@@ -9,6 +9,7 @@
 #include <parser/parser.h>
 #include <interpreter/interpreter.h>
 #include <setting.h>
+#include <stdlib.h>
 #include <string.h>
 #include <info.h>
 #include <def.h>
@@ -25,7 +26,7 @@ int main(int argc, char** argv)
 
         setting = setting_init();
 
-        char* code = m_alloc(CMD_INPUT_SIZE);
+        char* code = malloc(CMD_INPUT_SIZE);
         unsigned long long size;
 
         lres_t lres;
@@ -84,7 +85,7 @@ int main(int argc, char** argv)
             value_free(&ires.value);
         }
 
-        m_free(code);
+        free(code);
         return 0;
     }
 

@@ -7,7 +7,7 @@
 #include <str.h>
 #include <array/list.h>
 #include <setting.h>
-#include <def.h>
+#include <stdlib.h>
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context)
 {

@@ -58,8 +58,4 @@
 
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
-void* m_alloc(unsigned long long size);
-void* m_realloc(void* block, unsigned long long size);
-void m_free(void* block);
-
 #endif /* __M_DEF__ */

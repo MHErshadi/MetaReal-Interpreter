@@ -71,13 +71,15 @@ void node_free(node_p node)
         free(node->value.ptr);
         return;
     case LIST_N:
-        list_n_free(node->value.ptr);
+        if (node->value.ptr)
+            list_n_free(node->value.ptr);
         return;
     case TUPLE_N:
         tuple_n_free(node->value.ptr);
         return;
     case DICT_N:
-        dict_n_free(node->value.ptr);
+        if (node->value.ptr)
+            dict_n_free(node->value.ptr);
         return;
     case SET_N:
         set_n_free(node->value.ptr);

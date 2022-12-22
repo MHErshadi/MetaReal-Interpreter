@@ -18,7 +18,7 @@ typedef struct __str__ str_t;
 typedef struct __str__* str_p;
 
 str_p str_set(const str_p src);
-str_p str_set_str(char* src, unsigned long long size);
+str_p str_set_str(const char* src, unsigned long long size);
 
 void str_free(str_p str);
 

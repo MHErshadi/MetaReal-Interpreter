@@ -33,7 +33,10 @@ enum _value_types_
 
     /* */
 
-    CHAR_PTR_V
+    CHAR_PTR_V,
+
+    CONTINUE_V,
+    BREAK_V
 };
 
 static const char* value_labels[14] =

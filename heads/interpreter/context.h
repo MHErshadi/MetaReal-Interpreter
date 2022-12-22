@@ -73,9 +73,9 @@ void table_free(table_p table);
 value_t table_var_get(table_p table, const char* name);
 value_p table_ptr_get(table_p table, unsigned char* type, const char* name, char* flag);
 
-char table_var_set(table_p table, unsigned char properties, char* name, unsigned char type, value_p value);
-value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, char* name, unsigned char type, value_p value, char* flag);
+char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value);
+value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
 
-value_p table_ptr_add(table_p table, char* name);
+value_p table_ptr_add(table_p table, const char* name);
 
 #endif /* __M_CONTEXT__ */

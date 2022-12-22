@@ -12,12 +12,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define IPROP_SET(ptr, assign, in_loop) ((ptr) | ((assign) << 1) | ((in_loop) << 2))
-#define IPROP_MASK 0b100
+#define IPROP_SET(ptr, assign, in_loop) ((ptr) | ((assign) << 1) | ((in_loop) << 2) | ((in_loop) << 3))
+#define IPROP_MASK 0b0100
+#define IPROP_BODY_MASK 0b1100
 
 #define IPROP_PTR(x) ((x) & 1)
 #define IPROP_ASSIGN(x) ((x) >> 1 & 1)
 #define IPROP_IN_LOOP(x) ((x) >> 2 & 1)
+#define IPROP_IN_LOOP_BODY(x) ((x) >> 3 & 1)
 
 value_t ires_merge(ires_p ires, ires_t other);
 
@@ -163,6 +165,10 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_if(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FOR_N:
         return interpret_for(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case CONTINUE_N:
+        return interpret_continue(&node->poss, &node->pose, context, properties);
+    case BREAK_N:
+        return interpret_break(&node->poss, &node->pose, context, properties);
     default:
         fprintf(stderr, "interpret_node function: invalid node type (#%u)\n", node->type);
         abort();
@@ -188,6 +194,9 @@ ires_t interpret_body(body_p body, context_p context, char properties)
             free(body->nodes);
             return ires;
         }
+
+        if (ires.value.type == CONTINUE_V || ires.value.type == BREAK_V)
+            break;
     }
 
     if (!IPROP_IN_LOOP(properties))
@@ -352,7 +361,10 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
     value_t value = value_set1(STR_V, ptr, poss, pose, context);
 
     if (!IPROP_IN_LOOP(properties))
+    {
+        free(node->value);
         free(node);
+    }
 
     return ires_success(&value);
 }
@@ -975,7 +987,10 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
     ires.value.context = context;
 
     if (!IPROP_IN_LOOP(properties))
+    {
+        free(node->name);
         free(node);
+    }
 
     return ires;
 }
@@ -1356,7 +1371,7 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
         {
             value_free(&condition);
 
-            ires.value = ires_merge(&ires, interpret_body(&node->cases[i - 1].body, context, properties & IPROP_MASK));
+            ires.value = ires_merge(&ires, interpret_body(&node->cases[i - 1].body, context, properties & IPROP_BODY_MASK));
 
             if (!IPROP_IN_LOOP(properties))
             {
@@ -1391,7 +1406,7 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
 
     if (node->ebody.size)
     {
-        ires.value = ires_merge(&ires, interpret_body(&node->ebody, context, properties & IPROP_MASK));
+        ires.value = ires_merge(&ires, interpret_body(&node->ebody, context, properties & IPROP_BODY_MASK));
         if (ires.has_error)
         {
             if (!IPROP_IN_LOOP(properties))
@@ -1617,13 +1632,13 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         return ires_fail(&error);
     }
 
+    value_t value;
+
     char sign = operate_sign(&step);
     if (sign)
         while (operate_greater_compare(var, &end))
         {
-            value_free(&ires.value);
-
-            ires.value = ires_merge(&ires, interpret_body(&node->body, context, properties | IPROP_SET(0, 0, 1)));
+            value = ires_merge(&ires, interpret_body(&node->body, context, properties | IPROP_SET(0, 0, 1)));
             if (ires.has_error)
             {
                 value_free(&step);
@@ -1632,20 +1647,25 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
                 if (!IPROP_IN_LOOP(properties))
                 {
                     node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
                     free(node);
                 }
 
                 return ires;
             }
 
+            if (value.type == BREAK_V)
+                break;
+
             operate_success(var, &step);
+
+            value_free(&ires.value);
+            ires.value = value;
         }
     else
         while (operate_less_compare(var, &end))
         {
-            value_free(&ires.value);
-
-            ires.value = ires_merge(&ires, interpret_body(&node->body, context, properties | IPROP_SET(0, 0, 1)));
+            value = ires_merge(&ires, interpret_body(&node->body, context, properties | IPROP_SET(0, 0, 1)));
             if (ires.has_error)
             {
                 value_free(&step);
@@ -1654,13 +1674,20 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
                 if (!IPROP_IN_LOOP(properties))
                 {
                     node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
                     free(node);
                 }
 
                 return ires;
             }
 
+            if (value.type == BREAK_V)
+                break;
+
             operate_success(var, &step);
+
+            value_free(&ires.value);
+            ires.value = value;
         }
 
     ires.value.poss = *poss;
@@ -1670,6 +1697,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
     if (!IPROP_IN_LOOP(properties))
     {
         node_p_free1(node->body.nodes, node->body.size);
+        free(node->iterator);
         free(node);
     }
 
@@ -1718,10 +1746,36 @@ ires_t interpret_return(return_np node, pos_p poss, pos_p pose, context_p contex
 
 ires_t interpret_continue(pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (!IPROP_IN_LOOP_BODY(properties))
+    {
+        char* detail = malloc(41);
+        strcpy(detail, "Continue statement must be inside a loop");
 
+        runtime_t error = runtime_set(OUTSIDE_LOOP_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+    ires.value.type = CONTINUE_V;
+
+    return ires;
 }
 
 ires_t interpret_break(pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (!IPROP_IN_LOOP_BODY(properties))
+    {
+        char* detail = malloc(38);
+        strcpy(detail, "Break statement must be inside a loop");
 
+        runtime_t error = runtime_set(OUTSIDE_LOOP_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+    ires.value.type = BREAK_V;
+
+    return ires;
 }

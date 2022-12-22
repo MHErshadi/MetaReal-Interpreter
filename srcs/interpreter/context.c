@@ -110,7 +110,7 @@ value_p table_ptr_get(table_p table, unsigned char* type, const char* name, char
     return NULL;
 }
 
-char table_var_set(table_p table, unsigned char properties, char* name, unsigned char type, value_p value)
+char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value)
 {
     unsigned long long i;
     for (i = 0; i < table->size; i++)
@@ -134,11 +134,14 @@ char table_var_set(table_p table, unsigned char properties, char* name, unsigned
     if (table->alloc == table->size)
         table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
 
-    table->vars[table->size++] = (var_t){properties, name, type, *value};
+    char* copy = malloc(strlen(name) + 1);
+    strcpy(copy, name);
+
+    table->vars[table->size++] = (var_t){properties, copy, type, *value};
     return 0;
 }
 
-value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, char* name, unsigned char type, value_p value, char* flag)
+value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag)
 {
     unsigned long long i;
     for (i = 0; i < table->size; i++)
@@ -178,14 +181,17 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
     if (table->alloc == table->size)
         table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
 
-    table->vars[table->size] = (var_t){properties, name, type, *value};
+    char* copy = malloc(strlen(name) + 1);
+    strcpy(copy, name);
+
+    table->vars[table->size] = (var_t){properties, copy, type, *value};
 
     if (ptype)
         *ptype = type;
     return &table->vars[table->size++].value;
 }
 
-value_p table_ptr_add(table_p table, char* name)
+value_p table_ptr_add(table_p table, const char* name)
 {
     if (table->alloc == table->size)
         table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
@@ -193,6 +199,9 @@ value_p table_ptr_add(table_p table, char* name)
     value_t value;
     value.type = NULL_V;
 
-    table->vars[table->size] = (var_t){0, name, NULL_V, value};
+    char* copy = malloc(strlen(name) + 1);
+    strcpy(copy, name);
+
+    table->vars[table->size] = (var_t){0, copy, NULL_V, value};
     return &table->vars[table->size++].value;
 }

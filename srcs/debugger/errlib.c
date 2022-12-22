@@ -10,7 +10,7 @@
 
 unsigned char number_length(unsigned long long number);
 
-const char* runtime_labels[8] =
+const char* runtime_labels[9] =
 {
     "TypeError",
     "IllegalOpError",
@@ -19,7 +19,8 @@ const char* runtime_labels[8] =
     "DivByZeroError",
     "NotDefinedError",
     "ConstError",
-    "AccessError"
+    "AccessError",
+    "OutsideLoopError"
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos)

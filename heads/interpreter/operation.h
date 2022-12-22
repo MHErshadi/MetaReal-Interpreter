@@ -37,7 +37,7 @@ ires_t operate_is(value_p left, value_p right);
 ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_subscript(value_p left, value_p right);
-ires_t operate_subscript_ptr(value_p left, value_p right);
+ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p left_pose);
 
 /* */
 

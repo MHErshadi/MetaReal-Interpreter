@@ -3629,7 +3629,7 @@ index_err:
     return ires_fail(&error);
 }
 
-ires_t operate_subscript_ptr(value_p left, value_p right)
+ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p left_pose)
 {
     runtime_t error;
     unsigned long long index;
@@ -3714,6 +3714,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
 
             int_free(right->value.ptr);
 
+            right->type = NULL_V;
             right->value.ptr = ptr;
 
             return ires_success(right);
@@ -3725,56 +3726,8 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
                 return ires_fail(&error);
             }
 
+            right->type = NULL_V;
             right->value.ptr = ((list_p)left->value.ptr)->elements + right->value.chr;
-
-            return ires_success(right);
-        }
-
-        value_free(right);
-        goto index_err;
-    case TUPLE_V:
-        switch (right->type)
-        {
-        case INT_V:
-            if (!int_fits_ull(right->value.ptr))
-            {
-                int_free(right->value.ptr);
-
-                error = out_of_range_error(&right->poss, &right->pose, right->context);
-                return ires_fail(&error);
-            }
-
-            index = int_get_ull(right->value.ptr);
-
-            if (int_sign(right->value.ptr) < 0)
-                index = ((tuple_p)left->value.ptr)->size - index;
-
-            if (index >= ((tuple_p)left->value.ptr)->size)
-            {
-                int_free(right->value.ptr);
-
-                error = out_of_range_error(&right->poss, &right->pose, right->context);
-                return ires_fail(&error);
-            }
-
-            ptr = ((tuple_p)left->value.ptr)->elements + index;
-
-            int_free(right->value.ptr);
-
-            right->value.ptr = ptr;
-
-            return ires_success(right);
-        case BOOL_V:
-        case CHAR_V:
-            if (right->value.chr >= ((tuple_p)left->value.ptr)->size)
-            {
-                error = out_of_range_error(&right->poss, &right->pose, right->context);
-                return ires_fail(&error);
-            }
-
-            ptr = ((tuple_p)left->value.ptr)->elements + right->value.chr;
-
-            right->value.ptr = ptr;
 
             return ires_success(right);
         }
@@ -3783,10 +3736,10 @@ ires_t operate_subscript_ptr(value_p left, value_p right)
         goto index_err;
     }
 
-    detail = malloc(63 + value_label_lens[left->type]);
-    sprintf(detail, "<%s> is not iterable (iterable types: <str>, <list> and <tuple>)", value_labels[left->type]);
+    detail = malloc(62 + value_label_lens[left->type]);
+    sprintf(detail, "<%s> is not dynamic-iterable (iterable types: <str> and <list>)", value_labels[left->type]);
 
-    error = runtime_set(TYPE_E, detail, &left->poss, &left->pose, left->context);
+    error = runtime_set(TYPE_E, detail, left_poss, left_pose, left->context);
     return ires_fail(&error);
 
 index_err:

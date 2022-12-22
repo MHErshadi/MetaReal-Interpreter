@@ -216,8 +216,11 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
-        free(node->value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            free(node->value);
+            free(node);
+        }
 
         char* detail = malloc(49);
         strcpy(detail, "<int> object can not be accessed like a variable");
@@ -242,8 +245,11 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
 {
     if (IPROP_PTR(properties))
     {
-        free(node->value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            free(node->value);
+            free(node);
+        }
 
         char* detail = malloc(51);
         strcpy(detail, "<float> object can not be accessed like a variable");
@@ -268,8 +274,11 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
 {
     if (IPROP_PTR(properties))
     {
-        free(node->value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            free(node->value);
+            free(node);
+        }
 
         char* detail = malloc(53);
         strcpy(detail, "<complex> object can not be accessed like a variable");
@@ -326,8 +335,11 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
-        free(node->value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            free(node->value);
+            free(node);
+        }
 
         char* detail = malloc(49);
         strcpy(detail, "<str> object can not be accessed like a variable");
@@ -349,7 +361,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
 {
     if (IPROP_PTR(properties))
     {
-        if (node)
+        if (node && !IPROP_IN_LOOP(properties))
         {
             node_p_free1(node->elements, node->size);
             free(node);
@@ -381,16 +393,20 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
         value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            i++;
-            while (node->size > i)
-                node_free(node->elements + --node->size);
-            free(node->elements);
-            i--;
+            if (!IPROP_IN_LOOP(properties))
+            {
+                i++;
+                while (node->size > i)
+                    node_free(node->elements + --node->size);
+                free(node->elements);
+                i--;
+
+                free(node);
+            }
 
             while (i)
                 value_free(&elements[--i]);
             free(elements);
-            free(node);
 
             return ires;
         }
@@ -414,8 +430,11 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
 {
     if (IPROP_PTR(properties))
     {
-        node_p_free1(node->elements, node->size);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->elements, node->size);
+            free(node);
+        }
 
         char* detail = malloc(51);
         strcpy(detail, "<tuple> object can not be accessed like a variable");
@@ -435,16 +454,20 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
         value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            i++;
-            while (node->size > i)
-                node_free(node->elements + --node->size);
-            free(node->elements);
-            i--;
+            if (!IPROP_IN_LOOP(properties))
+            {
+                i++;
+                while (node->size > i)
+                    node_free(node->elements + --node->size);
+                free(node->elements);
+                i--;
+
+                free(node);
+            }
 
             while (i)
                 value_free(elements + --i);
             free(elements);
-            free(node);
 
             return ires;
         }
@@ -494,9 +517,12 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 {
     if (IPROP_PTR(properties))
     {
-        node_free(&node->left);
-        node_free(&node->right);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->left);
+            node_free(&node->right);
+            free(node);
+        }
 
         char* detail = malloc(63);
         strcpy(detail, "Result of binary operation can not be accessed like a variable");
@@ -511,8 +537,11 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     value_t left = ires_merge(&ires, interpret_node(&node->left, context, properties & IPROP_MASK));
     if (ires.has_error)
     {
-        node_free(&node->right);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->right);
+            free(node);
+        }
         return ires;
     }
 
@@ -520,7 +549,10 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     if (ires.has_error)
     {
         value_free(&left);
-        free(node);
+
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
+
         return ires;
     }
 
@@ -605,7 +637,8 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
 
     if (ires.has_error)
     {
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -623,8 +656,11 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 {
     if (IPROP_PTR(properties))
     {
-        node_free(&node->operand);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->operand);
+            free(node);
+        }
 
         char* detail = malloc(62);
         strcpy(detail, "Result of unary operation can not be accessed like a variable");
@@ -639,7 +675,8 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     value_t operand = ires_merge(&ires, interpret_node(&node->operand, context, properties & IPROP_MASK));
     if (ires.has_error)
     {
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -662,7 +699,8 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
 
     if (ires.has_error)
     {
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -684,9 +722,12 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
     value_t condition = ires_merge(&ires, interpret_node(&node->condition, context, properties & IPROP_MASK));
     if (ires.has_error)
     {
-        node_free(&node->left);
-        node_free(&node->right);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->left);
+            node_free(&node->right);
+            free(node);
+        }
         return ires;
     }
 
@@ -701,7 +742,9 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (ires.has_error)
         {
             value_free(&condition);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
             return ires;
         }
     }
@@ -714,7 +757,9 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (ires.has_error)
         {
             value_free(&condition);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
             return ires;
         }
     }
@@ -740,8 +785,11 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
     value_t value = ires_merge(&ires, interpret_node(&node->value, context, properties));
     if (ires.has_error)
     {
-        node_free(&node->pos);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->pos);
+            free(node);
+        }
         return ires;
     }
 
@@ -750,17 +798,19 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
     {
         if (!IPROP_PTR(properties))
             value_free(&value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
     if (IPROP_PTR(properties))
     {
-        ires = operate_subscript_ptr(value.value.ptr, &pos);
+        ires = operate_subscript_ptr(value.value.ptr, &pos, &value.poss, &value.pose);
 
         if (ires.has_error)
         {
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
             return ires;
         }
     }
@@ -770,14 +820,15 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
 
         if (ires.has_error)
         {
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
             return ires;
         }
-
-        ires.value.poss = *poss;
-        ires.value.pose = *pose;
-        ires.value.context = context;
     }
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
 
     if (!IPROP_IN_LOOP(properties))
         free(node);
@@ -804,16 +855,23 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            free(node->name);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
             return ires;
         }
 
         if (node->type != NULL_V && node->type != value.type)
         {
             value_free(&value);
-            free(node->name);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
 
             char* detail = malloc(59 + value_label_lens[node->type] + value_label_lens[value.type]);
             sprintf(detail, "Type of variable and type of value do not match (<%s> and <%s>)",
@@ -843,8 +901,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             char* detail = malloc(26 + strlen(node->name));
             sprintf(detail, "'%s' is a constant variable", node->name);
 
-            free(node->name);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -857,8 +918,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
                 node->name, value_labels[(unsigned)res]);
 
-            free(node->name);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
 
             runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -876,8 +940,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             char* detail = malloc(26 + strlen(node->name));
             sprintf(detail, "'%s' is a constant variable", node->name);
 
-            free(node->name);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -890,18 +957,22 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
                 node->name, value_labels[(unsigned)res]);
 
-            free(node->name);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->name);
+                free(node);
+            }
 
             runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
             return ires_fail(&error);
         }
 
         ires.value = value_copy(&value);
-        ires.value.poss = *poss;
-        ires.value.pose = *pose;
-        ires.value.context = context;
     }
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
 
     if (!IPROP_IN_LOOP(properties))
         free(node);
@@ -917,7 +988,8 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     value_t var = ires_merge(&ires, interpret_node(&node->var, context, properties | IPROP_SET(1, 0, 0)));
     if (ires.has_error)
     {
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -968,7 +1040,9 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     if (ires.has_error)
     {
         value_free(&res);
-        free(node);
+
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -1004,7 +1078,6 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     ires.value.pose = *pose;
     ires.value.context = context;
 
-
     if (!IPROP_IN_LOOP(properties))
         free(node);
 
@@ -1019,15 +1092,19 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     value_t var = ires_merge(&ires, interpret_node(&node->var, context, properties | IPROP_SET(1, node->operator == ASSIGN_T, 0)));
     if (ires.has_error)
     {
-        node_free(&node->value);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_free(&node->value);
+            free(node);
+        }
         return ires;
     }
 
     value_t value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
     if (ires.has_error)
     {
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -1038,7 +1115,8 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     case ASSIGN_T:
         if (var.type != NULL_V && var.type != ires.value.type)
         {
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
 
             char* detail = malloc(60 + value_label_lens[ires.value.type] + value_label_lens[var.type]);
             sprintf(detail, "Can not assign <%s> to a type-specified variable (type is <%s>)",
@@ -1094,7 +1172,8 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     {
         *(value_p)var.value.ptr = copy;
 
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+            free(node);
         return ires;
     }
 
@@ -1104,7 +1183,8 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
         {
             *(value_p)var.value.ptr = copy;
 
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
 
             char* detail = malloc(60 + value_label_lens[ires.value.type] + value_label_lens[var.type]);
             sprintf(detail, "Can not assign <%s> to a type-specified variable (type is <%s>)",
@@ -1145,7 +1225,8 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
             char* detail = malloc(26 + strlen(node));
             sprintf(detail, "'%s' is a constant variable", node);
 
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
 
             runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
             return ires_fail(&error);
@@ -1163,7 +1244,8 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
                 char* detail = malloc(45 + strlen(node));
                 sprintf(detail, "'%s' is not defined", node);
 
-                free(node);
+                if (!IPROP_IN_LOOP(properties))
+                    free(node);
 
                 runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
                 return ires_fail(&error);
@@ -1180,18 +1262,19 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
             char* detail = malloc(45 + strlen(node));
             sprintf(detail, "'%s' is not defined", node);
 
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
 
             runtime_t error = runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
             return ires_fail(&error);
         }
 
         ires.value = value_copy(&value);
-
-        ires.value.poss = *poss;
-        ires.value.pose = *pose;
-        ires.value.context = context;
     }
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
 
     if (!IPROP_IN_LOOP(properties))
         free(node);
@@ -1228,9 +1311,12 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
 {
     if (IPROP_PTR(properties))
     {
-        node_p_free1(node->ebody.nodes, node->ebody.size);
-        case_p_free(node->cases, node->size);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->ebody.nodes, node->ebody.size);
+            case_p_free(node->cases, node->size);
+            free(node);
+        }
 
         char* detail = malloc(59);
         strcpy(detail, "Result of if statement can not be accessed like a variable");
@@ -1248,23 +1334,21 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
         value_t condition = ires_merge(&ires, interpret_node(&node->cases[i++].condition, context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            node_p_free1(node->ebody.nodes, node->ebody.size);
-
-            if (IPROP_IN_LOOP(properties))
+            if (!IPROP_IN_LOOP(properties))
             {
+                node_p_free1(node->ebody.nodes, node->ebody.size);
+
                 while (node->size > 0)
                 {
                     node->size--;
                     node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
                     node_free(&node->cases[node->size].condition);
                 }
-
                 free(node->cases);
-            }
-            else
-                case_p_free(node->cases, node->size);
 
-            free(node);
+                free(node);
+            }
+
             return ires;
         }
 
@@ -1274,29 +1358,23 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
 
             ires.value = ires_merge(&ires, interpret_body(&node->cases[i - 1].body, context, properties & IPROP_MASK));
 
-            if (!IPROP_IN_LOOP(properties) || ires.has_error)
+            if (!IPROP_IN_LOOP(properties))
             {
                 node_p_free1(node->ebody.nodes, node->ebody.size);
 
-                if (IPROP_IN_LOOP(properties))
+                while (node->size > 0)
                 {
-                    while (node->size > 0)
-                    {
-                        node->size--;
-                        node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
-                        node_free(&node->cases[node->size].condition);
-                    }
-
-                    free(node->cases);
+                    node->size--;
+                    node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
+                    node_free(&node->cases[node->size].condition);
                 }
-                else
-                    case_p_free(node->cases, node->size);
+                free(node->cases);
 
                 free(node);
-
-                if (ires.has_error)
-                    return ires;
             }
+
+            if (ires.has_error)
+                return ires;
 
             ires.value.poss = *poss;
             ires.value.pose = *pose;
@@ -1316,12 +1394,11 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
         ires.value = ires_merge(&ires, interpret_body(&node->ebody, context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            if (IPROP_IN_LOOP(properties))
-                case_p_free(node->cases, node->size);
-            else
+            if (!IPROP_IN_LOOP(properties))
+            {
                 free(node->cases);
-
-            free(node);
+                free(node);
+            }
             return ires;
         }
     }
@@ -1350,12 +1427,15 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
 {
     if (IPROP_PTR(properties))
     {
-        node_p_free1(node->body.nodes, node->body.size);
-        node_free(&node->step);
-        node_free(&node->end);
-        node_free(&node->start);
-        free(node->iterator);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            node_free(&node->step);
+            node_free(&node->end);
+            node_free(&node->start);
+            free(node->iterator);
+            free(node);
+        }
 
         char* detail = malloc(60);
         strcpy(detail, "Result of for statement can not be accessed like a variable");
@@ -1374,22 +1454,29 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         start = ires_merge(&ires, interpret_node(&node->start, context, properties & IPROP_MASK));
         if (ires.has_error)
         {
-            node_p_free1(node->body.nodes, node->body.size);
-            node_free(&node->step);
-            node_free(&node->end);
-            free(node->iterator);
-            free(node);
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                node_free(&node->step);
+                node_free(&node->end);
+                free(node->iterator);
+                free(node);
+            }
             return ires;
         }
 
         if (start.type != INT_V && start.type != FLOAT_V && start.type != BOOL_V && start.type != CHAR_V)
         {
             value_free(&start);
-            node_p_free1(node->body.nodes, node->body.size);
-            node_free(&node->step);
-            node_free(&node->end);
-            free(node->iterator);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                node_free(&node->step);
+                node_free(&node->end);
+                free(node->iterator);
+                free(node);
+            }
 
             char* detail = malloc(68 + value_label_lens[start.type]);
             sprintf(detail, "Start of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
@@ -1409,10 +1496,15 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
     if (ires.has_error)
     {
         value_free(&start);
-        node_p_free1(node->body.nodes, node->body.size);
-        node_free(&node->step);
-        free(node->iterator);
-        free(node);
+
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            node_free(&node->step);
+            free(node->iterator);
+            free(node);
+        }
+
         return ires;
     }
 
@@ -1420,10 +1512,14 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
     {
         value_free(&end);
         value_free(&start);
-        node_p_free1(node->body.nodes, node->body.size);
-        node_free(&node->step);
-        free(node->iterator);
-        free(node);
+
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            node_free(&node->step);
+            free(node->iterator);
+            free(node);
+        }
 
         char* detail = malloc(66 + value_label_lens[end.type]);
         sprintf(detail, "End of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
@@ -1441,9 +1537,14 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         {
             value_free(&end);
             value_free(&start);
-            node_p_free1(node->body.nodes, node->body.size);
-            free(node->iterator);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->iterator);
+                free(node);
+            }
+
             return ires;
         }
 
@@ -1452,9 +1553,13 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             value_free(&step);
             value_free(&end);
             value_free(&start);
-            node_p_free1(node->body.nodes, node->body.size);
-            free(node->iterator);
-            free(node);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->iterator);
+                free(node);
+            }
 
             char* detail = malloc(67 + value_label_lens[step.type]);
             sprintf(detail, "Step of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
@@ -1477,13 +1582,16 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         value_free(&step);
         value_free(&end);
         value_free(&start);
-        node_p_free1(node->body.nodes, node->body.size);
 
         char* detail = malloc(26 + strlen(node->iterator));
         sprintf(detail, "'%s' is a constant variable", node->iterator);
 
-        free(node->iterator);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            free(node->iterator);
+            free(node);
+        }
 
         runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
         return ires_fail(&error);
@@ -1493,14 +1601,17 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         value_free(&step);
         value_free(&end);
         value_free(&start);
-        node_p_free1(node->body.nodes, node->body.size);
 
         char* detail = malloc(45 + strlen(node->iterator) + value_label_lens[(unsigned)flag]);
         sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
             node->iterator, value_labels[(unsigned)flag]);
 
-        free(node->iterator);
-        free(node);
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            free(node->iterator);
+            free(node);
+        }
 
         runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
         return ires_fail(&error);
@@ -1517,10 +1628,13 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             {
                 value_free(&step);
                 value_free(&end);
-                value_free(&start);
-                node_p_free1(node->body.nodes, node->body.size);
-                free(node->iterator);
-                free(node);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node);
+                }
+
                 return ires;
             }
 
@@ -1536,10 +1650,13 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             {
                 value_free(&step);
                 value_free(&end);
-                value_free(&start);
-                node_p_free1(node->body.nodes, node->body.size);
-                free(node->iterator);
-                free(node);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node);
+                }
+
                 return ires;
             }
 

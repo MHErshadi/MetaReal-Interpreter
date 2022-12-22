@@ -116,7 +116,7 @@ char table_var_set(table_p table, unsigned char properties, char* name, unsigned
     for (i = 0; i < table->size; i++)
         if (!strcmp(name, table->vars[i].name))
         {
-            if (VAR_CONST(table->vars[i].properties) && table->vars[i].value.type != NULL_V)
+            if ((VAR_CONST(table->vars[i].properties) && table->vars[i].value.type != NULL_V))
                 return -1;
 
             if (table->vars[i].type != NULL_V && value->type != table->vars[i].type)
@@ -144,7 +144,8 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
     for (i = 0; i < table->size; i++)
         if (!strcmp(name, table->vars[i].name))
         {
-            if (VAR_CONST(table->vars[i].properties) && table->vars[i].value.type != NULL_V)
+            if ((VAR_CONST(table->vars[i].properties) && table->vars[i].value.type != NULL_V) ||
+                (VAR_CONST(properties) && value->type != NULL_V))
             {
                 *flag = -1;
                 return NULL;
@@ -158,20 +159,29 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
 
             value_free(&table->vars[i].value);
 
+            table->vars[i].properties |= properties;
             if (table->vars[i].type == NULL_V)
                 table->vars[i].type = type;
             table->vars[i].value = *value;
 
-            *ptype = table->vars[i].type;
+            if (ptype)
+                *ptype = table->vars[i].type;
             return &table->vars[i].value;
         }
+
+    if (VAR_CONST(properties) && value->type != NULL_V)
+    {
+        *flag = -1;
+        return NULL;
+    }
 
     if (table->alloc == table->size)
         table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
 
     table->vars[table->size] = (var_t){properties, name, type, *value};
 
-    *ptype = type;
+    if (ptype)
+        *ptype = type;
     return &table->vars[table->size++].value;
 }
 

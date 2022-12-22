@@ -21,6 +21,7 @@ typedef struct __float__* float_p;
 float_p float_set(const float_p src, unsigned long long prec);
 float_p float_set_str(const char* str, unsigned long long size, unsigned long long prec);
 float_p float_set_ul(unsigned long src, unsigned long long prec);
+float_p float_set_int(const int_p src, unsigned long long prec);
 
 char* float_get_str(const float_p src, unsigned long long prec);
 int_p float_get_int(const float_p src);

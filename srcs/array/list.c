@@ -190,7 +190,7 @@ char list_equal(const list_p array1, const list_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_compare(&array1->elements[i], &array2->elements[i]))
+        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
             return 0;
 
     return 1;
@@ -203,7 +203,7 @@ char list_equal_tuple(const list_p array1, const tuple_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_compare(&array1->elements[i], &array2->elements[i]))
+        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
             return 0;
 
     return 1;
@@ -216,7 +216,7 @@ char list_nequal(const list_p array1, const list_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_compare(&array1->elements[i], &array2->elements[i]))
+        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
             return 1;
 
     return 0;
@@ -229,7 +229,7 @@ char list_nequal_tuple(const list_p array1, const tuple_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_compare(&array1->elements[i], &array2->elements[i]))
+        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
             return 1;
 
     return 0;
@@ -242,7 +242,7 @@ char list_contains(const list_p array, const value_p value)
 
     unsigned long long i;
     for (i = 0; i < array->size; i++)
-        if (operate_compare(&array->elements[i], value))
+        if (operate_equal_compare(&array->elements[i], value))
             return 1;
 
     return 0;

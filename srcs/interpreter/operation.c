@@ -3993,7 +3993,7 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
     return ires_fail(&error);
 }
 
-char operate_compare(const value_p left, const value_p right)
+char operate_equal_compare(const value_p left, const value_p right)
 {
     switch (left->type)
     {
@@ -4110,6 +4110,227 @@ char operate_compare(const value_p left, const value_p right)
         }
 
         break;
+    }
+
+    return 0;
+}
+
+char operate_less_compare(const value_p left, const value_p right)
+{
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return int_less(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_int_less(left->value.ptr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return int_less_ul(left->value.ptr, right->value.chr);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return float_less_int(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_less(left->value.ptr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return float_less_ul(left->value.ptr, right->value.chr);
+        }
+
+        break;
+    case BOOL_V:
+    case CHAR_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return int_ul_less(left->value.chr, right->value.ptr);
+        case FLOAT_V:
+            return float_ul_less(left->value.chr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return left->value.chr < right->value.chr;
+        }
+
+        break;
+    }
+
+    return 0;
+}
+
+char operate_greater_compare(const value_p left, const value_p right)
+{
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return int_greater(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_int_greater(left->value.ptr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return int_greater_ul(left->value.ptr, right->value.chr);
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return float_greater_int(left->value.ptr, right->value.ptr);
+        case FLOAT_V:
+            return float_greater(left->value.ptr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return float_greater_ul(left->value.ptr, right->value.chr);
+        }
+
+        break;
+    case BOOL_V:
+    case CHAR_V:
+        switch (right->type)
+        {
+        case INT_V:
+            return int_ul_greater(left->value.chr, right->value.ptr);
+        case FLOAT_V:
+            return float_ul_greater(left->value.chr, right->value.ptr);
+        case BOOL_V:
+        case CHAR_V:
+            return left->value.chr > right->value.chr;
+        }
+
+        break;
+    }
+
+    return 0;
+}
+
+void operate_success(value_p left, const value_p right)
+{
+    switch (left->type)
+    {
+    case INT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            int_add(left->value.ptr, right->value.ptr);
+            break;
+        case FLOAT_V:
+            left->type = FLOAT_V;
+
+            float_p conv = float_set_int(left->value.ptr, setting.float_prec_bit);
+            int_free(left->value.ptr);
+            left->value.ptr = conv;
+
+            float_add(left->value.ptr, right->value.ptr);
+            break;
+        case BOOL_V:
+        case CHAR_V:
+        case CHAR_PTR_V:
+            int_add_ul(left->value.ptr, right->value.chr);
+            break;
+        }
+
+        break;
+    case FLOAT_V:
+        switch (right->type)
+        {
+        case INT_V:
+            float_add_int(left->value.ptr, right->value.ptr);
+            break;
+        case FLOAT_V:
+            float_add(left->value.ptr, right->value.ptr);
+            break;
+        case BOOL_V:
+        case CHAR_V:
+        case CHAR_PTR_V:
+            float_add_ul(left->value.ptr, right->value.chr);
+            break;
+        }
+
+        break;
+    case CHAR_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add(left->value.ptr, right->value.ptr);
+            break;
+        case FLOAT_V:
+            left->type = FLOAT_V;
+            left->value.ptr = float_set_ul(left->value.chr, setting.float_prec_bit);
+
+            float_add(left->value.ptr, right->value.ptr);
+            break;
+        case BOOL_V:
+        case CHAR_V:
+            left->value.chr += right->value.chr;
+            break;
+        case CHAR_PTR_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add_ul(left->value.ptr, right->value.chr);
+            break;
+        }
+
+        break;
+    case BOOL_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add(left->value.ptr, right->value.ptr);
+            break;
+        case FLOAT_V:
+            left->type = FLOAT_V;
+            left->value.ptr = float_set_ul(left->value.chr, setting.float_prec_bit);
+
+            float_add(left->value.ptr, right->value.ptr);
+            break;
+        case BOOL_V:
+            left->value.chr ^= right->value.chr;
+            break;
+        case CHAR_V:
+            left->type = CHAR_V;
+            left->value.chr += right->value.chr;
+            break;
+        case CHAR_PTR_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add_ul(left->value.ptr, right->value.chr);
+            break;
+        }
+
+        break;
+    }
+}
+
+char operate_sign(const value_p operand)
+{
+    switch (operand->type)
+    {
+    case INT_V:
+        return int_sign(operand->value.ptr) < 0;
+    case FLOAT_V:
+        return float_sign(operand->value.ptr) < 0;
+    case BOOL_V:
+    case CHAR_V:
+    case CHAR_PTR_V:
+        return 0;
     }
 
     return 0;

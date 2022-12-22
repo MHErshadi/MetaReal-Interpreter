@@ -53,6 +53,14 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
 
 /* */
 
-char operate_compare(const value_p left, const value_p right);
+void operate_success(value_p left, const value_p right);
+
+char operate_equal_compare(const value_p left, const value_p right);
+char operate_less_compare(const value_p left, const value_p right);
+char operate_greater_compare(const value_p left, const value_p right);
+
+/* */
+
+char operate_sign(const value_p operand);
 
 #endif /* __M_OPERATION__ */

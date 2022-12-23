@@ -3210,32 +3210,6 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
     return ires_fail(&error);
 }
 
-ires_t operate_and(value_p left, value_p right)
-{
-    char res = value_is_true(left) & value_is_true(right);
-
-    value_free(left);
-    value_free(right);
-
-    left->type = BOOL_V;
-    left->value.chr = res;
-
-    return ires_success(left);
-}
-
-ires_t operate_or(value_p left, value_p right)
-{
-    char res = value_is_true(left) | value_is_true(right);
-
-    value_free(left);
-    value_free(right);
-
-    left->type = BOOL_V;
-    left->value.chr = res;
-
-    return ires_success(left);
-}
-
 ires_t operate_xor(value_p left, value_p right)
 {
     char res = value_is_true(left) ^ value_is_true(right);

@@ -191,6 +191,52 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
     return &table->vars[table->size++].value;
 }
 
+var_p table_ptr_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag)
+{
+    unsigned long long i;
+    for (i = 0; i < table->size; i++)
+        if (!strcmp(name, table->vars[i].name))
+        {
+            if ((VAR_CONST(table->vars[i].properties) && table->vars[i].value.type != NULL_V) ||
+                (VAR_CONST(properties) && value->type != NULL_V))
+            {
+                *flag = -1;
+                return NULL;
+            }
+
+            if (table->vars[i].type != NULL_V && value->type != table->vars[i].type)
+            {
+                *flag = table->vars[i].type;
+                return NULL;
+            }
+
+            value_free(&table->vars[i].value);
+
+            table->vars[i].properties |= properties;
+            if (table->vars[i].type == NULL_V)
+                table->vars[i].type = type;
+            table->vars[i].value = *value;
+
+            return table->vars + i;
+        }
+
+    if (VAR_CONST(properties) && value->type != NULL_V)
+    {
+        *flag = -1;
+        return NULL;
+    }
+
+    if (table->alloc == table->size)
+        table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
+
+    char* copy = malloc(strlen(name) + 1);
+    strcpy(copy, name);
+
+    table->vars[table->size] = (var_t){properties, copy, type, *value};
+
+    return table->vars + table->size++;
+}
+
 value_p table_ptr_add(table_p table, const char* name)
 {
     if (table->alloc == table->size)

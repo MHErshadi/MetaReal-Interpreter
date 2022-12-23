@@ -4184,34 +4184,6 @@ void operate_success(value_p left, const value_p right)
         }
 
         break;
-    case CHAR_V:
-        switch (right->type)
-        {
-        case INT_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
-
-            int_add(left->value.ptr, right->value.ptr);
-            break;
-        case FLOAT_V:
-            left->type = FLOAT_V;
-            left->value.ptr = float_set_ul(left->value.chr, setting.float_prec_bit);
-
-            float_add(left->value.ptr, right->value.ptr);
-            break;
-        case BOOL_V:
-        case CHAR_V:
-            left->value.chr += right->value.chr;
-            break;
-        case CHAR_PTR_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
-
-            int_add_ul(left->value.ptr, right->value.chr);
-            break;
-        }
-
-        break;
     case BOOL_V:
         switch (right->type)
         {
@@ -4243,7 +4215,52 @@ void operate_success(value_p left, const value_p right)
         }
 
         break;
+    case CHAR_V:
+        switch (right->type)
+        {
+        case INT_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add(left->value.ptr, right->value.ptr);
+            break;
+        case FLOAT_V:
+            left->type = FLOAT_V;
+            left->value.ptr = float_set_ul(left->value.chr, setting.float_prec_bit);
+
+            float_add(left->value.ptr, right->value.ptr);
+            break;
+        case BOOL_V:
+        case CHAR_V:
+            left->value.chr += right->value.chr;
+            break;
+        case CHAR_PTR_V:
+            left->type = INT_V;
+            left->value.ptr = int_set_ull(left->value.chr);
+
+            int_add_ul(left->value.ptr, right->value.chr);
+            break;
+        }
+
+        break;
     }
+}
+
+char operate_success_type_change(const value_p left, const value_p right)
+{
+    switch (left->type)
+    {
+    case INT_V:
+        return right->type == FLOAT_V;
+    case FLOAT_V:
+        return 0;
+    case BOOL_V:
+        return right->type != BOOL_V;
+    case CHAR_V:
+        return right->type != BOOL_V && right->type != CHAR_V;
+    }
+
+    return 0;
 }
 
 char operate_sign(const value_p operand)
@@ -4261,6 +4278,41 @@ char operate_sign(const value_p operand)
     }
 
     return 0;
+}
+
+unsigned long long operate_size(const value_p operand)
+{
+    switch (operand->type)
+    {
+    case STR_V:
+        return ((str_p)operand->value.ptr)->size;
+    case LIST_V:
+        return ((list_p)operand->value.ptr)->size;
+    case TUPLE_V:
+        return ((tuple_p)operand->value.ptr)->size;
+    }
+
+    return 0;
+}
+
+value_t operate_index(const value_p operand, unsigned long long index)
+{
+    value_t res;
+
+    switch (operand->type)
+    {
+    case STR_V:
+        res.type = CHAR_V;
+        res.value.chr = ((str_p)operand->value.ptr)->str[index];
+
+        return res;
+    case LIST_V:
+        return value_copy(((list_p)operand->value.ptr)->elements + index);
+    case TUPLE_V:
+        return value_copy(((tuple_p)operand->value.ptr)->elements + index);
+    }
+
+    return res;
 }
 
 runtime_t illegal_operation_error(unsigned char type1, unsigned char type2, const char* operator, pos_p poss, pos_p pose, context_p context)

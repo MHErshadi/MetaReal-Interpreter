@@ -75,6 +75,7 @@ value_p table_ptr_get(table_p table, unsigned char* type, const char* name, char
 
 char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value);
 value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
+var_p table_ptr_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
 
 value_p table_ptr_add(table_p table, const char* name);
 

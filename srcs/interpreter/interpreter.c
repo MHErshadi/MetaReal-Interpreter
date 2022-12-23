@@ -165,10 +165,12 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_if(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FOR_N:
         return interpret_for(node->value.ptr, &node->poss, &node->pose, context, properties);
-    case WHILE_N:
-        return interpret_while(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case FOREACH_N:
+        return interpret_foreach(node->value.ptr, &node->poss, &node->pose, context, properties);
     case DO_WHILE_N:
         return interpret_do_while(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case WHILE_N:
+        return interpret_while(node->value.ptr, &node->poss, &node->pose, context, properties);
     case CONTINUE_N:
         return interpret_continue(&node->poss, &node->pose, context, properties);
     case BREAK_N:
@@ -1550,7 +1552,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             sprintf(detail, "Start of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
                 value_labels[start.type]);
 
-            runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+            runtime_t error = runtime_set(TYPE_E, detail, &start.poss, &start.pose, start.context);
             return ires_fail(&error);
         }
     }
@@ -1593,7 +1595,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
         sprintf(detail, "End of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
             value_labels[end.type]);
 
-        runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+        runtime_t error = runtime_set(TYPE_E, detail, &end.poss, &end.pose, end.context);
         return ires_fail(&error);
     }
 
@@ -1633,7 +1635,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             sprintf(detail, "Step of for loop must be <int>, <float>, <bool> or <char> (not <%s>)",
                 value_labels[step.type]);
 
-            runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+            runtime_t error = runtime_set(TYPE_E, detail, &step.poss, &step.pose, step.context);
             return ires_fail(&error);
         }
     }
@@ -1644,7 +1646,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
     }
 
     char flag = 0;
-    value_p var = table_ptr_set(&context->table, NULL, 0, node->iterator, 0, &start, &flag);
+    var_p var = table_ptr_var_set(&context->table, 0, node->iterator, 0, &start, &flag);
     if (flag == -1)
     {
         value_free(&step);
@@ -1661,7 +1663,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             free(node);
         }
 
-        runtime_t error = runtime_set(CONST_E, detail, poss, pose, context);
+        runtime_t error = runtime_set(CONST_E, detail, &start.poss, &start.pose, start.context);
         return ires_fail(&error);
     }
     if (flag)
@@ -1681,7 +1683,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             free(node);
         }
 
-        runtime_t error = runtime_set(TYPE_E, detail, poss, pose, context);
+        runtime_t error = runtime_set(TYPE_E, detail, &start.poss, &start.pose, start.context);
         return ires_fail(&error);
     }
 
@@ -1689,7 +1691,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
 
     char sign = operate_sign(&step);
     if (sign)
-        while (operate_greater_compare(var, &end))
+        while (operate_greater_compare(&var->value, &end))
         {
             value = ires_merge(&ires, interpret_body(&node->body, context, IPROP_SET(0, 0, 1, 1)));
             if (ires.has_error)
@@ -1710,13 +1712,54 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             if (value.type == BREAK_V)
                 break;
 
-            operate_success(var, &step);
+            if (value.type == CONTINUE_V)
+                continue;
+
+            if (VAR_CONST(var->properties))
+            {
+                value_free(&step);
+                value_free(&end);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
+                    free(node);
+                }
+
+                char* detail = malloc(26 + strlen(var->name));
+                sprintf(detail, "'%s' is a constant variable", var->name);
+
+                runtime_t error = runtime_set(CONST_E, detail, &step.poss, &step.pose, step.context);
+                return ires_fail(&error);
+            }
+            if (var->type != NULL_V && operate_success_type_change(&var->value, &step))
+            {
+                value_free(&step);
+                value_free(&end);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
+                    free(node);
+                }
+
+                char* detail = malloc(45 + strlen(var->name) + value_label_lens[var->type]);
+                sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
+                    var->name, value_labels[var->type]);
+
+                runtime_t error = runtime_set(TYPE_E, detail, &step.poss, &step.pose, step.context);
+                return ires_fail(&error);
+            }
+
+            operate_success(&var->value, &step);
 
             value_free(&ires.value);
             ires.value = value;
         }
     else
-        while (operate_less_compare(var, &end))
+        while (operate_less_compare(&var->value, &end))
         {
             value = ires_merge(&ires, interpret_body(&node->body, context, IPROP_SET(0, 0, 1, 1)));
             if (ires.has_error)
@@ -1737,7 +1780,48 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
             if (value.type == BREAK_V)
                 break;
 
-            operate_success(var, &step);
+            if (value.type == CONTINUE_V)
+                continue;
+
+            if (VAR_CONST(var->properties))
+            {
+                value_free(&step);
+                value_free(&end);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
+                    free(node);
+                }
+
+                char* detail = malloc(26 + strlen(var->name));
+                sprintf(detail, "'%s' is a constant variable", var->name);
+
+                runtime_t error = runtime_set(CONST_E, detail, &step.poss, &step.pose, step.context);
+                return ires_fail(&error);
+            }
+            if (var->type != NULL_V && operate_success_type_change(&var->value, &step))
+            {
+                value_free(&step);
+                value_free(&end);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->body.nodes, node->body.size);
+                    free(node->iterator);
+                    free(node);
+                }
+
+                char* detail = malloc(45 + strlen(var->name) + value_label_lens[var->type]);
+                sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
+                    var->name, value_labels[var->type]);
+
+                runtime_t error = runtime_set(TYPE_E, detail, &step.poss, &step.pose, step.context);
+                return ires_fail(&error);
+            }
+
+            operate_success(&var->value, &step);
 
             value_free(&ires.value);
             ires.value = value;
@@ -1759,7 +1843,141 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
 
 ires_t interpret_foreach(foreach_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            node_free(&node->iterable);
+            free(node->iterator);
+            free(node);
+        }
 
+        char* detail = malloc(65);
+        strcpy(detail, "Result of foreach statement can not be accessed like a variable");
+
+        runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+    ires.value.type = NULL_V;
+
+    value_t iterable = ires_merge(&ires, interpret_node(&node->iterable, context, properties & IPROP_MASK));
+    if (ires.has_error)
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            free(node->iterator);
+            free(node);
+        }
+        return ires;
+    }
+
+    if (iterable.type != STR_V && iterable.type != LIST_V && iterable.type != TUPLE_V)
+    {
+        value_free(&iterable);
+
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->body.nodes, node->body.size);
+            free(node->iterator);
+            free(node);
+        }
+
+        char* detail = malloc(69 + value_label_lens[iterable.type]);
+        sprintf(detail, "Iterable of foreach loop must be <str>, <list> or <tuple> (not <%s>)",
+            value_labels[iterable.type]);
+
+        runtime_t error = runtime_set(TYPE_E, detail, &iterable.poss, &iterable.pose, iterable.context);
+        return ires_fail(&error);
+    }
+
+    unsigned long long size = operate_size(&iterable);
+
+    char res = 0;
+    value_t value;
+
+    unsigned long long i;
+    for (i = 0; i < size; i++)
+    {
+        value = operate_index(&iterable, i);
+        res = table_var_set(&context->table, 0, node->iterator, 0, &value);
+        if (res == -1)
+        {
+            value_free(&iterable);
+
+            char* detail = malloc(26 + strlen(node->iterator));
+            sprintf(detail, "'%s' is a constant variable", node->iterator);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->iterator);
+                free(node);
+            }
+
+            runtime_t error = runtime_set(CONST_E, detail, &iterable.poss, &iterable.pose, iterable.context);
+            return ires_fail(&error);
+        }
+        if (res)
+        {
+            value_free(&iterable);
+
+            char* detail = malloc(45 + strlen(node->iterator) + value_label_lens[(unsigned)res]);
+            sprintf(detail, "'%s' is a type-specified variable (type is <%s>)",
+                node->iterator, value_labels[(unsigned)res]);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->iterator);
+                free(node);
+            }
+
+            runtime_t error = runtime_set(TYPE_E, detail, &iterable.poss, &iterable.pose, iterable.context);
+            return ires_fail(&error);
+        }
+
+        value = ires_merge(&ires, interpret_body(&node->body, context, IPROP_SET(0, 0, 1, 1)));
+        if (ires.has_error)
+        {
+            value_free(&iterable);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->iterator);
+                free(node);
+            }
+
+            return ires;
+        }
+
+        if (value.type == BREAK_V)
+            break;
+
+        if (value.type == CONTINUE_V)
+            continue;
+
+        value_free(&ires.value);
+        ires.value = value;
+    }
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+    if (!IPROP_IN_LOOP(properties))
+    {
+        node_p_free1(node->body.nodes, node->body.size);
+        free(node->iterator);
+        free(node);
+    }
+
+    return ires;
 }
 
 ires_t interpret_loop(loop_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -1807,8 +2025,11 @@ ires_t interpret_do_while(do_while_np node, pos_p poss, pos_p pose, context_p co
         if (value.type == BREAK_V)
             break;
 
-        value_free(&ires.value);
-        ires.value = value;
+        if (value.type != CONTINUE_V)
+        {
+            value_free(&ires.value);
+            ires.value = value;
+        }
 
         condition = ires_merge(&ires, interpret_node(&node->condition, context, IPROP_SET(0, 0, 1, 0)));
         if (ires.has_error)
@@ -1900,6 +2121,9 @@ ires_t interpret_while(while_np node, pos_p poss, pos_p pose, context_p context,
             break;
 
         value_free(&condition);
+
+        if (value.type == CONTINUE_V)
+            continue;
 
         value_free(&ires.value);
         ires.value = value;

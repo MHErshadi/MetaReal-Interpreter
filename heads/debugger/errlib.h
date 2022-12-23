@@ -7,6 +7,8 @@
 
 #include <interpreter/context.h>
 
+unsigned char number_length(unsigned long long number);
+
 struct __illegal_char__
 {
     char chr;
@@ -49,7 +51,11 @@ enum _runtime_types_
     NOT_DEFINED_E,
     CONST_E,
     ACCESS_E,
-    OUTSIDE_LOOP_E
+    OUTSIDE_LOOP_E,
+    INVALID_ARG_COUNT_E,
+    BOUNDARY_E,
+    INVALID_DOLLAR_FUNCTION_E,
+    INVALID_VALUE_E
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos);

@@ -3,6 +3,7 @@
 /*/
 
 #include <interpreter/operation.h>
+#include <interpreter/dollar_func.h>
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
@@ -161,8 +162,12 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ACCESS_N:
         return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case DOLLAR_FUNC_CALL_N:
+        return interpret_dollar_func_call(node->value.ptr, &node->poss, &node->pose, context, properties);
     case IF_N:
         return interpret_if(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case SWITCH_N:
+        return interpret_switch(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FOR_N:
         return interpret_for(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FOREACH_N:
@@ -413,6 +418,10 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
         value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties & IPROP_MASK));
         if (ires.has_error)
         {
+            while (i)
+                value_free(elements + --i);
+            free(elements);
+
             if (!IPROP_IN_LOOP(properties))
             {
                 i++;
@@ -423,10 +432,6 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
 
                 free(node);
             }
-
-            while (i)
-                value_free(&elements[--i]);
-            free(elements);
 
             return ires;
         }
@@ -474,6 +479,10 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
         value_t element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties & IPROP_MASK));
         if (ires.has_error)
         {
+            while (i)
+                value_free(elements + --i);
+            free(elements);
+
             if (!IPROP_IN_LOOP(properties))
             {
                 i++;
@@ -484,10 +493,6 @@ ires_t interpret_tuple(list_np node, pos_p poss, pos_p pose, context_p context, 
 
                 free(node);
             }
-
-            while (i)
-                value_free(elements + --i);
-            free(elements);
 
             return ires;
         }
@@ -1376,7 +1381,84 @@ ires_t interpret_struct_def(struct_def_np node, pos_p poss, pos_p pose, context_
 
 ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->args, node->size);
+            free(node->name);
+            free(node);
+        }
 
+        char* detail = malloc(67);
+        strcpy(detail, "Result of dollar-function call can not be accessed like a variable");
+
+        runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+    
+    value_p args = malloc(node->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < node->size; i++)
+    {
+        value_t arg = ires_merge(&ires, interpret_node(&node->args[i], context, properties & IPROP_MASK));
+        if (ires.has_error)
+        {
+            while (i)
+                value_free(args + --i);
+            free(args);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                i++;
+                while (node->size > i)
+                    node_free(node->args + --node->size);
+                free(node->args);
+                i--;
+
+                free(node->name);
+                free(node);
+            }
+
+            return ires;
+        }
+
+        args[i] = arg;
+    }
+
+    ires.value = ires_merge(&ires, handle_dollar_func(node->name, args, i, poss, pose, context));
+
+    while (i)
+        value_free(args + --i);
+    free(args);
+
+    if (ires.has_error)
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            free(node->args);
+            free(node->name);
+            free(node);
+        }
+        return ires;
+    }
+
+    if (!IPROP_IN_LOOP(properties))
+    {
+        free(node->args);
+        free(node->name);
+        free(node);
+    }
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+    return ires;
 }
 
 ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -1492,7 +1574,130 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
 
 ires_t interpret_switch(switch_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->dbody.nodes, node->dbody.size);
+            case_p_free(node->cases, node->size);
+            node_free(&node->value);
+            free(node);
+        }
 
+        char* detail = malloc(63);
+        strcpy(detail, "Result of switch statement can not be accessed like a variable");
+
+        runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+    ires.value.type = NULL_V;
+
+    value_t value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
+    if (ires.has_error)
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->dbody.nodes, node->dbody.size);
+            case_p_free(node->cases, node->size);
+            free(node);
+        }
+        return ires;
+    }
+
+    unsigned long long i = 0;
+    while (i < node->size)
+    {
+        value_t condition = ires_merge(&ires, interpret_node(&node->cases[i++].condition, context, properties & IPROP_MASK));
+        if (ires.has_error)
+        {
+            value_free(&value);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->dbody.nodes, node->dbody.size);
+
+                while (node->size > 0)
+                {
+                    node->size--;
+                    node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
+                    node_free(&node->cases[node->size].condition);
+                }
+                free(node->cases);
+
+                free(node);
+            }
+
+            return ires;
+        }
+
+        if (operate_equal_compare(&value, &condition))
+        {
+            value_free(&condition);
+            value_free(&value);
+
+            ires.value = ires_merge(&ires, interpret_body(&node->cases[i - 1].body, context, properties & IPROP_BODY_MASK));
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->dbody.nodes, node->dbody.size);
+
+                while (node->size > 0)
+                {
+                    node->size--;
+                    node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
+                    node_free(&node->cases[node->size].condition);
+                }
+                free(node->cases);
+
+                free(node);
+            }
+
+            if (ires.has_error)
+                return ires;
+
+            ires.value.poss = *poss;
+            ires.value.pose = *pose;
+            ires.value.context = context;
+
+            return ires;
+        }
+
+        value_free(&condition);
+
+        if (!IPROP_IN_LOOP(properties))
+            node_p_free1(node->cases[i - 1].body.nodes, node->cases[i - 1].body.size);
+    }
+
+    if (node->dbody.size)
+    {
+        ires.value = ires_merge(&ires, interpret_body(&node->dbody, context, properties & IPROP_BODY_MASK));
+        if (ires.has_error)
+        {
+            if (!IPROP_IN_LOOP(properties))
+            {
+                free(node->cases);
+                free(node);
+            }
+            return ires;
+        }
+    }
+    else
+        ires.value.type = NULL_V;
+
+    ires.value.poss = *poss;
+    ires.value.pose = *pose;
+    ires.value.context = context;
+
+    if (!IPROP_IN_LOOP(properties))
+    {
+        free(node->cases);
+        free(node);
+    }
+
+    return ires;
 }
 
 ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, char properties)

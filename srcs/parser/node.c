@@ -676,6 +676,9 @@ void arg_access_p_free(arg_access_p args, unsigned long long size)
 
 void case_p_free(case_p cases, unsigned long long size)
 {
+    if (!size)
+        return;
+
     while (size)
     {
         size--;

@@ -10,23 +10,6 @@
 
 unsigned char number_length(unsigned long long number);
 
-const char* runtime_labels[13] =
-{
-    "TypeError",
-    "IllegalOpError",
-    "MemOverflowError",
-    "OutRangeError",
-    "DivByZeroError",
-    "NotDefinedError",
-    "ConstError",
-    "AccessError",
-    "OutsideLoopError",
-    "InvalidArgCountError",
-    "BoundaryError",
-    "InvalidDollarFunctionError",
-    "InvalidValueError"
-};
-
 illegal_char_t illegal_char_set(char chr, pos_p pos)
 {
     illegal_char_t error;

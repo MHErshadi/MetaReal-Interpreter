@@ -41,6 +41,8 @@ struct __runtime__
 typedef struct __runtime__ runtime_t;
 typedef struct __runtime__* runtime_p;
 
+#define ERROR_CODE_COUNT 12
+
 enum _runtime_types_
 {
     TYPE_E,
@@ -56,6 +58,23 @@ enum _runtime_types_
     BOUNDARY_E,
     INVALID_DOLLAR_FUNCTION_E,
     INVALID_VALUE_E
+};
+
+static const char* runtime_labels[ERROR_CODE_COUNT + 1] =
+{
+    "TypeError",
+    "IllegalOpError",
+    "MemOverflowError",
+    "OutRangeError",
+    "DivByZeroError",
+    "NotDefinedError",
+    "ConstError",
+    "AccessError",
+    "OutsideLoopError",
+    "InvalidArgCountError",
+    "BoundaryError",
+    "InvalidDollarFunctionError",
+    "InvalidValueError"
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos);

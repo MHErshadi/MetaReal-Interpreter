@@ -2699,7 +2699,7 @@ token_p try_parse(pres_p pres, token_p tokens)
         advance_newline(tokens);
     }
 
-    case_p excepts;
+    case_p excepts = NULL;
 
     unsigned long long size = 0;
 

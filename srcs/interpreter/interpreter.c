@@ -178,6 +178,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_do_while(node->value.ptr, &node->poss, &node->pose, context, properties);
     case WHILE_N:
         return interpret_while(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case TRY_N:
+        return interpret_try(node->value.ptr, &node->poss, &node->pose, context, properties);
     case CONTINUE_N:
         return interpret_continue(&node->poss, &node->pose, context, properties);
     case BREAK_N:
@@ -1492,7 +1494,7 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
             {
                 node_p_free1(node->ebody.nodes, node->ebody.size);
 
-                while (node->size > 0)
+                while (node->size > i)
                 {
                     node->size--;
                     node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
@@ -1516,7 +1518,7 @@ ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char 
             {
                 node_p_free1(node->ebody.nodes, node->ebody.size);
 
-                while (node->size > 0)
+                while (node->size > i)
                 {
                     node->size--;
                     node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
@@ -1619,7 +1621,7 @@ ires_t interpret_switch(switch_np node, pos_p poss, pos_p pose, context_p contex
             {
                 node_p_free1(node->dbody.nodes, node->dbody.size);
 
-                while (node->size > 0)
+                while (node->size > i)
                 {
                     node->size--;
                     node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
@@ -1644,7 +1646,7 @@ ires_t interpret_switch(switch_np node, pos_p poss, pos_p pose, context_p contex
             {
                 node_p_free1(node->dbody.nodes, node->dbody.size);
 
-                while (node->size > 0)
+                while (node->size > i)
                 {
                     node->size--;
                     node_p_free1(node->cases[node->size].body.nodes, node->cases[node->size].body.size);
@@ -2464,7 +2466,267 @@ ires_t interpret_while(while_np node, pos_p poss, pos_p pose, context_p context,
 
 ires_t interpret_try(try_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->fbody.nodes, node->fbody.size);
+            case_p_free(node->excepts, node->size);
+            node_p_free1(node->tbody.nodes, node->tbody.size);
+            free(node);
+        }
 
+        char* detail = malloc(60);
+        strcpy(detail, "Result of try statement can not be accessed like a variable");
+
+        runtime_t error = runtime_set(ACCESS_E, detail, poss, pose, context);
+        return ires_fail(&error);
+    }
+
+    ires_t ires;
+    ires.has_error = 0;
+
+    ires.value = ires_merge(&ires, interpret_body(&node->tbody, context, properties & IPROP_BODY_MASK));
+    if (!ires.has_error)
+    {
+        ires.value.poss = *poss;
+        ires.value.pose = *pose;
+        ires.value.context = context;
+
+        if (!IPROP_IN_LOOP(properties))
+        {
+            node_p_free1(node->fbody.nodes, node->fbody.size);
+            case_p_free(node->excepts, node->size);
+            free(node);
+        }
+
+        return ires;
+    }
+
+    runtime_t error = ires.error;
+    ires.has_error = 0;
+
+    unsigned long long i;
+    char* label = NULL;
+    unsigned long long code;
+    for (i = 0; i < node->size; i++)
+    {
+        ires.value = ires_merge(&ires, interpret_node(&node->excepts[i].condition, context, properties & IPROP_MASK));
+        if (ires.has_error)
+        {
+            free(error.detail);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                while (node->size > i + 1)
+                {
+                    node->size--;
+                    node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                    node_free(&node->excepts[node->size].condition);
+                }
+                node_p_free1(node->excepts[i].body.nodes, node->excepts[i].body.size);
+                free(node->excepts);
+
+                free(node);
+            }
+
+            return ires;
+        }
+
+        switch (ires.value.type)
+        {
+        case INT_V:
+            if (int_sign(ires.value.value.ptr) < 0 || !int_fits_ull(ires.value.value.ptr))
+            {
+                int_free(ires.value.value.ptr);
+                free(error.detail);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                    while (node->size > i + 1)
+                    {
+                        node->size--;
+                        node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                        node_free(&node->excepts[node->size].condition);
+                    }
+                    node_p_free1(node->excepts[i].body.nodes, node->excepts[i].body.size);
+                    free(node->excepts);
+
+                    free(node);
+                }
+
+                char* detail = malloc(46 + number_length(ERROR_CODE_COUNT));
+                sprintf(detail, "Error code must be between 0 and %llu (inclusive)", ERROR_CODE_COUNT);
+
+                runtime_t error = runtime_set(INVALID_VALUE_E, detail, &ires.value.poss, &ires.value.pose, ires.value.context);
+                return ires_fail(&error);
+            }
+
+            code = int_get_ull(ires.value.value.ptr);
+
+            int_free(ires.value.value.ptr);
+            break;
+        case BOOL_V:
+        case CHAR_V:
+            code = ires.value.value.chr;
+            break;
+        case STR_V:
+            label = ((str_p)ires.value.value.ptr)->str;
+            break;
+        default:
+            value_free(&ires.value);
+            free(error.detail);
+
+            if (!IPROP_IN_LOOP(properties))
+            {
+                node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                while (node->size > i + 1)
+                {
+                    node->size--;
+                    node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                    node_free(&node->excepts[node->size].condition);
+                }
+                node_p_free1(node->excepts[i].body.nodes, node->excepts[i].body.size);
+                free(node->excepts);
+
+                free(node);
+            }
+
+            char* detail = malloc(49);
+            strcpy(detail, "Exception must be <int>, <bool>, <char> or <str>");
+
+            runtime_t error = runtime_set(TYPE_E, detail, &ires.value.poss, &ires.value.pose, ires.value.context);
+            return ires_fail(&error);
+        }
+
+        if (!label)
+        {
+            if (code > ERROR_CODE_COUNT)
+            {
+                free(error.detail);
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                    while (node->size > i + 1)
+                    {
+                        node->size--;
+                        node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                        node_free(&node->excepts[node->size].condition);
+                    }
+                    node_p_free1(node->excepts[i].body.nodes, node->excepts[i].body.size);
+                    free(node->excepts);
+
+                    free(node);
+                }
+
+                char* detail = malloc(46 + number_length(ERROR_CODE_COUNT));
+                sprintf(detail, "Error code must be between 0 and %u (inclusive)", ERROR_CODE_COUNT);
+
+                runtime_t error = runtime_set(BOUNDARY_E, detail, &ires.value.poss, &ires.value.pose, ires.value.context);
+                return ires_fail(&error);
+            }
+
+            if (code == ires.error.type)
+            {
+                free(error.detail);
+
+                ires.value = ires_merge(&ires, interpret_body(&node->excepts[i].body, context, properties | IPROP_BODY_MASK));
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                    while (node->size > i + 1)
+                    {
+                        node->size--;
+                        node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                        node_free(&node->excepts[node->size].condition);
+                    }
+                    free(node->excepts);
+
+                    free(node);
+                }
+
+                if (ires.has_error)
+                    return ires;
+
+                ires.value.poss = *poss;
+                ires.value.pose = *pose;
+                ires.value.context = context;
+
+                return ires;
+            }
+        }
+        else
+        {
+            str_free(ires.value.value.ptr);
+
+            if (!strcmp(label, error.detail) || !strcmp(label, runtime_labels[error.type]))
+            {
+                free(error.detail);
+
+                ires.value = ires_merge(&ires, interpret_body(&node->excepts[i].body, context, properties | IPROP_BODY_MASK));
+
+                if (!IPROP_IN_LOOP(properties))
+                {
+                    node_p_free1(node->fbody.nodes, node->fbody.size);
+
+                    while (node->size > i + 1)
+                    {
+                        node->size--;
+                        node_p_free1(node->excepts[node->size].body.nodes, node->excepts[node->size].body.size);
+                        node_free(&node->excepts[node->size].condition);
+                    }
+                    free(node->excepts);
+
+                    free(node);
+                }
+
+                if (ires.has_error)
+                    return ires;
+
+                ires.value.poss = *poss;
+                ires.value.pose = *pose;
+                ires.value.context = context;
+
+                return ires;
+            }
+        }
+
+        if (!IPROP_IN_LOOP(properties))
+            node_p_free1(node->excepts[i].body.nodes, node->excepts[i].body.size);
+    }
+
+    if (!IPROP_IN_LOOP(properties))
+        free(node->excepts);
+
+    if (node->fbody.size)
+    {
+        free(error.detail);
+
+        ires.value = ires_merge(&ires, interpret_body(&node->fbody, context, properties & IPROP_BODY_MASK));
+        if (ires.has_error)
+        {
+            if (!IPROP_IN_LOOP(properties))
+                free(node);
+            return ires;
+        }
+
+        ires.value.poss = *poss;
+        ires.value.pose = *pose;
+        ires.value.context = context;
+
+        return ires;
+    }
+
+    return ires_fail(&error);
 }
 
 ires_t interpret_import(char* node, pos_p poss, pos_p pose, context_p context, char properties)

@@ -470,12 +470,16 @@ void case_p_free(case_p cases, unsigned long long size);
 /* */
 
 int_np int_n_set(char* value, unsigned long long size);
+void int_n_free(int_np node);
 
 float_np float_n_set(char* value, unsigned long long size);
+void float_n_free(float_np node);
 
 complex_np complex_n_set(char* value, unsigned long long size);
+void complex_n_free(complex_np node);
 
 str_np str_n_set(char* value, unsigned long long size);
+void str_n_free(str_np node);
 
 list_np list_n_set(node_p elements, unsigned long long size);
 void list_n_free(list_np node);

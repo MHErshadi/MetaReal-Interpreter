@@ -33,13 +33,17 @@ enum _value_types_
 
     /* */
 
+    FUNC_V,
+
+    /* */
+
     CHAR_PTR_V,
 
     CONTINUE_V,
     BREAK_V
 };
 
-static const char* value_labels[14] =
+static const char* value_labels[15] =
 {
     "null", "none",
     "object",
@@ -48,10 +52,12 @@ static const char* value_labels[14] =
     "char",
     "str",
     "list", "tuple", "dict", "set",
-    "type"
+    "type",
+
+    "func"
 };
 
-static const int value_label_lens[14] =
+static const int value_label_lens[15] =
 {
     4, 4,
     6,
@@ -61,7 +67,19 @@ static const int value_label_lens[14] =
     3,
     4, 5, 4, 3,
     4,
+
+    4
 };
+
+struct __func_t__
+{
+    unsigned char type;
+
+    context_t context;
+    body_t body;
+};
+typedef struct __func_t__ func_t;
+typedef struct __func_t__* func_p;
 
 value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context);
 value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context_p context);
@@ -74,5 +92,11 @@ void value_free(value_p value);
 void value_label(value_p value, const char* end);
 
 char value_is_true(value_p value);
+
+/* */
+
+func_p func_set(unsigned char type, context_p context, body_p body);
+
+void func_free(func_p func);
 
 #endif /* __M_VALUE__ */

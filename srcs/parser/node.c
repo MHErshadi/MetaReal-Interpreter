@@ -659,6 +659,9 @@ void pair_p_free(pair_p pairs, unsigned long long size)
 
 void arg_p_free(arg_p args, unsigned long long size)
 {
+    if (!size)
+        return;
+
     while (size)
         node_free(&args[--size].value);
     free(args);
@@ -699,6 +702,12 @@ int_np int_n_set(char* value, unsigned long long size)
     return int_n;
 }
 
+void int_n_free(int_np node)
+{
+    free(node->value);
+    free(node);
+}
+
 float_np float_n_set(char* value, unsigned long long size)
 {
     float_np float_n = malloc(sizeof(float_nt));
@@ -707,6 +716,12 @@ float_np float_n_set(char* value, unsigned long long size)
     float_n->size = size;
 
     return float_n;
+}
+
+void float_n_free(float_np node)
+{
+    free(node->value);
+    free(node);
 }
 
 complex_np complex_n_set(char* value, unsigned long long size)
@@ -719,6 +734,12 @@ complex_np complex_n_set(char* value, unsigned long long size)
     return complex_n;
 }
 
+void complex_n_free(complex_np node)
+{
+    free(node->value);
+    free(node);
+}
+
 str_np str_n_set(char* value, unsigned long long size)
 {
     str_np str_n = malloc(sizeof(str_nt));
@@ -727,6 +748,12 @@ str_np str_n_set(char* value, unsigned long long size)
     str_n->size = size;
 
     return str_n;
+}
+
+void str_n_free(str_np node)
+{
+    free(node->value);
+    free(node);
 }
 
 list_np list_n_set(node_p elements, unsigned long long size)

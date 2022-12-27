@@ -46,7 +46,7 @@ typedef struct __table__* table_p;
 
 struct __context__
 {
-    const char* name;
+    char* name;
 
     struct __context__* parent;
     pos_t parent_pos;
@@ -58,8 +58,8 @@ struct __context__
 typedef struct __context__ context_t;
 typedef struct __context__* context_p;
 
-context_t context_set1(const char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname);
-context_t context_set2(const char* name, table_p table, const char* fname);
+context_t context_set1(char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname);
+context_t context_set2(char* name, table_p table, const char* fname);
 
 value_t context_var_get(context_p context, const char* name);
 value_p context_ptr_get(context_p context, unsigned char* type, const char* name, char* flag);

@@ -58,4 +58,8 @@
 
 #define DOLLAR_FUNC_ARGS_SIZE 4
 
+/* */
+
+#define FUNC_CONTEXT_SIZE 16
+
 #endif /* __M_DEF__ */

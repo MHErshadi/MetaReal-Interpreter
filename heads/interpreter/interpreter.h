@@ -22,6 +22,6 @@ typedef struct __ires__* ires_p;
 ires_t interpret(node_p nodes, context_p context);
 
 ires_t ires_success(value_p value);
-ires_t ires_fail(runtime_p error);
+ires_t ires_fail(runtime_t error);
 
 #endif /* __M_INTERPRETER__ */

@@ -4,10 +4,8 @@
 
 #include <setting.h>
 
-setting_t setting_init()
+void setting_init()
 {
-    setting_t setting;
-
     setting.output = stdout;
     setting.input = stdin;
     setting.error = stderr;
@@ -17,6 +15,4 @@ setting_t setting_init()
 
     setting.complex_prec_bit = 64;
     setting.complex_prec_show = 16;
-
-    return setting;
 }

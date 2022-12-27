@@ -8,8 +8,6 @@
 #include <string.h>
 #include <interpreter/value.h>
 
-unsigned char number_length(unsigned long long number);
-
 illegal_char_t illegal_char_set(char chr, pos_p pos)
 {
     illegal_char_t error;

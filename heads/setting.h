@@ -22,7 +22,7 @@ struct __setting__
 typedef struct __setting__ setting_t;
 typedef struct __setting__* setting_p;
 
-setting_t setting_init();
+void setting_init();
 
 setting_t setting;
 

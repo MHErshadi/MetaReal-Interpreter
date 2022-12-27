@@ -7,8 +7,6 @@
 
 #include <interpreter/context.h>
 
-unsigned char number_length(unsigned long long number);
-
 struct __illegal_char__
 {
     char chr;
@@ -85,5 +83,7 @@ void invalid_syntax_print(invalid_syntax_p error, const char* code, unsigned lon
 
 runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose, context_p context);
 void runtime_print(runtime_p error, const char* code, unsigned long long size);
+
+unsigned char number_length(unsigned long long number);
 
 #endif /* __M_ERRLIB__ */

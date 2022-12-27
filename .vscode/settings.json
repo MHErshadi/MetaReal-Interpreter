@@ -15,6 +15,10 @@
         "xlocale": "c",
         "xmemory": "c",
         "stdexcept": "c",
-        "iterator": "c"
+        "iterator": "c",
+        "compare": "c",
+        "memory": "c",
+        "tuple": "c",
+        "utility": "c"
     }
 }

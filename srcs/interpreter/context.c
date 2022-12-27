@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-context_t context_set1(const char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname)
+context_t context_set1(char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname)
 {
     context_t context;
 
@@ -19,7 +19,7 @@ context_t context_set1(const char* name, context_p parent, pos_p parent_pos, tab
     return context;
 }
 
-context_t context_set2(const char* name, table_p table, const char* fname)
+context_t context_set2(char* name, table_p table, const char* fname)
 {
     context_t context;
 

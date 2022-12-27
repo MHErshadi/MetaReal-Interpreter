@@ -24,7 +24,7 @@ int main(int argc, char** argv)
         printf("MetaReal Core verified as %s version %s\n", DEF_CORE, CORE_VER);
         printf("MetaReal Portal verified as %s version %s\n\n", DEF_PORT, PORT_VER);
 
-        setting = setting_init();
+        setting_init();
 
         char* code = malloc(CMD_INPUT_SIZE);
         unsigned long long size;
@@ -84,6 +84,8 @@ int main(int argc, char** argv)
             value_label(&ires.value, "\n");
             value_free(&ires.value);
         }
+
+        table_free(&table);
 
         free(code);
         return 0;

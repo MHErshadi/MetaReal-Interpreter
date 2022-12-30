@@ -4711,7 +4711,7 @@ unsigned long long operate_size(const value_p operand)
     return 0;
 }
 
-value_t operate_index(const value_p operand, unsigned long long index, char should_copy)
+value_t operate_index(const value_p operand, unsigned long long index)
 {
     value_t res;
 
@@ -4723,19 +4723,9 @@ value_t operate_index(const value_p operand, unsigned long long index, char shou
 
         return res;
     case LIST_V:
-        res = ((list_p)operand->value.ptr)->elements[index];
-
-        if (should_copy)
-            res = value_copy(&res);
-
-        return res;
+        return value_copy(((list_p)operand->value.ptr)->elements + index);
     case TUPLE_V:
-        res = ((tuple_p)operand->value.ptr)->elements[index];
-
-        if (should_copy)
-            res = value_copy(&res);
-
-        return res;
+        return value_copy(((tuple_p)operand->value.ptr)->elements + index);
     }
 
     return res;

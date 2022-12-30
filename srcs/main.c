@@ -73,7 +73,7 @@ int main(int argc, char** argv)
             //clock_t s = clock();
 
             ires = interpret(pres.nodes, &context);
-            if (ires.has_error)
+            if (IRES_HAS_ERROR(ires.response))
             {
                 runtime_print(&ires.error, code, size);
                 continue;

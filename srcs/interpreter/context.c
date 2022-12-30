@@ -72,7 +72,7 @@ void table_free(table_p table)
         if (VAR_STATIC(table->vars[--table->size].properties))
             continue;
 
-        value_free(&table->vars[table->size].value);
+        value_delete(&table->vars[table->size].value);
         free(table->vars[table->size].name);
     }
 
@@ -122,12 +122,14 @@ char table_var_set(table_p table, unsigned char properties, const char* name, un
             if (table->vars[i].type != NULL_V && value->type != table->vars[i].type)
                 return table->vars[i].type;
 
-            value_free(&table->vars[i].value);
+            value_delete(&table->vars[i].value);
 
             table->vars[i].properties |= properties;
             if (table->vars[i].type == NULL_V)
                 table->vars[i].type = type;
+
             table->vars[i].value = *value;
+            table->vars[i].value.should_free = 1;
             return 0;
         }
 
@@ -137,7 +139,8 @@ char table_var_set(table_p table, unsigned char properties, const char* name, un
     char* copy = malloc(strlen(name) + 1);
     strcpy(copy, name);
 
-    table->vars[table->size++] = (var_t){properties, copy, type, *value};
+    table->vars[table->size] = (var_t){properties, copy, type, *value};
+    table->vars[table->size++].value.should_free = 1;
     return 0;
 }
 
@@ -160,12 +163,14 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
                 return NULL;
             }
 
-            value_free(&table->vars[i].value);
+            value_delete(&table->vars[i].value);
 
             table->vars[i].properties |= properties;
             if (table->vars[i].type == NULL_V)
                 table->vars[i].type = type;
+
             table->vars[i].value = *value;
+            table->vars[i].value.should_free = 1;
 
             if (ptype)
                 *ptype = table->vars[i].type;
@@ -185,6 +190,7 @@ value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char propert
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){properties, copy, type, *value};
+    table->vars[table->size].value.should_free = 1;
 
     if (ptype)
         *ptype = type;
@@ -210,12 +216,14 @@ var_p table_ptr_var_set(table_p table, unsigned char properties, const char* nam
                 return NULL;
             }
 
-            value_free(&table->vars[i].value);
+            value_delete(&table->vars[i].value);
 
             table->vars[i].properties |= properties;
             if (table->vars[i].type == NULL_V)
                 table->vars[i].type = type;
+
             table->vars[i].value = *value;
+            table->vars[i].value.should_free = 1;
 
             return table->vars + i;
         }
@@ -233,6 +241,7 @@ var_p table_ptr_var_set(table_p table, unsigned char properties, const char* nam
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){properties, copy, type, *value};
+    table->vars[table->size].value.should_free = 1;
 
     return table->vars + table->size++;
 }
@@ -249,5 +258,7 @@ value_p table_ptr_add(table_p table, const char* name)
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){0, copy, NULL_V, value};
+    table->vars[table->size].value.should_free = 1;
+
     return &table->vars[table->size++].value;
 }

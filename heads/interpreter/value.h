@@ -33,14 +33,7 @@ enum _value_types_
 
     /* */
 
-    FUNC_V,
-
-    /* */
-
-    CHAR_PTR_V,
-
-    CONTINUE_V,
-    BREAK_V
+    FUNC_V
 };
 
 static const char* value_labels[15] =
@@ -87,6 +80,7 @@ value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context
 
 value_t value_copy(const value_p value);
 
+void value_delete(value_p value);
 void value_free(value_p value);
 
 void value_label(value_p value, const char* end);

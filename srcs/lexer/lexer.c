@@ -6,6 +6,16 @@
 #include <stdlib.h>
 #include <def.h>
 
+#define token_add(type)                                 \
+    {                                                   \
+        poss = pos;                                     \
+                                                        \
+        code++;                                         \
+        pos.index++;                                    \
+                                                        \
+        tokens[size++] = token_set2(type, &poss, &pos); \
+    }
+
 lres_t lres_fail(illegal_char_p error);
 lres_t lres_success(token_p tokens);
 
@@ -87,12 +97,7 @@ lres_t lex(const char* code, char terminator)
         switch (*code)
         {
         case ';':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(SEMICOLON_T, &poss, &pos);
+            token_add(SEMICOLON_T);
             break;
         case '\'':
             code = gen_char(&tokens[size++], ++code, terminator, &pos);
@@ -154,12 +159,7 @@ lres_t lex(const char* code, char terminator)
             code = hand_rshift(&tokens[size++], ++code, &pos);
             break;
         case '~':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(B_NOT_T, &poss, &pos);
+            token_add(B_NOT_T);
             break;
         case '=':
             code = hand_equal(&tokens[size++], ++code, &pos);
@@ -168,84 +168,34 @@ lres_t lex(const char* code, char terminator)
             code = hand_nequal(&tokens[size++], ++code, &pos);
             break;
         case '(':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(LPAREN_T, &poss, &pos);
+            token_add(LPAREN_T);
             break;
         case ')':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(RPAREN_T, &poss, &pos);
+            token_add(RPAREN_T);
             break;
         case '[':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(LSQUARE_T, &poss, &pos);
+            token_add(LSQUARE_T);
             break;
         case ']':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(RSQUARE_T, &poss, &pos);
+            token_add(RSQUARE_T);
             break;
         case '{':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(LCURLY_T, &poss, &pos);
+            token_add(LCURLY_T);
             break;
         case '}':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(RCURLY_T, &poss, &pos);
+            token_add(RCURLY_T);
             break;
         case '?':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(QUESTION_T, &poss, &pos);
+            token_add(QUESTION_T);
             break;
         case ':':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(COLON_T, &poss, &pos);
+            token_add(COLON_T);
             break;
         case ',':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(COMMA_T, &poss, &pos);
+            token_add(COMMA_T);
             break;
         case '$':
-            poss = pos;
-
-            code++;
-            pos.index++;
-
-            tokens[size++] = token_set2(DOLLAR_T, &poss, &pos);
+            token_add(DOLLAR_T);
             break;
         default:
             token_p_free1(tokens, size);

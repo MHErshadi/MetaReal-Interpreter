@@ -810,7 +810,7 @@ token_p factor(pres_p pres, token_p tokens)
         if (pres->has_error)
             return tokens;
 
-        var_fixed_assign_np node = var_fixed_assign_n_set(VFA_PROP(0), operator, pres->nodes);
+        var_fixed_assign_np node = var_fixed_assign_n_set(0, operator, pres->nodes);
         *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, poss, &pres->nodes->pose);
         return tokens;
     }
@@ -913,7 +913,7 @@ check:
 
         advance_newline(tokens);
 
-        var_fixed_assign_np node = var_fixed_assign_n_set(VFA_PROP(1), operator, pres->nodes);
+        var_fixed_assign_np node = var_fixed_assign_n_set(1, operator, pres->nodes);
         *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, &pres->nodes->poss, pose);
         goto check;
     }

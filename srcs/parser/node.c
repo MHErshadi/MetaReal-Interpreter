@@ -397,7 +397,7 @@ void node_print(FILE* stream, node_p node)
         var_fixed_assign_np value = node->value.ptr;
 
         fprintf(stream, "(VAR_FIXED_ASSIGN: (#post=%u), %s, ",
-            PROP_POST(value->properties),
+            value->properties,
             token_labels[value->operator]);
         node_print(stream, &value->var);
         putc(')', stream);

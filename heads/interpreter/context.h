@@ -16,6 +16,8 @@ struct __value__
     unsigned char type;
     union_value_t value;
 
+    unsigned char should_free;
+
     pos_t poss;
     pos_t pose;
 

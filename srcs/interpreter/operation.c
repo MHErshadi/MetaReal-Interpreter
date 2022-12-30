@@ -22,16 +22,19 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         {
         case INT_V:
             int_add(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_add_int(right->value.ptr, left->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case COMPLEX_V:
             complex_add_int(right->value.ptr, left->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
@@ -44,28 +47,34 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = int_get_str(left->value.ptr);
 
             str_str_concat(str, right->value.ptr);
+
             free(str);
             int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             float_add_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_add(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_add_float(right->value.ptr, left->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -78,28 +87,34 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = float_get_str(left->value.ptr, setting.float_prec_show);
 
             str_str_concat(str, right->value.ptr);
+
             free(str);
             float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             complex_add_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             complex_add_float(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_add(left->value.ptr, right->value.ptr);
+
             complex_free(right->value.ptr);
 
             return ires_success(left);
@@ -112,12 +127,15 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = complex_get_str(left->value.ptr, setting.complex_prec_show);
 
             str_str_concat(str, right->value.ptr);
+
             free(str);
-            float_free(left->value.ptr);
+            complex_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -183,6 +201,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = int_get_str(right->value.ptr);
 
             str_concat_str(left->value.ptr, str);
+
             free(str);
             int_free(right->value.ptr);
 
@@ -191,6 +210,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = float_get_str(right->value.ptr, setting.float_prec_show);
 
             str_concat_str(left->value.ptr, str);
+
             free(str);
             float_free(right->value.ptr);
 
@@ -199,6 +219,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             str = complex_get_str(right->value.ptr, setting.complex_prec_show);
 
             str_concat_str(left->value.ptr, str);
+
             free(str);
             complex_free(right->value.ptr);
 
@@ -213,23 +234,28 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
             return ires_success(left);
         case STR_V:
             str_concat(left->value.ptr, right->value.ptr);
+
             str_free(right->value.ptr);
 
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         switch (right->type)
         {
         case LIST_V:
             list_concat(left->value.ptr, right->value.ptr);
-            free(right->value.ptr);
+
+            list_free(right->value.ptr);
 
             return ires_success(left);
         case TUPLE_V:
             list_concat_tuple(left->value.ptr, right->value.ptr);
-            free(right->value.ptr);
+
+            tuple_free(right->value.ptr);
 
             return ires_success(left);
         }
@@ -237,10 +263,12 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         list_append(left->value.ptr, right);
 
         return ires_success(left);
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "+",
         poss, pose, context));
@@ -255,16 +283,19 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         {
         case INT_V:
             int_subtract(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_int_subtract(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case COMPLEX_V:
             complex_int_subtract(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
@@ -275,22 +306,27 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             float_subtract_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_subtract(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_float_subtract(left->value.ptr, right->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -301,22 +337,27 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             complex_subtract_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             complex_subtract_float(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_subtract(left->value.ptr, right->value.ptr);
+
             complex_free(right->value.ptr);
 
             return ires_success(left);
@@ -327,6 +368,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -383,7 +426,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                str_free(left->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
@@ -396,13 +440,15 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
 
             if (index >= ((str_p)left->value.ptr)->size)
             {
-                str_free(left->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             str_remove(left->value.ptr, index);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -410,7 +456,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         case CHAR_V:
             if (right->value.chr >= ((str_p)left->value.ptr)->size)
             {
-                str_free(left->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -420,6 +467,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         switch (right->type)
@@ -427,7 +476,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
@@ -440,13 +490,15 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
 
             if (index >= ((list_p)left->value.ptr)->size)
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             list_remove(left->value.ptr, index);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -454,7 +506,8 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
         case CHAR_V:
             if (right->value.chr >= ((list_p)left->value.ptr)->size)
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -464,11 +517,15 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            list_free(left->value.ptr);
+        break;
+    default:
+        value_free(left);
         break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "-",
         poss, pose, context));
@@ -483,16 +540,19 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
         {
         case INT_V:
             int_multiply(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_multiply_int(right->value.ptr, left->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case COMPLEX_V:
             complex_multiply_int(right->value.ptr, left->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
@@ -503,22 +563,27 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             float_multiply_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             float_multiply(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_multiply_float(right->value.ptr, left->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -529,22 +594,27 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             complex_multiply_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             complex_multiply_float(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_multiply(left->value.ptr, right->value.ptr);
+
             complex_free(right->value.ptr);
 
             return ires_success(left);
@@ -555,6 +625,8 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -611,7 +683,8 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                str_free(left->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(mem_overflow(poss, pose, context));
@@ -623,6 +696,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             unsigned long long count = int_get_ull(right->value.ptr);
 
             str_repeat(left->value.ptr, count);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -633,6 +707,8 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         switch (right->type)
@@ -640,7 +716,8 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(mem_overflow(poss, pose, context));
@@ -652,6 +729,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             unsigned long long count = int_get_ull(right->value.ptr);
 
             list_repeat(left->value.ptr, count);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -662,11 +740,15 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            list_free(left->value.ptr);
+        break;
+    default:
+        value_free(left);
         break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "*",
         poss, pose, context));
@@ -684,13 +766,15 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             res = float_int_divide_int(left->value.ptr, right->value.ptr, setting.float_prec_bit);
+
             int_free(left->value.ptr);
             int_free(right->value.ptr);
 
@@ -701,33 +785,38 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_int_divide(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case COMPLEX_V:
             if (complex_is_zero(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             complex_int_divide(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -736,12 +825,14 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case CHAR_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             res = float_int_divide_ul(left->value.ptr, right->value.chr, setting.complex_prec_bit);
+
             int_free(left->value.ptr);
 
             left->type = FLOAT_V;
@@ -750,6 +841,8 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
@@ -757,46 +850,53 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_divide_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_divide(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             if (complex_is_zero(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             complex_float_divide(left->value.ptr, right->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -805,7 +905,8 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case CHAR_V:
             if (!right->value.chr)
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -815,6 +916,8 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
@@ -822,46 +925,53 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                complex_free(left->value.ptr);
+                if (left->should_free)
+                    complex_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             complex_divide_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                complex_free(left->value.ptr);
+                if (left->should_free)
+                    complex_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             complex_divide_float(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             if (complex_is_zero(right->value.ptr))
             {
-                complex_free(left->value.ptr);
+                if (left->should_free)
+                    complex_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             complex_divide(left->value.ptr, right->value.ptr);
+
             complex_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
             if (!right->value.chr)
             {
-                complex_free(left->value.ptr);
+                if (left->should_free)
+                    complex_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -870,7 +980,8 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case CHAR_V:
             if (!right->value.chr)
             {
-                complex_free(left->value.ptr);
+                if (left->should_free)
+                    complex_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -880,6 +991,8 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -893,6 +1006,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             }
 
             res = float_ul_divide_int(left->value.chr, right->value.ptr, setting.float_prec_bit);
+
             int_free(right->value.ptr);
 
             left->type = FLOAT_V;
@@ -951,6 +1065,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             }
 
             res = float_ul_divide_int(left->value.chr, right->value.ptr, setting.float_prec_bit);
+
             int_free(right->value.ptr);
 
             left->type = FLOAT_V;
@@ -997,10 +1112,12 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "/",
         poss, pose, context));
@@ -1016,34 +1133,43 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
 
             int_modulo(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_int_modulo(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case BOOL_V:
-            int_free(left->value.ptr);
-
             if (!right->value.chr)
+            {
+                if (left->should_free)
+                    int_free(left->value.ptr);
+
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+            }
+
+            int_free(left->value.ptr);
 
             left->value.ptr = int_set_ull(0);
 
@@ -1051,7 +1177,8 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case CHAR_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -1061,6 +1188,8 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
@@ -1068,33 +1197,38 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_modulo_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_modulo(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
             if (!right->value.chr)
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -1105,7 +1239,8 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case CHAR_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -1115,6 +1250,8 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1150,11 +1287,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-            {
-                int_free(left->value.ptr);
-
                 return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
-            }
 
             right->value.chr = left->value.chr % right->value.chr;
 
@@ -1204,10 +1337,12 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "%",
         poss, pose, context));
@@ -1225,33 +1360,38 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             int_quotient(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_int_quotient(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -1260,7 +1400,8 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         case CHAR_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
@@ -1270,6 +1411,8 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
@@ -1277,26 +1420,30 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         case INT_V:
             if (!int_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             float_quotient_int(left->value.ptr, right->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
         case FLOAT_V:
             if (!float_sign(right->value.ptr))
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             res = float_quotient(left->value.ptr, right->value.ptr);
+
             float_free(left->value.ptr);
             float_free(right->value.ptr);
 
@@ -1307,12 +1454,14 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         case BOOL_V:
             if (!right->value.chr)
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             res = float_get_int(left->value.ptr);
+
             float_free(left->value.ptr);
 
             left->type = INT_V;
@@ -1322,12 +1471,14 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         case CHAR_V:
             if (!right->value.chr)
             {
-                float_free(left->value.ptr);
+                if (left->should_free)
+                    float_free(left->value.ptr);
 
                 return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
             }
 
             res = float_quotient_ul(left->value.ptr, right->value.chr);
+
             float_free(left->value.ptr);
 
             left->type = INT_V;
@@ -1336,6 +1487,8 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1425,10 +1578,12 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "//",
         poss, pose, context));
@@ -1445,6 +1600,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (int_sign(right->value.ptr) < 0)
             {
                 float_p res = float_int_power_int(left->value.ptr, right->value.ptr, setting.float_prec_bit);
+
                 int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
@@ -1456,13 +1612,15 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
 
             if (!int_fits_ul(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(mem_overflow(poss, pose, context));
             }
 
             int_power(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1470,6 +1628,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (int_sign(left->value.ptr) < 0)
             {
                 complex_p res = complex_int_power_float(left->value.ptr, right->value.ptr, setting.complex_prec_bit);
+
                 int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
@@ -1480,11 +1639,13 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             }
 
             float_int_power(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
         case COMPLEX_V:
             complex_int_power(left->value.ptr, right->value.ptr);
+
             int_free(left->value.ptr);
 
             return ires_success(right);
@@ -1492,6 +1653,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (!right->value.chr)
             {
                 int_free(left->value.ptr);
+
                 left->value.ptr = int_set_ull(1);
             }
 
@@ -1502,12 +1664,15 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             float_power_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1515,6 +1680,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (float_sign(left->value.ptr) < 0)
             {
                 complex_p res = complex_float_power_float(left->value.ptr, right->value.ptr, setting.complex_prec_bit);
+
                 float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
@@ -1525,11 +1691,13 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             }
 
             float_power(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_float_power(left->value.ptr, right->value.ptr);
+
             float_free(left->value.ptr);
 
             return ires_success(right);
@@ -1537,6 +1705,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (!right->value.chr)
             {
                 float_free(left->value.ptr);
+
                 left->value.ptr = float_set_ul(1, setting.float_prec_bit);
             }
 
@@ -1547,22 +1716,27 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             return ires_success(left);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             complex_power_int(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             complex_power_float(left->value.ptr, right->value.ptr);
+
             float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             complex_power(left->value.ptr, right->value.ptr);
+
             complex_free(right->value.ptr);
 
             return ires_success(left);
@@ -1570,6 +1744,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (!right->value.chr)
             {
                 complex_free(left->value.ptr);
+
                 left->value.ptr = complex_set_ul(1, setting.complex_prec_bit);
             }
 
@@ -1580,6 +1755,8 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             return ires_success(left);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1588,11 +1765,13 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (!int_sign(right->value.ptr))
             {
                 int_free(right->value.ptr);
+
                 right->value.ptr = int_set_ull(1);
             }
             else
             {
                 int_free(right->value.ptr);
+
                 right->value.ptr = int_set_ull(left->value.chr);
             }
 
@@ -1601,11 +1780,13 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (!float_sign(right->value.ptr))
             {
                 float_free(right->value.ptr);
+
                 right->value.ptr = float_set_ul(1, setting.float_prec_bit);
             }
             else
             {
                 float_free(right->value.ptr);
+
                 right->value.ptr = float_set_ul(left->value.chr, setting.float_prec_bit);
             }
 
@@ -1614,11 +1795,13 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
             if (complex_is_zero(right->value.ptr))
             {
                 complex_free(right->value.ptr);
+
                 right->value.ptr = complex_set_ul(1, setting.complex_prec_bit);
             }
             else
             {
                 complex_free(right->value.ptr);
+
                 right->value.ptr = complex_set_ul(left->value.chr, setting.complex_prec_bit);
             }
 
@@ -1672,10 +1855,12 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "**",
         poss, pose, context));
@@ -1690,6 +1875,7 @@ ires_t operate_b_and(value_p left, value_p right, pos_p poss, pos_p pose, contex
         {
         case INT_V:
             int_and(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1700,6 +1886,8 @@ ires_t operate_b_and(value_p left, value_p right, pos_p poss, pos_p pose, contex
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1731,10 +1919,12 @@ ires_t operate_b_and(value_p left, value_p right, pos_p poss, pos_p pose, contex
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "&",
         poss, pose, context));
@@ -1749,6 +1939,7 @@ ires_t operate_b_or(value_p left, value_p right, pos_p poss, pos_p pose, context
         {
         case INT_V:
             int_or(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1759,6 +1950,8 @@ ires_t operate_b_or(value_p left, value_p right, pos_p poss, pos_p pose, context
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1790,10 +1983,12 @@ ires_t operate_b_or(value_p left, value_p right, pos_p poss, pos_p pose, context
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "|",
         poss, pose, context));
@@ -1808,6 +2003,7 @@ ires_t operate_b_xor(value_p left, value_p right, pos_p poss, pos_p pose, contex
         {
         case INT_V:
             int_xor(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1818,6 +2014,8 @@ ires_t operate_b_xor(value_p left, value_p right, pos_p poss, pos_p pose, contex
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1849,10 +2047,12 @@ ires_t operate_b_xor(value_p left, value_p right, pos_p poss, pos_p pose, contex
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "^",
         poss, pose, context));
@@ -1868,13 +2068,15 @@ ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_fits_ul(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(mem_overflow(poss, pose, context));
             }
 
             int_lshift(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1885,6 +2087,8 @@ ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -1930,10 +2134,12 @@ ires_t operate_lshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "<<",
         poss, pose, context));
@@ -1949,13 +2155,15 @@ ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
         case INT_V:
             if (!int_fits_ul(right->value.ptr))
             {
-                int_free(left->value.ptr);
+                if (left->should_free)
+                    int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
                 return ires_fail(mem_overflow(poss, pose, context));
             }
 
             int_rshift(left->value.ptr, right->value.ptr);
+
             int_free(right->value.ptr);
 
             return ires_success(left);
@@ -1966,6 +2174,8 @@ ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(left);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
@@ -2011,10 +2221,12 @@ ires_t operate_rshift(value_p left, value_p right, pos_p poss, pos_p pose, conte
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
-    value_free(right);
+    value_delete(right);
 
     return ires_fail(illegal_operation(left->type, right->type, ">>",
         poss, pose, context));
@@ -2030,10 +2242,14 @@ ires_t operate_equal(value_p left, value_p right)
         left->type = BOOL_V;
         left->value.chr = right->type == NULL_V;
 
+        value_free(right);
+
         return ires_success(left);
     case NONE_V:
         left->type = BOOL_V;
         left->value.chr = right->type == NONE_V;
+
+        value_free(right);
 
         return ires_success(left);
     case INT_V:
@@ -2041,8 +2257,11 @@ ires_t operate_equal(value_p left, value_p right)
         {
         case INT_V:
             res = int_equal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2050,8 +2269,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = float_equal_int(right->value.ptr, left->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2059,8 +2281,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_equal_int(right->value.ptr, left->value.ptr);
-            int_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2070,19 +2295,26 @@ ires_t operate_equal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_equal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_equal_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2090,8 +2322,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = float_equal(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2099,8 +2334,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_equal_float(right->value.ptr, left->value.ptr);
-            float_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2110,19 +2348,26 @@ ires_t operate_equal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_equal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             res = complex_equal_int(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2130,8 +2375,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = complex_equal_float(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2139,8 +2387,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_equal(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2150,28 +2401,38 @@ ires_t operate_equal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = complex_equal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_equal_ul(right->value.ptr, left->value.chr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_equal_ul(right->value.ptr, left->value.chr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             left->value.chr = complex_equal_ul(right->value.ptr, left->value.chr);
-            complex_free(right->value.ptr);
+
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -2190,21 +2451,27 @@ ires_t operate_equal(value_p left, value_p right)
         {
         case INT_V:
             left->value.chr = int_equal_ul(right->value.ptr, left->value.chr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_equal_ul(right->value.ptr, left->value.chr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case COMPLEX_V:
             left->value.chr = complex_equal_ul(right->value.ptr, left->value.chr);
-            complex_free(right->value.ptr);
+
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2217,7 +2484,9 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(right);
         case STR_V:
             left->value.chr = str_equal_char(right->value.ptr, left->value.chr);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2230,15 +2499,20 @@ ires_t operate_equal(value_p left, value_p right)
         {
         case CHAR_V:
             right->value.chr = str_equal_char(left->value.ptr, right->value.chr);
-            str_free(left->value.ptr);
+
+            if (left->should_free)
+                str_free(left->value.ptr);
 
             right->type = BOOL_V;
 
             return ires_success(right);
         case STR_V:
             res = str_equal(left->value.ptr, right->value.ptr);
-            str_free(left->value.ptr);
-            str_free(right->value.ptr);
+
+            if (left->should_free)
+                str_free(left->value.ptr);
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2246,14 +2520,19 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         switch (right->type)
         {
         case LIST_V:
             res = list_equal(left->value.ptr, right->value.ptr);
-            list_free(left->value.ptr);
-            list_free(right->value.ptr);
+
+            if (left->should_free)
+                list_free(left->value.ptr);
+            if (right->should_free)
+                list_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2261,8 +2540,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case TUPLE_V:
             res = list_equal_tuple(left->value.ptr, right->value.ptr);
-            list_free(left->value.ptr);
-            tuple_free(right->value.ptr);
+
+            if (left->should_free)
+                list_free(left->value.ptr);
+            if (right->should_free)
+                tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2270,14 +2552,19 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            list_free(left->value.ptr);
         break;
     case TUPLE_V:
         switch (right->type)
         {
         case LIST_V:
             res = list_equal_tuple(right->value.ptr, left->value.ptr);
-            tuple_free(left->value.ptr);
-            list_free(right->value.ptr);
+
+            if (left->should_free)
+                tuple_free(left->value.ptr);
+            if (right->should_free)
+                list_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2285,8 +2572,11 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         case TUPLE_V:
             res = tuple_equal(left->value.ptr, right->value.ptr);
-            tuple_free(left->value.ptr);
-            tuple_free(right->value.ptr);
+
+            if (left->should_free)
+                tuple_free(left->value.ptr);
+            if (right->should_free)
+                tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2294,6 +2584,8 @@ ires_t operate_equal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            tuple_free(left->value.ptr);
         break;
     case TYPE_V:
         if (right->type == TYPE_V)
@@ -2305,9 +2597,11 @@ ires_t operate_equal(value_p left, value_p right)
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     left->type = BOOL_V;
@@ -2326,10 +2620,14 @@ ires_t operate_nequal(value_p left, value_p right)
         left->type = BOOL_V;
         left->value.chr = right->type != NULL_V;
 
+        value_free(right);
+
         return ires_success(left);
     case NONE_V:
         left->type = BOOL_V;
         left->value.chr = right->type != NONE_V;
+
+        value_free(right);
 
         return ires_success(left);
     case INT_V:
@@ -2337,8 +2635,11 @@ ires_t operate_nequal(value_p left, value_p right)
         {
         case INT_V:
             res = int_nequal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2346,8 +2647,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = float_nequal_int(right->value.ptr, left->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2355,8 +2659,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_nequal_int(right->value.ptr, left->value.ptr);
-            int_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2366,19 +2673,26 @@ ires_t operate_nequal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_nequal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_nequal_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2386,8 +2700,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = float_nequal(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2395,8 +2712,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_nequal_float(right->value.ptr, left->value.ptr);
-            float_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2406,19 +2726,26 @@ ires_t operate_nequal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_nequal_ul(left->value.ptr, right->value.chr);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
             res = complex_nequal_int(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2426,8 +2753,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case FLOAT_V:
             res = complex_nequal_float(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2435,8 +2765,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case COMPLEX_V:
             res = complex_nequal(left->value.ptr, right->value.ptr);
-            complex_free(left->value.ptr);
-            complex_free(right->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2446,28 +2779,38 @@ ires_t operate_nequal(value_p left, value_p right)
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = complex_nequal_ul(left->value.ptr, right->value.chr);
-            complex_free(left->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            complex_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_nequal_ul(right->value.ptr, left->value.chr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_nequal_ul(right->value.ptr, left->value.chr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case COMPLEX_V:
             left->value.chr = complex_nequal_ul(right->value.ptr, left->value.chr);
-            complex_free(right->value.ptr);
+
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -2486,21 +2829,27 @@ ires_t operate_nequal(value_p left, value_p right)
         {
         case INT_V:
             left->value.chr = int_nequal_ul(right->value.ptr, left->value.chr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_nequal_ul(right->value.ptr, left->value.chr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case COMPLEX_V:
             left->value.chr = complex_nequal_ul(right->value.ptr, left->value.chr);
-            complex_free(right->value.ptr);
+
+            if (right->should_free)
+                complex_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2513,7 +2862,9 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(right);
         case STR_V:
             left->value.chr = str_nequal_char(right->value.ptr, left->value.chr);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2526,15 +2877,20 @@ ires_t operate_nequal(value_p left, value_p right)
         {
         case CHAR_V:
             right->value.chr = str_nequal_char(left->value.ptr, right->value.chr);
-            str_free(left->value.ptr);
+
+            if (left->should_free)
+                str_free(left->value.ptr);
 
             right->type = BOOL_V;
 
             return ires_success(right);
         case STR_V:
             res = str_nequal(left->value.ptr, right->value.ptr);
-            str_free(left->value.ptr);
-            str_free(right->value.ptr);
+
+            if (left->should_free)
+                str_free(left->value.ptr);
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2542,14 +2898,19 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         switch (right->type)
         {
         case LIST_V:
             res = list_nequal(left->value.ptr, right->value.ptr);
-            list_free(left->value.ptr);
-            list_free(right->value.ptr);
+
+            if (left->should_free)
+                list_free(left->value.ptr);
+            if (right->should_free)
+                list_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2557,8 +2918,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case TUPLE_V:
             res = list_nequal_tuple(left->value.ptr, right->value.ptr);
-            list_free(left->value.ptr);
-            tuple_free(right->value.ptr);
+
+            if (left->should_free)
+                list_free(left->value.ptr);
+            if (right->should_free)
+                tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2566,14 +2930,19 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            list_free(left->value.ptr);
         break;
     case TUPLE_V:
         switch (right->type)
         {
         case LIST_V:
             res = list_nequal_tuple(right->value.ptr, left->value.ptr);
-            tuple_free(left->value.ptr);
-            list_free(right->value.ptr);
+
+            if (left->should_free)
+                tuple_free(left->value.ptr);
+            if (right->should_free)
+                list_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2581,8 +2950,11 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         case TUPLE_V:
             res = tuple_nequal(left->value.ptr, right->value.ptr);
-            tuple_free(left->value.ptr);
-            tuple_free(right->value.ptr);
+
+            if (left->should_free)
+                tuple_free(left->value.ptr);
+            if (right->should_free)
+                tuple_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2590,6 +2962,8 @@ ires_t operate_nequal(value_p left, value_p right)
             return ires_success(left);
         }
 
+        if (left->should_free)
+            tuple_free(left->value.ptr);
         break;
     case TYPE_V:
         if (right->type == TYPE_V)
@@ -2601,9 +2975,11 @@ ires_t operate_nequal(value_p left, value_p right)
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     left->type = BOOL_V;
@@ -2623,8 +2999,11 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
         {
         case INT_V:
             res = int_less(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2632,8 +3011,11 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
             return ires_success(left);
         case FLOAT_V:
             res = float_int_less(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2643,19 +3025,26 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_less_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_less_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2663,8 +3052,11 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
             return ires_success(left);
         case FLOAT_V:
             res = float_less(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2674,23 +3066,31 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_less_ul(left->value.ptr, right->value.chr);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_ul_less(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_less(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -2706,14 +3106,18 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
         {
         case INT_V:
             left->value.chr = int_ul_less(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_less(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2727,9 +3131,11 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "<",
@@ -2747,8 +3153,11 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
         {
         case INT_V:
             res = int_greater(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2756,8 +3165,11 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
             return ires_success(left);
         case FLOAT_V:
             res = float_int_greater(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2767,19 +3179,26 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_greater_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_greater_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2787,8 +3206,11 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
             return ires_success(left);
         case FLOAT_V:
             res = float_greater(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2798,23 +3220,31 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_greater_ul(left->value.ptr, right->value.chr);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_ul_greater(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_greater(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -2830,14 +3260,18 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
         {
         case INT_V:
             left->value.chr = int_ul_greater(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_greater(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2851,9 +3285,11 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     return ires_fail(illegal_operation(left->type, right->type, ">",
@@ -2871,8 +3307,11 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
         {
         case INT_V:
             res = int_less_equal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2880,8 +3319,11 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
             return ires_success(left);
         case FLOAT_V:
             res = float_int_less_equal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2891,19 +3333,26 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_less_equal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_less_equal_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2911,8 +3360,11 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
             return ires_success(left);
         case FLOAT_V:
             res = float_less_equal(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -2922,23 +3374,31 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_less_equal_ul(left->value.ptr, right->value.chr);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_ul_less_equal(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_less_equal(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -2954,14 +3414,18 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
         {
         case INT_V:
             left->value.chr = int_ul_less_equal(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_less_equal(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -2975,9 +3439,11 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "<=",
@@ -2995,8 +3461,11 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
         {
         case INT_V:
             res = int_greater_equal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -3004,8 +3473,11 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
             return ires_success(left);
         case FLOAT_V:
             res = float_int_greater_equal(left->value.ptr, right->value.ptr);
-            int_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -3015,19 +3487,26 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = int_greater_equal_ul(left->value.ptr, right->value.chr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            int_free(left->value.ptr);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
             res = float_greater_equal_int(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            int_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -3035,8 +3514,11 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
             return ires_success(left);
         case FLOAT_V:
             res = float_greater_equal(left->value.ptr, right->value.ptr);
-            float_free(left->value.ptr);
-            float_free(right->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
+            if (right->should_free)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -3046,23 +3528,31 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
             right->type = BOOL_V;
         case BOOL_V:
             right->value.chr = float_greater_equal_ul(left->value.ptr, right->value.chr);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             return ires_success(right);
         }
 
+        if (left->should_free)
+            float_free(left->value.ptr);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
             left->value.chr = int_ul_greater_equal(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_greater_equal(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             return ires_success(left);
         case BOOL_V:
@@ -3078,14 +3568,18 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
         {
         case INT_V:
             left->value.chr = int_ul_greater_equal(left->value.chr, right->value.ptr);
-            int_free(right->value.ptr);
+
+            if (right->value.ptr)
+                int_free(right->value.ptr);
 
             left->type = BOOL_V;
 
             return ires_success(left);
         case FLOAT_V:
             left->value.chr = float_ul_greater_equal(left->value.chr, right->value.ptr);
-            float_free(right->value.ptr);
+
+            if (right->value.ptr)
+                float_free(right->value.ptr);
 
             left->type = BOOL_V;
 
@@ -3099,9 +3593,11 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
         }
 
         break;
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     return ires_fail(illegal_operation(left->type, right->type, ">=",
@@ -3132,7 +3628,8 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
         switch (left->type)
         {
         case NULL_V:
-            str_free(right->value.ptr);
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = 1;
@@ -3140,54 +3637,75 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
         case NONE_V:
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, "none");
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             return ires_success(left);
         case INT_V:
             str = int_get_str(left->value.ptr);
-            int_free(left->value.ptr);
+
+            if (left->should_free)
+                int_free(left->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
             free(str);
 
             return ires_success(left);
         case FLOAT_V:
             str = float_get_str(left->value.ptr, setting.float_prec_show);
-            float_free(left->value.ptr);
+
+            if (left->should_free)
+                float_free(left->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
             free(str);
 
             return ires_success(left);
         case COMPLEX_V:
             str = complex_get_str(left->value.ptr, setting.complex_prec_bit);
-            complex_free(left->value.ptr);
+
+            if (left->should_free)
+                complex_free(left->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = str_contains_str(right->value.ptr, str);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
             free(str);
 
             return ires_success(left);
         case BOOL_V:
             left->value.chr = str_contains_str(right->value.ptr, left->value.chr ? "true" : "false");
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             return ires_success(left);
         case CHAR_V:
             left->type = BOOL_V;
             left->value.chr = str_contains_char(right->value.ptr, left->value.chr);
-            str_free(right->value.ptr);
+
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             return ires_success(left);
         case STR_V:
             res = str_contains(right->value.ptr, left->value.ptr);
-            str_free(left->value.ptr);
-            str_free(right->value.ptr);
+
+            if (left->should_free)
+                str_free(left->value.ptr);
+            if (right->should_free)
+                str_free(right->value.ptr);
 
             left->type = BOOL_V;
             left->value.chr = res;
@@ -3195,10 +3713,14 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
             return ires_success(left);
         }
 
+        if (left->should_free)
+            str_free(left->value.ptr);
         break;
     case LIST_V:
         res = list_contains(right->value.ptr, left);
-        list_free(right->value.ptr);
+
+        if (right->should_free)
+            list_free(right->value.ptr);
         value_free(left);
 
         left->type = BOOL_V;
@@ -3207,16 +3729,20 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
         return ires_success(left);
     case TUPLE_V:
         res = tuple_contains(right->value.ptr, left);
-        tuple_free(right->value.ptr);
+
+        if (right->should_free)
+            tuple_free(right->value.ptr);
         value_free(left);
 
         left->type = BOOL_V;
         left->value.chr = res;
 
         return ires_success(left);
+    default:
+        value_free(left);
+        break;
     }
 
-    value_free(left);
     value_free(right);
 
     return ires_fail(illegal_operation(left->type, right->type, "in",
@@ -3266,7 +3792,8 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
         for (i = 0; i < ((list_p)left->value.ptr)->size; i++)
             if (((list_p)left->value.ptr)->elements[i].type != type)
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
                 value_free(right);
 
                 left->type = BOOL_V;
@@ -3275,7 +3802,8 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
                 return ires_success(left);
             }
 
-        list_free(left->value.ptr);
+        if (left->should_free)
+            list_free(left->value.ptr);
         value_free(right);
 
         left->type = BOOL_V;
@@ -3288,7 +3816,8 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
         for (i = 0; i < ((tuple_p)left->value.ptr)->size; i++)
             if (((tuple_p)left->value.ptr)->elements[i].type != type)
             {
-                tuple_free(left->value.ptr);
+                if (left->should_free)
+                    tuple_free(left->value.ptr);
                 value_free(right);
 
                 left->type = BOOL_V;
@@ -3297,7 +3826,8 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
                 return ires_success(left);
             }
 
-        tuple_free(left->value.ptr);
+        if (left->should_free)
+            tuple_free(left->value.ptr);
         value_free(right);
 
         left->type = BOOL_V;
@@ -3305,6 +3835,9 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
 
         return ires_success(left);
     }
+
+    value_free(left);
+    value_free(right);
 
     return ires_fail(invalid_type("Left operand", "<list> or <tuple>", left->type,
         &left->poss, &left->pose, left->context));
@@ -3323,8 +3856,10 @@ ires_t operate_subscript(value_p left, value_p right)
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                str_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -3336,16 +3871,20 @@ ires_t operate_subscript(value_p left, value_p right)
 
             if (index >= ((str_p)left->value.ptr)->size)
             {
-                str_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             char chr = ((str_p)left->value.ptr)->str[index];
 
-            str_free(left->value.ptr);
-            int_free(right->value.ptr);
+            if (left->should_free)
+                str_free(left->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             left->type = CHAR_V;
             left->value.chr = chr;
@@ -3356,20 +3895,22 @@ ires_t operate_subscript(value_p left, value_p right)
         case CHAR_V:
             if (right->value.chr >= ((str_p)left->value.ptr)->size)
             {
-                str_free(left->value.ptr);
+                if (left->should_free)
+                    str_free(left->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             right->value.chr = ((str_p)left->value.ptr)->str[right->value.chr];
 
-            str_free(left->value.ptr);
+            if (left->should_free)
+                str_free(left->value.ptr);
 
             return ires_success(right);
         }
 
-        str_free(left->value.ptr);
-        value_free(right);
+        if (left->should_free)
+            str_free(left->value.ptr);
         goto index_err;
     case LIST_V:
         switch (right->type)
@@ -3377,8 +3918,10 @@ ires_t operate_subscript(value_p left, value_p right)
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                list_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -3390,36 +3933,42 @@ ires_t operate_subscript(value_p left, value_p right)
 
             if (index >= ((list_p)left->value.ptr)->size)
             {
-                list_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             value = ((list_p)left->value.ptr)->elements[index];
 
-            list_free_exception(left->value.ptr, index);
-            int_free(right->value.ptr);
+            if (left->should_free)
+                list_free_exception(left->value.ptr, index);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             return ires_success(&value);
         case BOOL_V:
         case CHAR_V:
             if (right->value.chr >= ((list_p)left->value.ptr)->size)
             {
-                list_free(left->value.ptr);
+                if (left->should_free)
+                    list_free(left->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             value = ((list_p)left->value.ptr)->elements[right->value.chr];
 
-            list_free_exception(left->value.ptr, right->value.chr);
+            if (left->should_free)
+                list_free_exception(left->value.ptr, right->value.chr);
 
             return ires_success(&value);
         }
 
-        list_free(left->value.ptr);
-        value_free(right);
+        if (left->should_free)
+            list_free(left->value.ptr);
         goto index_err;
     case TUPLE_V:
         switch (right->type)
@@ -3427,8 +3976,10 @@ ires_t operate_subscript(value_p left, value_p right)
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                tuple_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    tuple_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -3440,49 +3991,61 @@ ires_t operate_subscript(value_p left, value_p right)
 
             if (index >= ((tuple_p)left->value.ptr)->size)
             {
-                tuple_free(left->value.ptr);
-                int_free(right->value.ptr);
+                if (left->should_free)
+                    tuple_free(left->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             value = ((tuple_p)left->value.ptr)->elements[index];
 
-            tuple_free_exception(left->value.ptr, index);
-            int_free(right->value.ptr);
+            if (left->should_free)
+                tuple_free_exception(left->value.ptr, index);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             return ires_success(&value);
         case BOOL_V:
         case CHAR_V:
             if (right->value.chr >= ((tuple_p)left->value.ptr)->size)
             {
-                tuple_free(left->value.ptr);
+                if (left->should_free)
+                    tuple_free(left->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             value = ((tuple_p)left->value.ptr)->elements[right->value.chr];
 
-            tuple_free_exception(left->value.ptr, right->value.chr);
+            if (left->should_free)
+                tuple_free_exception(left->value.ptr, right->value.chr);
 
             return ires_success(&value);
         }
 
-        tuple_free(left->value.ptr);
-        value_free(right);
+        if (left->should_free)
+            tuple_free(left->value.ptr);
         goto index_err;
     }
+
+    value_free(left);
+    value_free(right);
 
     return ires_fail(invalid_type("Operand", "<str>, <list> or <tuple>", left->type,
         &left->poss, &left->pose, left->context));
 
 index_err:
+    value_free(right);
+
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
         &right->poss, &right->pose, right->context));
 }
 
 ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p left_pose)
 {
+    ires_t ires;
     unsigned long long index;
     void* ptr;
 
@@ -3494,7 +4057,8 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                int_free(right->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -3506,29 +4070,36 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
 
             if (index >= ((str_p)left->value.ptr)->size)
             {
-                int_free(right->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
-            int_free(right->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
-            right->type = CHAR_PTR_V;
+            right->type = CHAR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + index;
 
-            return ires_success(right);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 1);
+            ires.value = *right;
+
+            return ires;
         case BOOL_V:
         case CHAR_V:
             if (right->value.chr >= ((str_p)left->value.ptr)->size)
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
 
-            right->type = CHAR_PTR_V;
+            right->type = CHAR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + right->value.chr;
 
-            return ires_success(right);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 1);
+            ires.value = *right;
+
+            return ires;
         }
 
-        value_free(right);
         goto index_err;
     case LIST_V:
         switch (right->type)
@@ -3536,7 +4107,8 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                int_free(right->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
@@ -3548,14 +4120,16 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
 
             if (index >= ((list_p)left->value.ptr)->size)
             {
-                int_free(right->value.ptr);
+                if (right->should_free)
+                    int_free(right->value.ptr);
 
                 return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
             }
 
             ptr = ((list_p)left->value.ptr)->elements + index;
 
-            int_free(right->value.ptr);
+            if (right->should_free)
+                int_free(right->value.ptr);
 
             right->type = NULL_V;
             right->value.ptr = ptr;
@@ -3572,14 +4146,17 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
             return ires_success(right);
         }
 
-        value_free(right);
         goto index_err;
     }
+
+    value_free(right);
 
     return ires_fail(invalid_type("Operand", "<str> or <list>", left->type,
         &left->poss, &left->pose, left->context));
 
 index_err:
+    value_free(right);
+
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
         &right->poss, &right->pose, right->context));
 }
@@ -3736,10 +4313,6 @@ ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p cont
         operand->value.chr++;
 
         return ires_success(operand);
-    case CHAR_PTR_V:
-        (*(char*)operand->value.ptr)++;
-
-        return ires_success(operand);
     }
 
     return ires_fail(illegal_operation_unary(operand->type, "++",
@@ -3768,10 +4341,6 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
         return ires_success(operand);
     case CHAR_V:
         operand->value.chr--;
-
-        return ires_success(operand);
-    case CHAR_PTR_V:
-        (*(char*)operand->value.ptr)--;
 
         return ires_success(operand);
     }
@@ -4014,14 +4583,15 @@ void operate_success(value_p left, const value_p right)
             left->type = FLOAT_V;
 
             float_p conv = float_set_int(left->value.ptr, setting.float_prec_bit);
+
             int_free(left->value.ptr);
+
             left->value.ptr = conv;
 
             float_add(left->value.ptr, right->value.ptr);
             break;
         case BOOL_V:
         case CHAR_V:
-        case CHAR_PTR_V:
             int_add_ul(left->value.ptr, right->value.chr);
             break;
         }
@@ -4038,7 +4608,6 @@ void operate_success(value_p left, const value_p right)
             break;
         case BOOL_V:
         case CHAR_V:
-        case CHAR_PTR_V:
             float_add_ul(left->value.ptr, right->value.chr);
             break;
         }
@@ -4066,12 +4635,6 @@ void operate_success(value_p left, const value_p right)
             left->type = CHAR_V;
             left->value.chr += right->value.chr;
             break;
-        case CHAR_PTR_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
-
-            int_add_ul(left->value.ptr, right->value.chr);
-            break;
         }
 
         break;
@@ -4093,12 +4656,6 @@ void operate_success(value_p left, const value_p right)
         case BOOL_V:
         case CHAR_V:
             left->value.chr += right->value.chr;
-            break;
-        case CHAR_PTR_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
-
-            int_add_ul(left->value.ptr, right->value.chr);
             break;
         }
 
@@ -4133,7 +4690,6 @@ char operate_sign(const value_p operand)
         return float_sign(operand->value.ptr) < 0;
     case BOOL_V:
     case CHAR_V:
-    case CHAR_PTR_V:
         return 0;
     }
 
@@ -4155,7 +4711,7 @@ unsigned long long operate_size(const value_p operand)
     return 0;
 }
 
-value_t operate_index(const value_p operand, unsigned long long index)
+value_t operate_index(const value_p operand, unsigned long long index, char should_copy)
 {
     value_t res;
 
@@ -4167,9 +4723,19 @@ value_t operate_index(const value_p operand, unsigned long long index)
 
         return res;
     case LIST_V:
-        return value_copy(((list_p)operand->value.ptr)->elements + index);
+        res = ((list_p)operand->value.ptr)->elements[index];
+
+        if (should_copy)
+            res = value_copy(&res);
+
+        return res;
     case TUPLE_V:
-        return value_copy(((tuple_p)operand->value.ptr)->elements + index);
+        res = ((tuple_p)operand->value.ptr)->elements[index];
+
+        if (should_copy)
+            res = value_copy(&res);
+
+        return res;
     }
 
     return res;

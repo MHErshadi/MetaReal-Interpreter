@@ -13,10 +13,6 @@
 #define PROP_CONST(x)  (x >> 2 & 1)
 #define PROP_STATIC(x) (x >> 3 & 1)
 
-#define VFA_PROP(post) 0b ## post
-
-#define PROP_POST(x) (x & 1)
-
 enum _node_types_
 {
     NULL_N,

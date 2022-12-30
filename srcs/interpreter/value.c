@@ -15,6 +15,7 @@ value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, contex
 
     value.type = type;
     value.value.ptr = ptr;
+    value.should_free = 1;
     value.poss = *poss;
     value.pose = *pose;
     value.context = context;
@@ -28,6 +29,7 @@ value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context
 
     value.type = type;
     value.value.chr = chr;
+    value.should_free = 1;
     value.poss = *poss;
     value.pose = *pose;
     value.context = context;
@@ -40,6 +42,7 @@ value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context
     value_t value;
 
     value.type = type;
+    value.should_free = 1;
     value.poss = *poss;
     value.pose = *pose;
     value.context = context;
@@ -50,6 +53,7 @@ value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context
 value_t value_copy(const value_p value)
 {
     value_t copy = *value;
+    copy.should_free = 1;
 
     switch (value->type)
     {
@@ -76,7 +80,7 @@ value_t value_copy(const value_p value)
     return copy;
 }
 
-void value_free(value_p value)
+void value_delete(value_p value)
 {
     switch (value->type)
     {
@@ -109,6 +113,14 @@ void value_free(value_p value)
         func_free(value->value.ptr);
         return;
     }
+}
+
+void value_free(value_p value)
+{
+    if (!value->should_free)
+        return;
+
+    value_delete(value);
 }
 
 void value_label(value_p value, const char* end)

@@ -1,10 +1,10 @@
-1. upgrade access ptr system
-2. remove CHAR_PTR_V, CONTINUE_V and BREAK_V
-3. fix char-ptr operations
-4. upgrade error system
-5. upgrade free, copy and allocate system
-6. add set and dict types
-7. fix ill defined function interpreter
-8. fix function arguments and names
-9. fix position system
-10. fix file headers
+1. upgrade access ptr system []
+2. remove CHAR_PTR_V, CONTINUE_V and BREAK_V []
+3. fix char-ptr operations []
+4. upgrade error system [*]
+5. upgrade free, copy and allocate system []
+6. add set and dict types []
+7. fix ill defined function interpreter []
+8. fix function arguments and names []
+9. fix position system []
+10. fix file headers []

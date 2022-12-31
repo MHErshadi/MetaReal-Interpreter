@@ -8,11 +8,11 @@
 #include "interpreter.h"
 
 ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
+ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose);
 ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
-ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
+ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose);
+ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose);
+ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose);
 ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_b_and(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
@@ -32,10 +32,10 @@ ires_t operate_xor(value_p left, value_p right);
 
 ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
 ires_t operate_is(value_p left, value_p right);
-ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context);
+ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p lposs, pos_p lpose);
 
-ires_t operate_subscript(value_p left, value_p right);
-ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p left_pose);
+ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose);
+ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose);
 
 /* */
 

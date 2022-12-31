@@ -274,7 +274,7 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         poss, pose, context));
 }
 
-ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose)
 {
     switch (left->type)
     {
@@ -430,7 +430,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                     str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             unsigned long long index = int_get_ull(right->value.ptr);
@@ -444,7 +444,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                     str_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             str_remove(left->value.ptr, index);
@@ -459,7 +459,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     str_free(left->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             str_remove(left->value.ptr, right->value.chr);
@@ -480,7 +480,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                     list_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             unsigned long long index = int_get_ull(right->value.ptr);
@@ -494,7 +494,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                     list_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             list_remove(left->value.ptr, index);
@@ -509,7 +509,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     list_free(left->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             list_remove(left->value.ptr, right->value.chr);
@@ -754,7 +754,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
         poss, pose, context));
 }
 
-ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose)
 {
     float_p res;
 
@@ -770,7 +770,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_int_divide_int(left->value.ptr, right->value.ptr, setting.float_prec_bit);
@@ -789,7 +789,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_int_divide(left->value.ptr, right->value.ptr);
@@ -804,7 +804,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     int_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_int_divide(left->value.ptr, right->value.ptr);
@@ -818,7 +818,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             return ires_success(left);
@@ -828,7 +828,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_int_divide_ul(left->value.ptr, right->value.chr, setting.complex_prec_bit);
@@ -854,7 +854,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_divide_int(left->value.ptr, right->value.ptr);
@@ -869,7 +869,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_divide(left->value.ptr, right->value.ptr);
@@ -884,7 +884,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     float_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_float_divide(left->value.ptr, right->value.ptr);
@@ -898,7 +898,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     float_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             return ires_success(left);
@@ -908,7 +908,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     float_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_divide_ul(left->value.ptr, right->value.chr);
@@ -929,7 +929,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     complex_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_divide_int(left->value.ptr, right->value.ptr);
@@ -944,7 +944,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     complex_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_divide_float(left->value.ptr, right->value.ptr);
@@ -959,7 +959,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     complex_free(left->value.ptr);
                 complex_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_divide(left->value.ptr, right->value.ptr);
@@ -973,7 +973,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     complex_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             return ires_success(left);
@@ -983,7 +983,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     complex_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_divide_ul(left->value.ptr, right->value.chr);
@@ -1002,7 +1002,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_ul_divide_int(left->value.chr, right->value.ptr, setting.float_prec_bit);
@@ -1018,7 +1018,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_ul_divide(left->value.chr, right->value.ptr);
@@ -1029,7 +1029,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 complex_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_ul_divide(left->value.chr, right->value.ptr);
@@ -1037,12 +1037,12 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             res = float_ul_divide_ul(left->value.chr, right->value.chr, setting.float_prec_bit);
 
@@ -1061,7 +1061,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_ul_divide_int(left->value.chr, right->value.ptr, setting.float_prec_bit);
@@ -1077,7 +1077,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_ul_divide(left->value.chr, right->value.ptr);
@@ -1088,7 +1088,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 complex_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             complex_ul_divide(left->value.chr, right->value.ptr);
@@ -1096,12 +1096,12 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             res = float_ul_divide_ul(left->value.chr, right->value.chr, setting.float_prec_bit);
 
@@ -1123,7 +1123,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
         poss, pose, context));
 }
 
-ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose)
 {
     switch (left->type)
     {
@@ -1137,7 +1137,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             int_modulo(left->value.ptr, right->value.ptr);
@@ -1152,7 +1152,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_int_modulo(left->value.ptr, right->value.ptr);
@@ -1166,7 +1166,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             int_free(left->value.ptr);
@@ -1180,7 +1180,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             int_modulo_ul(left->value.ptr, right->value.chr);
@@ -1201,7 +1201,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_modulo_int(left->value.ptr, right->value.ptr);
@@ -1216,7 +1216,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                     float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_modulo(left->value.ptr, right->value.ptr);
@@ -1230,7 +1230,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     float_free(left->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_modulo_ul(left->value.ptr, 1);
@@ -1242,7 +1242,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_modulo_ul(left->value.ptr, right->value.chr);
@@ -1261,7 +1261,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             int_ul_modulo(left->value.chr, right->value.ptr);
@@ -1272,7 +1272,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_ul_modulo(left->value.chr, right->value.ptr);
@@ -1280,14 +1280,14 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
 
             left->value.chr = 0;
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
 
             right->value.chr = left->value.chr % right->value.chr;
 
@@ -1303,7 +1303,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             int_ul_modulo(left->value.chr, right->value.ptr);
@@ -1314,7 +1314,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
             }
 
             float_ul_modulo(left->value.chr, right->value.ptr);
@@ -1322,14 +1322,14 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
             return ires_success(right);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
 
             left->value.chr = 0;
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(modulo_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(modulo_by_zero(rposs, rpose, context));
 
             left->value.chr %= right->value.chr;
 
@@ -1348,7 +1348,7 @@ ires_t operate_modulo(value_p left, value_p right, pos_p poss, pos_p pose, conte
         poss, pose, context));
 }
 
-ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p rposs, pos_p rpose)
 {
     int_p res;
 
@@ -1364,7 +1364,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                     int_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             int_quotient(left->value.ptr, right->value.ptr);
@@ -1379,7 +1379,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                     int_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_int_quotient(left->value.ptr, right->value.ptr);
@@ -1393,7 +1393,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             return ires_success(left);
@@ -1403,7 +1403,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     int_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             int_quotient_ul(left->value.ptr, right->value.chr);
@@ -1424,7 +1424,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                     float_free(left->value.ptr);
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             float_quotient_int(left->value.ptr, right->value.ptr);
@@ -1439,7 +1439,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                     float_free(left->value.ptr);
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_quotient(left->value.ptr, right->value.ptr);
@@ -1457,7 +1457,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     float_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_get_int(left->value.ptr);
@@ -1474,7 +1474,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 if (left->should_free)
                     float_free(left->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_quotient_ul(left->value.ptr, right->value.chr);
@@ -1498,7 +1498,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             int_ul_quotient(left->value.chr, right->value.ptr);
@@ -1509,7 +1509,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_ul_quotient(left->value.chr, right->value.ptr);
@@ -1521,12 +1521,12 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             right->value.chr = left->value.chr / right->value.chr;
 
@@ -1542,7 +1542,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             {
                 int_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             int_ul_quotient(left->value.chr, right->value.ptr);
@@ -1553,7 +1553,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             {
                 float_free(right->value.ptr);
 
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
             res = float_ul_quotient(left->value.chr, right->value.ptr);
@@ -1565,12 +1565,12 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
             return ires_success(left);
         case BOOL_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             return ires_success(left);
         case CHAR_V:
             if (!right->value.chr)
-                return ires_fail(division_by_zero(&right->poss, &right->pose, right->context));
+                return ires_fail(division_by_zero(rposs, rpose, context));
 
             left->value.chr /= right->value.chr;
 
@@ -3779,7 +3779,7 @@ ires_t operate_is(value_p left, value_p right)
     return ires_success(left);
 }
 
-ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
+ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p lposs, pos_p lpose)
 {
     char type;
     unsigned long long i;
@@ -3840,10 +3840,10 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
     value_free(right);
 
     return ires_fail(invalid_type("Left operand", "<list> or <tuple>", left->type,
-        &left->poss, &left->pose, left->context));
+        lposs, lpose, context));
 }
 
-ires_t operate_subscript(value_p left, value_p right)
+ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
 {
     unsigned long long index;
     value_t value;
@@ -3861,7 +3861,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             index = int_get_ull(right->value.ptr);
@@ -3876,7 +3876,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             char chr = ((str_p)left->value.ptr)->str[index];
@@ -3898,7 +3898,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (left->should_free)
                     str_free(left->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             right->value.chr = ((str_p)left->value.ptr)->str[right->value.chr];
@@ -3923,7 +3923,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             index = int_get_ull(right->value.ptr);
@@ -3938,7 +3938,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             value = ((list_p)left->value.ptr)->elements[index];
@@ -3956,7 +3956,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (left->should_free)
                     list_free(left->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             value = ((list_p)left->value.ptr)->elements[right->value.chr];
@@ -3981,7 +3981,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             index = int_get_ull(right->value.ptr);
@@ -3996,7 +3996,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             value = ((tuple_p)left->value.ptr)->elements[index];
@@ -4014,7 +4014,7 @@ ires_t operate_subscript(value_p left, value_p right)
                 if (left->should_free)
                     tuple_free(left->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             value = ((tuple_p)left->value.ptr)->elements[right->value.chr];
@@ -4034,16 +4034,16 @@ ires_t operate_subscript(value_p left, value_p right)
     value_free(right);
 
     return ires_fail(invalid_type("Operand", "<str>, <list> or <tuple>", left->type,
-        &left->poss, &left->pose, left->context));
+        lposs, lpose, context));
 
 index_err:
     value_free(right);
 
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
-        &right->poss, &right->pose, right->context));
+        rposs, rpose, context));
 }
 
-ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p left_pose)
+ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
 {
     ires_t ires;
     unsigned long long index;
@@ -4060,7 +4060,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             index = int_get_ull(right->value.ptr);
@@ -4073,7 +4073,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             if (right->should_free)
@@ -4089,7 +4089,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
         case BOOL_V:
         case CHAR_V:
             if (right->value.chr >= ((str_p)left->value.ptr)->size)
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
 
             right->type = CHAR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + right->value.chr;
@@ -4110,7 +4110,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             index = int_get_ull(right->value.ptr);
@@ -4123,7 +4123,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
                 if (right->should_free)
                     int_free(right->value.ptr);
 
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
             }
 
             ptr = ((list_p)left->value.ptr)->elements + index;
@@ -4138,7 +4138,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
         case BOOL_V:
         case CHAR_V:
             if (right->value.chr >= ((list_p)left->value.ptr)->size)
-                return ires_fail(out_of_range(&right->poss, &right->pose, right->context));
+                return ires_fail(out_of_range(rposs, rpose, context));
 
             right->type = NULL_V;
             right->value.ptr = ((list_p)left->value.ptr)->elements + right->value.chr;
@@ -4152,13 +4152,13 @@ ires_t operate_subscript_ptr(value_p left, value_p right, pos_p left_poss, pos_p
     value_free(right);
 
     return ires_fail(invalid_type("Operand", "<str> or <list>", left->type,
-        &left->poss, &left->pose, left->context));
+        lposs, lpose, context));
 
 index_err:
     value_free(right);
 
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
-        &right->poss, &right->pose, right->context));
+        rposs, rpose, context));
 }
 
 ires_t operate_positive(value_p operand)

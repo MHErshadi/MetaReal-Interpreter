@@ -9,43 +9,34 @@
 #include <setting.h>
 #include <stdlib.h>
 
-value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context)
+value_t value_set1(unsigned char type, void* ptr)
 {
     value_t value;
 
     value.type = type;
     value.value.ptr = ptr;
     value.should_free = 1;
-    value.poss = *poss;
-    value.pose = *pose;
-    value.context = context;
 
     return value;
 }
 
-value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context_p context)
+value_t value_set2(unsigned char type, char chr)
 {
     value_t value;
 
     value.type = type;
     value.value.chr = chr;
     value.should_free = 1;
-    value.poss = *poss;
-    value.pose = *pose;
-    value.context = context;
 
     return value;
 }
 
-value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context)
+value_t value_set3(unsigned char type)
 {
     value_t value;
 
     value.type = type;
     value.should_free = 1;
-    value.poss = *poss;
-    value.pose = *pose;
-    value.context = context;
 
     return value;
 }
@@ -109,9 +100,9 @@ void value_delete(value_p value)
     case TUPLE_V:
         tuple_free(value->value.ptr);
         return;
-    case FUNC_V:
-        func_free(value->value.ptr);
-        return;
+    //case FUNC_V:
+        //func_free(value->value.ptr);
+        //return;
     }
 }
 
@@ -190,9 +181,9 @@ void value_label(value_p value, const char* end)
     case TYPE_V:
         fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
         return;
-    case FUNC_V:
-        fprintf(setting.output, "<function %s at 0X%p>%s", ((func_p)value->value.ptr)->context.name, value, end);
-        return;
+    //case FUNC_V:
+        //fprintf(setting.output, "<function %s at 0X%p>%s", ((func_p)value->value.ptr)->context.name, value, end);
+        //return;
     }
 }
 
@@ -223,13 +214,14 @@ char value_is_true(value_p value)
         return ((tuple_p)value->value.ptr)->size != 0;
     case TYPE_V:
         return value->value.chr >= OBJECT_V;
-    case FUNC_V:
-        return ((func_p)value->value.ptr)->context.name != NULL;
+    //case FUNC_V:
+        //return ((func_p)value->value.ptr)->context.name != NULL;
     }
 
     return 0;
 }
 
+/*
 func_p func_set(unsigned char type, context_p context, body_p body)
 {
     func_p func = malloc(sizeof(func_t));
@@ -248,3 +240,4 @@ void func_free(func_p func)
     node_p_free1(func->body.nodes, func->body.size);
     free(func);
 }
+*/

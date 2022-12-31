@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-ires_t df_param_get(const char* param_name, pos_p poss, pos_p pose, context_p context);
+ires_t df_param_get(unsigned char* id, const char* param_name, pos_p poss, pos_p pose, context_p context);
 void df_float_prec(unsigned long long prec_bit);
 void df_float_prec_bit(unsigned long long prec_bit);
 void df_float_prec_show(unsigned long long prec_bit);
@@ -18,7 +18,7 @@ void df_complex_prec(unsigned long long prec_bit);
 void df_complex_prec_bit(unsigned long long prec_bit);
 void df_complex_prec_show(unsigned long long prec_bit);
 
-ires_t handle_dollar_func(const char* name, value_p args, unsigned long long size,
+ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context)
 {
     value_t res;
@@ -30,10 +30,13 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != STR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("param_name", "<str>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
-        return df_param_get(((str_p)args->value.ptr)->str, &args->poss, &args->pose, args->context);
+        return df_param_get(id, ((str_p)args->value.ptr)->str, poss, pose, context);
     }
     if (!strcmp(name, "float_prec"))
     {
@@ -42,16 +45,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) <= 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -61,8 +70,11 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
         }
 
         if (prec_bit <= 1)
+        {
+            *id = 1;
             return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         df_float_prec(prec_bit);
 
@@ -76,16 +88,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) <= 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -95,8 +113,11 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
         }
 
         if (prec_bit <= 1)
+        {
+            *id = 1;
             return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         df_float_prec_bit(prec_bit);
 
@@ -110,16 +131,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != BOOL_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int>, <bool> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) < 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 0, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -141,16 +168,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) <= 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -161,8 +194,11 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
         }
 
         if (prec_bit <= 1)
+        {
+            *id = 1;
             return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         df_complex_prec(prec_bit);
 
@@ -176,16 +212,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) <= 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -196,8 +238,11 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
         }
 
         if (prec_bit <= 1)
+        {
+            *id = 1;
             return ires_fail(out_of_boundary("prec_bit", 2, -1,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         df_complex_prec_bit(prec_bit);
 
@@ -211,16 +256,22 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
                 poss, pose, context));
 
         if (args->type != INT_V && args->type != BOOL_V && args->type != CHAR_V)
+        {
+            *id = 1;
             return ires_fail(invalid_type("prec_bit", "<int>, <bool> or <char>", args->type,
-                &args->poss, &args->pose, args->context));
+                poss, pose, context));
+        }
 
         unsigned long long prec_bit = 0;
         switch (args->type)
         {
         case INT_V:
             if (args->type == INT_V && (int_sign(args->value.ptr) < 0 || !int_fits_ull(args->value.ptr)))
+            {
+                *id = 1;
                 return ires_fail(out_of_boundary("prec_bit", 0, -1,
-                    &args->poss, &args->pose, args->context));
+                    poss, pose, context));
+            }
 
             prec_bit = int_get_ull(args->value.ptr);
             break;
@@ -240,7 +291,7 @@ ires_t handle_dollar_func(const char* name, value_p args, unsigned long long siz
         poss, pose, context));
 }
 
-ires_t df_param_get(const char* param_name, pos_p poss, pos_p pose, context_p context)
+ires_t df_param_get(unsigned char* id, const char* param_name, pos_p poss, pos_p pose, context_p context)
 {
     value_t res;
 
@@ -273,6 +324,7 @@ ires_t df_param_get(const char* param_name, pos_p poss, pos_p pose, context_p co
         return ires_success(&res);
     }
 
+    *id = 1;
     return ires_fail(invalid_param_name(param_name,
         poss, pose, context));
 }

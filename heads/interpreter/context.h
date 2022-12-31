@@ -5,26 +5,11 @@
 #ifndef __M_CONTEXT__
 #define __M_CONTEXT__
 
-#include <parser/node.h>
+#include "value.h"
 
 #define VAR_PUBLIC(x) (x & 1)
 #define VAR_CONST(x)  (x >> 2 & 1)
 #define VAR_STATIC(x) (x >> 3 & 1)
-
-struct __value__
-{
-    unsigned char type;
-    union_value_t value;
-
-    unsigned char should_free;
-
-    pos_t poss;
-    pos_t pose;
-
-    struct __context__* context;
-};
-typedef struct __value__ value_t;
-typedef struct __value__* value_p;
 
 struct __var__
 {

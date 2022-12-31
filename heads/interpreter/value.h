@@ -5,6 +5,18 @@
 #ifndef __M_VALUE__
 #define __M_VALUE__
 
+#include <parser/node.h>
+
+struct __value__
+{
+    unsigned char type;
+    union_value_t value;
+
+    unsigned char should_free;
+};
+typedef struct __value__ value_t;
+typedef struct __value__* value_p;
+
 #include "context.h"
 
 enum _value_types_
@@ -64,6 +76,7 @@ static const int value_label_lens[15] =
     4
 };
 
+/*
 struct __func_t__
 {
     unsigned char type;
@@ -73,10 +86,11 @@ struct __func_t__
 };
 typedef struct __func_t__ func_t;
 typedef struct __func_t__* func_p;
+*/
 
-value_t value_set1(unsigned char type, void* ptr, pos_p poss, pos_p pose, context_p context);
-value_t value_set2(unsigned char type, char chr, pos_p poss, pos_p pose, context_p context);
-value_t value_set3(unsigned char type, pos_p poss, pos_p pose, context_p context);
+value_t value_set1(unsigned char type, void* ptr);
+value_t value_set2(unsigned char type, char chr);
+value_t value_set3(unsigned char type);
 
 value_t value_copy(const value_p value);
 
@@ -89,8 +103,8 @@ char value_is_true(value_p value);
 
 /* */
 
-func_p func_set(unsigned char type, context_p context, body_p body);
+//func_p func_set(unsigned char type, context_p context, body_p body);
 
-void func_free(func_p func);
+//void func_free(func_p func);
 
 #endif /* __M_VALUE__ */

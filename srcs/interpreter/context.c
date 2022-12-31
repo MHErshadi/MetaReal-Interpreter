@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
 /*/
 
-#include <interpreter/value.h>
+#include <interpreter/context.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -65,6 +65,17 @@ table_t table_set(unsigned long long alloc)
     return table;
 }
 
+void table_delete(table_p table)
+{
+    while (table->size)
+    {
+        value_delete(&table->vars[table->size].value);
+        free(table->vars[table->size].name);
+    }
+
+    free(table->vars);
+}
+
 void table_free(table_p table)
 {
     while (table->size)
@@ -75,8 +86,6 @@ void table_free(table_p table)
         value_delete(&table->vars[table->size].value);
         free(table->vars[table->size].name);
     }
-
-    free(table->vars);
 }
 
 value_t table_var_get(table_p table, const char* name)

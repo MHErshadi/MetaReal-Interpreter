@@ -5,8 +5,6 @@
 #ifndef __M_INTERPRETER__
 #define __M_INTERPRETER__
 
-#include "value.h"
-#include <parser/node.h>
 #include <debugger/errlib.h>
 
 #define IRES_RESPONSE_SET(has_error, loop_continue, loop_break, char_ptr) ((has_error) | (loop_continue) << 1 | (loop_break) << 2 | (char_ptr) << 3)

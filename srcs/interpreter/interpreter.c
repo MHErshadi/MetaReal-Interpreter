@@ -10,9 +10,8 @@
 #include <array/list.h>
 #include <stdlib.h>
 #include <setting.h>
-#include <lexer/token.h>
 #include <string.h>
-#include <stdlib.h>
+#include <lexer/token.h>
 #include <def.h>
 
 #define IPROP_SET(ptr, assign, in_loop, should_copy) ((ptr) | (assign) << 1 | (in_loop) << 2 | (should_copy) << 3)

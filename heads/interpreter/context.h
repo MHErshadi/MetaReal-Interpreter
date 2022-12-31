@@ -55,6 +55,7 @@ value_p context_ptr_get(context_p context, unsigned char* type, const char* name
 
 table_t table_set(unsigned long long alloc);
 
+void table_delete(table_p table);
 void table_free(table_p table);
 
 value_t table_var_get(table_p table, const char* name);

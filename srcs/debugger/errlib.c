@@ -6,7 +6,6 @@
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
-#include <interpreter/value.h>
 
 illegal_char_t illegal_char_set(char chr, pos_p pos)
 {

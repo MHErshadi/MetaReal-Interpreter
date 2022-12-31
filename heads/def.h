@@ -8,6 +8,8 @@
 #define CMD_FILE_NAME "<stdin>"
 #define CMD_INPUT_SIZE 1025
 
+#define FILE_INPUT_SIZE 65537
+
 #define ROOT_CONTEXT "<program>"
 #define TABLE_SIZE 64
 

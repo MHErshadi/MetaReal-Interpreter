@@ -449,110 +449,165 @@ node_t node_set1(unsigned char type, void* value, pos_p poss, pos_p pose);
 node_t node_set2(unsigned char type, unsigned char value, pos_p poss, pos_p pose);
 node_t node_set3(unsigned char type, pos_p poss, pos_p pose);
 
+node_t node_copy(const node_p node);
+
 void node_free(node_p node);
 
 void node_print(FILE* stream, node_p node);
+
+/* */
+
+node_p node_p_copy(const node_p nodes, unsigned long long size);
 
 void node_p_free1(node_p nodes, unsigned long long size);
 void node_p_free2(node_p nodes);
 
 body_t body_set(node_p node);
 
+/* */
+
+pair_p pair_p_copy(const pair_p pairs, unsigned long long size);
+
 void pair_p_free(pair_p pairs, unsigned long long size);
+
+/* */
+
+arg_p arg_p_copy(const arg_p args, unsigned long long size);
+
 void arg_p_free(arg_p args, unsigned long long size);
+
+/* */
+
+arg_access_p arg_access_p_copy(const arg_access_p args, unsigned long long size);
+
 void arg_access_p_free(arg_access_p args, unsigned long long size);
+
+/* */
+
+case_p case_p_copy(const case_p cases, unsigned long long size);
+
 void case_p_free(case_p cases, unsigned long long size);
 
 /* */
 
 int_np int_n_set(char* value, unsigned long long size);
+int_np int_n_copy(const int_np node);
 void int_n_free(int_np node);
 
 float_np float_n_set(char* value, unsigned long long size);
+float_np float_n_copy(const float_np node);
 void float_n_free(float_np node);
 
 complex_np complex_n_set(char* value, unsigned long long size);
+complex_np complex_n_copy(const complex_np node);
 void complex_n_free(complex_np node);
 
 str_np str_n_set(char* value, unsigned long long size);
+str_np str_n_copy(const str_np node);
 void str_n_free(str_np node);
 
 list_np list_n_set(node_p elements, unsigned long long size);
+list_np list_n_copy(const list_np node);
 void list_n_free(list_np node);
 
 tuple_np tuple_n_set(node_p elements, unsigned long long size);
+tuple_np tuple_n_copy(const tuple_np node);
 void tuple_n_free(tuple_np node);
 
 dict_np dict_n_set(pair_p elements, unsigned long long size);
+dict_np dict_n_copy(const dict_np node);
 void dict_n_free(dict_np node);
 
 set_np set_n_set(node_p elements, unsigned long long size);
+set_np set_n_copy(const set_np node);
 void set_n_free(set_np node);
 
 binary_operation_np binary_operation_n_set(unsigned char operator, node_p left, node_p right);
+binary_operation_np binary_operation_n_copy(const binary_operation_np node);
 void binary_operation_n_free(binary_operation_np node);
 
 unary_operation_np unary_operation_n_set(unsigned char operator, node_p operand);
+unary_operation_np unary_operation_n_copy(const unary_operation_np node);
 void unary_operation_n_free(unary_operation_np node);
 
 ternary_condition_np ternary_condition_n_set(node_p condition, node_p left, node_p right);
+ternary_condition_np ternary_condition_n_copy(const ternary_condition_np node);
 void ternary_condition_n_free(ternary_condition_np node);
 
 subscript_np subscript_n_set(node_p value, node_p pos);
+subscript_np subscript_n_copy(const subscript_np node);
 void subscript_n_free(subscript_np node);
 
 access_np access_n_set(node_p value, node_p property);
+access_np access_n_copy(const access_np node);
 void access_n_free(access_np node);
 
 var_assign_np var_assign_n_set(char properties, char* name, unsigned char type, node_p value);
+var_assign_np var_assign_n_copy(const var_assign_np node);
 void var_assign_n_free(var_assign_np node);
 
 var_fixed_assign_np var_fixed_assign_n_set(char properties, unsigned char operator, node_p var);
+var_fixed_assign_np var_fixed_assign_n_copy(const var_fixed_assign_np node);
 void var_fixed_assign_n_free(var_fixed_assign_np node);
 
 var_reassign_np var_reassign_n_set(unsigned char operator, node_p var, node_p value);
+var_reassign_np var_reassign_n_copy(const var_reassign_np node);
 void var_reassign_n_free(var_reassign_np node);
 
 func_def_np func_def_n_set(char properties, char* name, arg_p args, unsigned long long size, unsigned char type, body_p body);
+func_def_np func_def_n_copy(const func_def_np node);
 void func_def_n_free(func_def_np node);
 
 func_call_np func_call_n_set(node_p func, arg_access_p args, unsigned long long size);
+func_call_np func_call_n_copy(const func_call_np node);
 void func_call_n_free(func_call_np node);
 
 class_def_np class_def_n_set(char properties, char* name, body_p body);
+class_def_np class_def_n_copy(const class_def_np node);
 void class_def_n_free(class_def_np node);
 
 struct_def_np struct_def_n_set(char properties, char* name, body_p body);
+struct_def_np struct_def_n_copy(const struct_def_np node);
 void struct_def_n_free(struct_def_np node);
 
 dollar_func_call_np dollar_func_call_n_set(char* name, node_p args, unsigned long long size);
+dollar_func_call_np dollar_func_call_n_copy(const dollar_func_call_np node);
 void dollar_func_call_n_free(dollar_func_call_np node);
 
 if_np if_n_set(case_p cases, unsigned long long size, body_p ebody);
+if_np if_n_copy(const if_np node);
 void if_n_free(if_np node);
 
 switch_np switch_n_set(node_p value, case_p cases, unsigned long long size, body_p dbody);
+switch_np switch_n_copy(const switch_np node);
 void switch_n_free(switch_np node);
 
 for_np for_n_set(char* iterator, node_p start, node_p end, node_p step, body_p body);
+for_np for_n_copy(const for_np node);
 void for_n_free(for_np node);
 
 foreach_np foreach_n_set(char* iterator, node_p iterable, body_p body);
+foreach_np foreach_n_copy(const foreach_np node);
 void foreach_n_free(foreach_np node);
 
 loop_np loop_n_set(node_p init, node_p condition, node_p step, body_p body);
+loop_np loop_n_copy(const loop_np node);
 void loop_n_free(loop_np node);
 
 do_while_np do_while_n_set(body_p body, node_p condition);
+do_while_np do_while_n_copy(const do_while_np node);
 void do_while_n_free(do_while_np node);
 
 while_np while_n_set(node_p condition, body_p body);
+while_np while_n_copy(const while_np node);
 void while_n_free(while_np node);
 
 try_np try_n_set(body_p tbody, case_p excepts, unsigned long long size, body_p fbody);
+try_np try_n_copy(const try_np node);
 void try_n_free(try_np node);
 
 return_np return_n_set(node_p value);
+return_np return_n_copy(const return_np node);
 void return_n_free(return_np node);
 
 #endif /* __M_NODE__ */

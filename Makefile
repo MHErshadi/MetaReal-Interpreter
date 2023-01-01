@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -std=c99
+CFLAGS = -O3 -Wall -std=c99 -Wno-unused-variable
 
 SDIR = srcs
 ODIR = objs

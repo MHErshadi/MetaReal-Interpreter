@@ -34,7 +34,7 @@ tuple_p tuple_copy(const tuple_p array)
 void tuple_free(tuple_p array)
 {
     while (array->size)
-        value_free(&array->elements[--array->size]);
+        value_delete(&array->elements[--array->size]);
     free(array);
 }
 

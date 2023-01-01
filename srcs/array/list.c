@@ -44,7 +44,7 @@ void list_free_exception(list_p array, unsigned long long exception)
     {
         if (--array->size == exception)
             continue;
-        value_free(&array->elements[array->size]);
+        value_delete(&array->elements[array->size]);
     }
 
     free(array);

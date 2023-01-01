@@ -797,7 +797,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
         return ires;
     }
 
-    value_t pos = ires_merge(&ires, interpret_node(&node->pos, context, properties & IPROP_SUBSCRIPT_MASK));
+    value_t pos = ires_merge(&ires, interpret_node(&node->pos, context, properties & IPROP_MASK));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_PTR(properties))
@@ -997,7 +997,7 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
                 if (IPROP_SHOULD_COPY(properties))
                     res = value_copy(var.value.ptr);
                 else
-                    res = var;
+                    res = *(value_p)var.value.ptr;
             }
         }
     }
@@ -1048,7 +1048,7 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
                 if (IPROP_SHOULD_COPY(properties))
                     ires.value = value_copy(var.value.ptr);
                 else
-                    ires.value = var;
+                    ires.value = *(value_p)var.value.ptr;
             }
         }
     }
@@ -1077,10 +1077,22 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     }
 
     value_t copy;
-    if (node->operator != ASSIGN_T && !IRES_CHAR_PTR(ires.response))
+    char* ptr = NULL;
+    if (node->operator != ASSIGN_T)
     {
-        copy = value_copy(var.value.ptr);
         copy.should_free = 0;
+
+        if (IRES_CHAR_PTR(ires.response))
+        {
+            ptr = var.value.ptr;
+
+            copy.type = CHAR_V;
+            copy.value.chr = *(char*)var.value.ptr;
+
+            var.value.ptr = &copy;
+        }
+        else
+            copy = value_copy(var.value.ptr);
     }
 
     ires.value = ires_merge(&ires, interpret_node(&node->value, context, IPROP_SET(0, 0, IPROP_IN_LOOP(properties), 1)));
@@ -1090,6 +1102,8 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
             free(node);
         return ires;
     }
+
+    char response = ires.response;
 
     switch (node->operator)
     {
@@ -1104,14 +1118,25 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
             return ires_fail(assign_type_specified_variable(ires.value.type, var.type, poss, pose, context));
         }
 
+        ires.value.should_free = 0;
+
         if (IRES_CHAR_PTR(ires.response))
+        {
             *(char*)var.value.ptr = ires.value.value.chr;
+
+            if (IPROP_PTR(properties))
+                ires.value.value.ptr = var.value.ptr;
+        }
         else
         {
-            ires.value.should_free = 0;
-
             value_delete(var.value.ptr);
             *(value_p)var.value.ptr = ires.value;
+
+            if (IPROP_PTR(properties))
+            {
+                ires.value.type = var.type;
+                ires.value.value.ptr = var.value.ptr;
+            }
         }
 
         break;
@@ -1175,17 +1200,27 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
 
         ires.value.should_free = 0;
 
-        *(value_p)var.value.ptr = ires.value;
-    }
+        if (IRES_CHAR_PTR(response))
+        {
+            *ptr = ires.value.value.chr;
 
-    if (IRES_CHAR_PTR(ires.response))
-        ires.value.value.chr = *(char*)var.value.ptr;
-    else
-    {
-        value_delete(&copy);
+            if (IPROP_PTR(properties))
+                ires.value.value.ptr = ptr;
+        }
+        else
+        {
+            *(value_p)var.value.ptr = ires.value;
 
-        if (IPROP_SHOULD_COPY(properties))
-            ires.value = value_copy(&ires.value);
+            value_delete(&copy);
+
+            if (IPROP_PTR(properties))
+            {
+                ires.value.type = var.type;
+                ires.value.value.ptr = var.value.ptr;
+            }
+            else if (IPROP_SHOULD_COPY(properties))
+                ires.value = value_copy(&ires.value);
+        }
     }
 
     if (!IPROP_IN_LOOP(properties))
@@ -2445,7 +2480,7 @@ ires_t interpret_try(try_np node, pos_p poss, pos_p pose, context_p context, cha
 
     unsigned long long i;
     char* label = NULL;
-    unsigned long long code;
+    unsigned long long code = 0;
     for (i = 0; i < node->size; i++)
     {
         ires.value = ires_merge(&ires, interpret_node(&node->excepts[i].condition, context, properties & IPROP_MASK));

@@ -1477,7 +1477,7 @@ token_p func_def_parse(pres_p pres, token_p tokens)
     tokens++;
     advance_newline(tokens);
 
-    arg_p args;
+    arg_p args = NULL;
 
     unsigned long long size = 0;
 
@@ -2028,7 +2028,7 @@ token_p switch_parse(pres_p pres, token_p tokens)
     tokens++;
     advance_newline(tokens);
 
-    case_p cases;
+    case_p cases = NULL;
 
     unsigned long long size = 0;
 

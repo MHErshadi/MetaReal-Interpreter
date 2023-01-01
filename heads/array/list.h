@@ -5,7 +5,7 @@
 #ifndef __M_LIST__
 #define __M_LIST__
 
-#include <array/tuple.h>
+#include "tuple.h"
 
 struct __list__
 {

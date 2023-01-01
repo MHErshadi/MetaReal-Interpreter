@@ -48,12 +48,15 @@ typedef struct __context__* context_p;
 context_t context_set1(char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname);
 context_t context_set2(char* name, table_p table, const char* fname);
 
+context_t context_copy(const context_p context);
+
 value_t context_var_get(context_p context, const char* name);
-value_p context_ptr_get(context_p context, unsigned char* type, const char* name, char* flag);
 
 /* */
 
 table_t table_set(unsigned long long alloc);
+
+table_t table_copy(const table_p table);
 
 void table_delete(table_p table);
 void table_free(table_p table);

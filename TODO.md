@@ -9,3 +9,4 @@
 9. fix position system [*]
 10. fix file headers [*]
 11. read code from file with .mr format [*]
+12. fix problem in parser grammar

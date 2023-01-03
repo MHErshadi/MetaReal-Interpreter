@@ -1529,7 +1529,7 @@ token_p func_def_parse(pres_p pres, token_p tokens)
                 args[size++].value = *pres->nodes;
             }
             else
-                args[size++].value.type = NONE_N;
+                args[size++].value.type = NULL_N;
 
             if (tokens->type != COMMA_T)
                 break;

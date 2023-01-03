@@ -34,6 +34,9 @@ runtime_t out_of_boundary(const char* name, unsigned long long lbound, unsigned 
 runtime_t outside_loop(const char* name,
     pos_p poss, pos_p pose, context_p context);
 
+runtime_t invalid_arg_number_function(const char* name, unsigned long long min, unsigned long long max, unsigned long long size,
+    pos_p poss, pos_p pose, context_p context);
+
 runtime_t invalid_dollar_function(const char* name,
     pos_p poss, pos_p pose, context_p context);
 runtime_t invalid_arg_number(const char* name, unsigned long long size1, unsigned long long size2,

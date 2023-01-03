@@ -249,13 +249,13 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         case LIST_V:
             list_concat(left->value.ptr, right->value.ptr);
 
-            list_free(right->value.ptr);
+            free(right->value.ptr);
 
             return ires_success(left);
         case TUPLE_V:
             list_concat_tuple(left->value.ptr, right->value.ptr);
 
-            tuple_free(right->value.ptr);
+            free(right->value.ptr);
 
             return ires_success(left);
         }

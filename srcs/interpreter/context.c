@@ -100,7 +100,7 @@ void table_delete(table_p table)
     while (table->size)
     {
         value_delete(&table->vars[table->size].value);
-        free(table->vars[table->size].name);
+        free(table->vars[--table->size].name);
     }
 
     free(table->vars);

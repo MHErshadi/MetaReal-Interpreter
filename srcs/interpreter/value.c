@@ -185,7 +185,7 @@ void value_label(value_p value, const char* end)
         fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
         return;
     case FUNC_V:
-        fprintf(setting.output, "<function %s at 0X%p>%s", ((func_p)value->value.ptr)->context.name, value, end);
+        func_print(setting.output, value->value.ptr, end);
         return;
     }
 }

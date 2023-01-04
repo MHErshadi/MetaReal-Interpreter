@@ -1803,6 +1803,9 @@ return_np return_n_copy(const return_np node)
 
 void return_n_free(return_np node)
 {
+    if (!node)
+        return;
+
     node_free(&node->value);
     free(node);
 }

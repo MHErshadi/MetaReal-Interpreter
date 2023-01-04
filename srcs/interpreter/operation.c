@@ -4082,7 +4082,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
             right->type = CHAR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + index;
 
-            ires.response = IRES_RESPONSE_SET(0, 0, 0, 1);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1);
             ires.value = *right;
 
             return ires;
@@ -4094,7 +4094,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
             right->type = CHAR_V;
             right->value.ptr = ((str_p)left->value.ptr)->str + right->value.chr;
 
-            ires.response = IRES_RESPONSE_SET(0, 0, 0, 1);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1);
             ires.value = *right;
 
             return ires;

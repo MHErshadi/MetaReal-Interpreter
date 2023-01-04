@@ -95,6 +95,14 @@ runtime_t out_of_boundary(const char* name, unsigned long long lbound, unsigned 
     return runtime_set(INVALID_VALUE_E, detail, poss, pose, context);
 }
 
+runtime_t outside_func(pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(43);
+    strcpy(detail, "Return statement must be inside a function");
+
+    return runtime_set(OUTSIDE_FUNC_E, detail, poss, pose, context);
+}
+
 runtime_t outside_loop(const char* name,
     pos_p poss, pos_p pose, context_p context)
 {

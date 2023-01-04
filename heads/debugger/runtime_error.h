@@ -31,6 +31,7 @@ runtime_t invalid_type(const char* name, const char* types, unsigned char type,
 runtime_t out_of_boundary(const char* name, unsigned long long lbound, unsigned long long rbound,
     pos_p poss, pos_p pose, context_p context);
 
+runtime_t outside_func(pos_p poss, pos_p pose, context_p context);
 runtime_t outside_loop(const char* name,
     pos_p poss, pos_p pose, context_p context);
 

@@ -7,13 +7,13 @@
 
 #include <debugger/errlib.h>
 
-#define IRES_RESPONSE_SET(has_error, loop_continue, loop_break, char_ptr) ((has_error) | (loop_continue) << 1 | (loop_break) << 2 | (char_ptr) << 3)
-#define IRES_RESPONSE_MASK 0b110
+#define IRES_RESPONSE_SET(has_error, func_return, loop_continue, loop_break, char_ptr) ((has_error) | (func_return) << 1 | (loop_continue) << 2 | (loop_break) << 3 | (char_ptr) << 4)
 
 #define IRES_HAS_ERROR(x) ((x) & 1)
-#define IRES_LOOP_CONTINUE(x) ((x) >> 1 & 1)
-#define IRES_LOOP_BREAK(x) ((x) >> 2 & 1)
-#define IRES_CHAR_PTR(x) ((x) >> 3 & 1)
+#define IRES_FUNC_RETURN(x) ((x) >> 1 & 1)
+#define IRES_LOOP_CONTINUE(x) ((x) >> 2 & 1)
+#define IRES_LOOP_BREAK(x) ((x) >> 3 & 1)
+#define IRES_CHAR_PTR(x) ((x) >> 4 & 1)
 
 struct __ires__
 {

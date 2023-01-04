@@ -12,7 +12,6 @@
 #define PROP_GLOBAL(x) (x >> 1 & 1)
 #define PROP_CONST(x)  (x >> 2 & 1)
 #define PROP_STATIC(x) (x >> 3 & 1)
-#define PROP_NOT_FREE(x) (x >> 4 & 1)
 
 enum _node_types_
 {

@@ -71,3 +71,36 @@ void arg_value_free(arg_value_p args, unsigned long long size)
         value_free(&args[--size].value);
     free(args);
 }
+
+void func_table_free(table_p table, unsigned long long arg_size)
+{
+    unsigned long long i, j;
+    for (i = 0; i < arg_size; i++)
+    {
+        value_delete(&table->vars[i].value);
+        table->vars[i].value.type = NULL_V;
+    }
+
+    for (j = arg_size; i < table->size; i++)
+    {
+        if (VAR_STATIC(table->vars[i].properties))
+        {
+            if (i != j)
+            {
+                table->vars[j].properties = table->vars[i].properties;
+                table->vars[j].name = table->vars[i].name;
+
+                table->vars[j].type = table->vars[i].type;
+                table->vars[j].value = table->vars[i].value;
+            }
+
+            j++;
+            continue;
+        }
+
+        value_delete(&table->vars[i].value);
+        free(table->vars[i].name);
+    }
+
+    table->size = j;
+}

@@ -45,4 +45,8 @@ void func_print(FILE* stream, const func_p func, const char* end);
 
 void arg_value_free(arg_value_p args, unsigned long long size);
 
+/* */
+
+void func_table_free(table_p table, unsigned long long arg_size);
+
 #endif /* __M_FUNCTION__ */

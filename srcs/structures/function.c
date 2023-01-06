@@ -31,7 +31,6 @@ func_p func_copy(const func_p func)
     copy->min_size = func->min_size;
     copy->max_size = func->max_size;
 
-
     copy->size = func->size;
 
     copy->context = context_copy(&func->context);
@@ -52,14 +51,6 @@ void func_free(func_p func)
     node_p_free1(func->body.nodes, func->body.size);
 
     free(func);
-}
-
-void func_print(FILE* stream, const func_p func, const char* end)
-{
-    if (func->context.name)
-        fprintf(stream, "<function %s at 0x%p>%s", func->context.name, func->context.name, end);
-    else
-        fprintf(stream, "<function <anonymous> at 0x%p>%s", func->context.name, end);
 }
 
 void arg_value_free(arg_value_p args, unsigned long long size)

@@ -39,8 +39,6 @@ func_p func_copy(const func_p func);
 
 void func_free(func_p func);
 
-void func_print(FILE* stream, const func_p func, const char* end);
-
 /* */
 
 void arg_value_free(arg_value_p args, unsigned long long size);

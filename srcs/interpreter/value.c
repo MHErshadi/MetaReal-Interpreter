@@ -69,6 +69,10 @@ value_t value_copy(const value_p value)
     case FUNC_V:
         copy.value.ptr = func_copy(copy.value.ptr);
         return copy;
+    case STRCUT_V:
+        copy.value.ptr = malloc(sizeof(context_t));
+        *(context_p)copy.value.ptr = context_copy(value->value.ptr);
+        return copy;
     }
 
     return copy;
@@ -106,6 +110,9 @@ void value_delete(value_p value)
     case FUNC_V:
         func_free(value->value.ptr);
         return;
+    case STRCUT_V:
+        context_free(value->value.ptr);
+        return;
     }
 }
 
@@ -127,7 +134,7 @@ void value_label(value_p value, const char* end)
         fprintf(setting.output, "none%s", end);
         return;
     case OBJECT_V:
-        fprintf(setting.output, "<object at 0X%p>%s", value, end);
+        fprintf(setting.output, "<object at 0x%p>%s", value->value.ptr, end);
         return;
     case INT_V:
         int_print(setting.output, value->value.ptr, end);
@@ -185,7 +192,10 @@ void value_label(value_p value, const char* end)
         fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
         return;
     case FUNC_V:
-        func_print(setting.output, value->value.ptr, end);
+        context_print(setting.output, "function", &((func_p)value->value.ptr)->context, end);
+        return;
+    case STRCUT_V:
+        context_print(setting.output, "struct", value->value.ptr, end);
         return;
     }
 }
@@ -219,6 +229,8 @@ char value_is_true(value_p value)
         return value->value.chr >= OBJECT_V;
     case FUNC_V:
         return ((func_p)value->value.ptr)->context.name != NULL;
+    case STRCUT_V:
+        return ((context_p)value->value.ptr)->name != NULL;
     }
 
     return 0;

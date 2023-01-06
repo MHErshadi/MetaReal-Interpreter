@@ -1,2 +1,14 @@
-try
-except:
+func f(n)
+{
+    if !n
+    {
+        var static h = 0
+        return
+    }
+    else:
+        f(n - 1)
+
+    h
+}
+
+f(10)

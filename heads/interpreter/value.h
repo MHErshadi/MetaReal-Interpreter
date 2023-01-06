@@ -43,10 +43,12 @@ enum _value_types_
 
     /* */
 
-    FUNC_V
+    FUNC_V,
+
+    STRCUT_V
 };
 
-static const char* value_labels[15] =
+static const char* value_labels[16] =
 {
     "null", "none",
     "object",
@@ -57,10 +59,11 @@ static const char* value_labels[15] =
     "list", "tuple", "dict", "set",
     "type",
 
-    "func"
+    "func",
+    "struct"
 };
 
-static const int value_label_lens[15] =
+static const int value_label_lens[16] =
 {
     4, 4,
     6,
@@ -71,7 +74,8 @@ static const int value_label_lens[15] =
     4, 5, 4, 3,
     4,
 
-    4
+    4,
+    6
 };
 
 value_t value_set1(unsigned char type, void* ptr);

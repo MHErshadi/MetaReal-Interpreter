@@ -50,6 +50,10 @@ context_t context_set2(char* name, table_p table, const char* fname);
 
 context_t context_copy(const context_p context);
 
+void context_free(context_p context);
+
+void context_print(FILE* stream, const char* label, const context_p context, const char* end);
+
 value_t context_var_get(context_p context, const char* name);
 
 /* */

@@ -4,6 +4,7 @@
 
 #include <interpreter/operation.h>
 #include <interpreter/dollar_func.h>
+#include <interpreter/type_call.h>
 #include <debugger/runtime_error.h>
 #include <complex.h>
 #include <str.h>
@@ -26,7 +27,7 @@
 #define IPROP_IN_LOOP(x) ((x) >> 4 & 1)
 #define IPROP_SHOULD_COPY(x) ((x) >> 5 & 1)
 
-#define IPROP_COVER(x, ptr, assign, should_copy) ((x) | (ptr) | (assign) << 1 | (should_copy) << 5)
+#define IPROP_COVER(x, ptr, assign, should_copy) IPROP_SET(ptr, assign, IPROP_NOT_FREE(x), IPROP_IN_FUNC(x), IPROP_IN_LOOP(x), should_copy)
 
 value_t ires_merge(ires_p ires, ires_t other);
 
@@ -160,6 +161,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_ternary_condition(node->value.ptr, &node->poss, &node->pose, context, properties);
     case SUBSCRIPT_N:
         return interpret_subscript(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case ACCESS_N:
+        return interpret_access(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ASSIGN_N:
         return interpret_var_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_FIXED_ASSIGN_N:
@@ -172,6 +175,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_func_def(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FUNC_CALL_N:
         return interpret_func_call(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case STRUCT_DEF_N:
+        return interpret_struct_def(node->value.ptr, &node->poss, &node->pose, context, properties);
     case DOLLAR_FUNC_CALL_N:
         return interpret_dollar_func_call(node->value.ptr, &node->poss, &node->pose, context, properties);
     case IF_N:
@@ -708,7 +713,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     switch (node->operator)
     {
     case PLUS_T:
-        ires = operate_positive(&operand);
+        ires = operate_positive(&operand, poss, pose, context);
         break;
     case MINUS_T:
         ires = operate_negate(&operand, poss, pose, context);
@@ -852,7 +857,68 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
 
 ires_t interpret_access(access_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    ires_t ires;
+    ires.response = 0;
 
+    value_t value = ires_merge(&ires, interpret_node(&node->value, context, IPROP_COVER(properties, 0, 0, 0)));
+    if (IRES_HAS_ERROR(ires.response))
+    {
+        if (!IPROP_NOT_FREE(properties))
+        {
+            node_free(&node->property);
+            free(node);
+        }
+
+        return ires;
+    }
+
+    context_p access;
+    switch (value.type)
+    {
+    case FUNC_V:
+        access = &((func_p)value.value.ptr)->context;
+        break;
+    case STRCUT_V:
+        access = value.value.ptr;
+        break;
+    default:
+        value_free(&value);
+
+        runtime_t error = invalid_type("Value", "<func> or <struct>", value.type, &node->value.poss, &node->value.pose, context);
+
+        if (!IPROP_NOT_FREE(properties))
+        {
+            node_free(&node->property);
+            free(node);
+        }
+
+        return ires_fail(error);
+    }
+
+    ires.value = ires_merge(&ires, interpret_node(&node->property, access, properties));
+    if (IRES_HAS_ERROR(ires.response))
+    {
+        if (value.should_free)
+            value_free(&value);
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires;
+    }
+
+    if (value.should_free)
+    {
+        if (!ires.value.should_free)
+            ires.value = value_copy(&ires.value);
+
+        value_free(&value);
+    }
+
+    if (!IPROP_NOT_FREE(properties))
+        free(node);
+
+    return ires;
 }
 
 ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -1521,11 +1587,12 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
         return ires;
     }
 
-    if (func.type != FUNC_V)
+    func_p func_v;
+    if (func.type != TYPE_V && func.type != FUNC_V)
     {
         value_free(&func);
 
-        runtime_t error = invalid_type("Value", "<func>", func.type, &node->func.poss, &node->func.pose, context);
+        runtime_t error = invalid_type("Value", "<type> or <func>", func.type, &node->func.poss, &node->func.pose, context);
 
         if (!IPROP_NOT_FREE(properties))
         {
@@ -1536,7 +1603,20 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
         return ires_fail(error);
     }
 
-    func_p func_v = func.value.ptr;
+    if (func.type == TYPE_V)
+    {
+        // ill defined
+        switch (func.value.chr)
+        {
+        case OBJECT_V:
+            ires = object_call(node);
+            break;
+        }
+
+        return ires;
+    }
+    else
+        func_v = func.value.ptr;
 
     if (node->size < func_v->min_size || node->size > func_v->max_size)
     {
@@ -1709,19 +1789,37 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
         IPROP_SET(0, 0, 1, 1, 0, 0)));
     if (IRES_HAS_ERROR(ires.response))
     {
+        if (func.should_free)
+            func_free(func_v);
+        else
+            func_table_free(&func_v->context.table, func_v->max_size);
+
         if (!IPROP_NOT_FREE(properties))
             free(node);
 
         return ires;
     }
 
+    if (!IPROP_NOT_FREE(properties))
+        free(node);
+
+    if (func_v->type && func_v->type != ires.value.type)
+    {
+        runtime_t error = invalid_type("Return value", value_labels[func_v->type], ires.value.type, poss, pose, context);
+
+        if (func.should_free)
+            func_free(func_v);
+
+        return ires_fail(error);
+    }
+
     if (!ires.value.should_free)
         ires.value = value_copy(&ires.value);
 
-    func_table_free(&func_v->context.table, func_v->max_size);
-
-    if (!IPROP_NOT_FREE(properties))
-        free(node);
+    if (func.should_free)
+        func_free(func_v);
+    else
+        func_table_free(&func_v->context.table, func_v->max_size);
 
     ires.response = 0;
     return ires;
@@ -1734,7 +1832,108 @@ ires_t interpret_class_def(class_def_np node, pos_p poss, pos_p pose, context_p 
 
 ires_t interpret_struct_def(struct_def_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_NOT_FREE(properties))
+            struct_def_n_free(node);
 
+        return ires_fail(invalid_access_statement("struct definition", poss, pose, context));
+    }
+
+    ires_t ires;
+    ires.response = 0;
+
+    context_p copy = context;
+
+    if (PROP_GLOBAL(node->properties))
+        while (copy->parent)
+            copy = copy->parent;
+
+    char* cname;
+    if (node->name)
+    {
+        cname = malloc(strlen(node->name) + 1);
+        strcpy(cname, node->name);
+    }
+    else
+        cname = NULL;
+
+    table_t table = table_set(STRUCT_CONTEXT_SIZE);
+
+    context_p struct_context = malloc(sizeof(context_t));
+    *struct_context = context_set1(cname, copy, poss, &table, copy->fname);
+
+    ires_merge(&ires, interpret_body(&node->body, struct_context, IPROP_COVER(properties, 0, 0, 0)));
+    if (IRES_HAS_ERROR(ires.response))
+    {
+        context_free(struct_context);
+
+        if (!IPROP_NOT_FREE(properties))
+        {
+            free(node->name);
+            free(node);
+        }
+
+        return ires;
+    }
+
+    if (node->name)
+    {
+        char* name = malloc(strlen(node->name) + 1);
+        strcpy(name, node->name);
+
+        ires.value = value_set1(STRCUT_V, struct_context);
+
+        char res = table_var_set(&copy->table, node->properties, name, 0, &ires.value);
+        if (res == -1)
+        {
+            context_free(struct_context);
+            free(name);
+
+            runtime_t error = const_variable(node->name, poss, pose, context);
+
+            if (!IPROP_NOT_FREE(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->name);
+                free(node);
+            }
+
+            return ires_fail(error);
+        }
+        if (res)
+        {
+            context_free(struct_context);
+            free(name);
+
+            runtime_t error = type_specified_variable(node->name, res, poss, pose, context);
+
+            if (!IPROP_NOT_FREE(properties))
+            {
+                node_p_free1(node->body.nodes, node->body.size);
+                free(node->name);
+                free(node);
+            }
+
+            return ires_fail(error);
+        }
+
+        if (IPROP_SHOULD_COPY(properties))
+        {
+            ires.value.value.ptr = malloc(sizeof(context_t));
+            *(context_p)ires.value.value.ptr = context_copy(struct_context);
+        }
+    }
+    else
+        ires.value = value_set1(STRCUT_V, struct_context);
+
+    if (!IPROP_NOT_FREE(properties))
+    {
+        free(node->name);
+        free(node);
+    }
+
+    return ires;
 }
 
 ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p pose, context_p context, char properties)

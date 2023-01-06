@@ -67,7 +67,8 @@ node_t node_copy(const node_p node)
     case VAR_ACCESS_N:
     case IMPORT_N:
     case INCLUDE_N:
-        strcpy(copy.value.ptr, copy.value.ptr);
+        copy.value.ptr = malloc(strlen(node->value.ptr) + 1);
+        strcpy(copy.value.ptr, node->value.ptr);
         return copy;
     case INT_N:
         copy.value.ptr = int_n_copy(copy.value.ptr);
@@ -818,7 +819,13 @@ arg_p arg_p_copy(const arg_p args, unsigned long long size)
     unsigned long long i;
     for (i = 0; i < size; i++)
     {
-        strcpy(copy[i].name, args[i].name);
+        if (args[i].name)
+        {
+            copy[i].name = malloc(strlen(args[i].name) + 1);
+            strcpy(copy[i].name, args[i].name);
+        }
+        else
+            copy[i].name = NULL;
 
         copy[i].type = args[i].type;
         copy[i].value = node_copy(&args[i].value);
@@ -847,7 +854,13 @@ arg_access_p arg_access_p_copy(const arg_access_p args, unsigned long long size)
     unsigned long long i;
     for (i = 0; i < size; i++)
     {
-        strcpy(copy[i].name, args[i].name);
+        if (args[i].name)
+        {
+            copy[i].name = malloc(strlen(args[i].name) + 1);
+            strcpy(copy[i].name, args[i].name);
+        }
+        else
+            copy[i].name = NULL;
 
         copy[i].value = node_copy(&args[i].value);
     }
@@ -1794,6 +1807,9 @@ return_np return_n_set(node_p value)
 
 return_np return_n_copy(const return_np node)
 {
+    if (!node)
+        return NULL;
+
     return_np copy = malloc(sizeof(return_nt));
 
     copy->value = node_copy(&node->value);

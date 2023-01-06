@@ -63,5 +63,6 @@
 /* */
 
 #define FUNC_CONTEXT_SIZE 16
+#define STRUCT_CONTEXT_SIZE 16
 
 #endif /* __M_DEF__ */

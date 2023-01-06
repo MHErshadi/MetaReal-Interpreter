@@ -48,6 +48,22 @@ context_t context_copy(const context_p context)
     return copy;
 }
 
+void context_free(context_p context)
+{
+    free(context->name);
+    table_delete(&context->table);
+
+    free(context);
+}
+
+void context_print(FILE* stream, const char* label, const context_p context, const char* end)
+{
+    if (context->name)
+        fprintf(stream, "<%s %s at 0x%p>%s", label, context->name, context->name, end);
+    else
+        fprintf(stream, "<%s anonymous>%s", label, end);
+}
+
 value_t context_var_get(context_p context, const char* name)
 {
     value_t value = table_var_get(&context->table, name);
@@ -81,11 +97,11 @@ table_t table_copy(const table_p table)
         copy.vars[i].properties = table->vars[i].properties;
 
         copy.vars[i].name = malloc(strlen(table->vars[i].name) + 1);
-        copy.vars[i].name = table->vars[i].name;
+        strcpy(copy.vars[i].name, table->vars[i].name);
 
         copy.vars[i].type = table->vars[i].type;
 
-        copy.vars[i].value = value_copy(&copy.vars[i].value);
+        copy.vars[i].value = value_copy(&table->vars[i].value);
         copy.vars[i].value.should_free = 0;
     }
 

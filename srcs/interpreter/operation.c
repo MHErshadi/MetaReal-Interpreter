@@ -7,6 +7,7 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
+#include <structures/function.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2252,6 +2253,13 @@ ires_t operate_equal(value_p left, value_p right)
         value_free(right);
 
         return ires_success(left);
+    case OBJECT_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type == OBJECT_V && left->value.ptr == right->value.ptr;
+
+        value_free(right);
+
+        return ires_success(left);
     case INT_V:
         switch (right->type)
         {
@@ -2588,15 +2596,19 @@ ires_t operate_equal(value_p left, value_p right)
             tuple_free(left->value.ptr);
         break;
     case TYPE_V:
-        if (right->type == TYPE_V)
-        {
-            left->type = BOOL_V;
-            left->value.chr = left->value.chr == right->value.chr;
+        left->type = BOOL_V;
+        left->value.chr = right->type == TYPE_V && left->value.chr == right->value.chr;
 
-            return ires_success(left);
-        }
+        value_free(right);
 
-        break;
+        return ires_success(left);
+    case FUNC_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type == FUNC_V && left->value.ptr == right->value.ptr;
+
+        value_free(right);
+
+        return ires_success(left);
     default:
         value_free(left);
         break;
@@ -2626,6 +2638,13 @@ ires_t operate_nequal(value_p left, value_p right)
     case NONE_V:
         left->type = BOOL_V;
         left->value.chr = right->type != NONE_V;
+
+        value_free(right);
+
+        return ires_success(left);
+    case OBJECT_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type != OBJECT_V || left->value.ptr != right->value.ptr;
 
         value_free(right);
 
@@ -2966,15 +2985,19 @@ ires_t operate_nequal(value_p left, value_p right)
             tuple_free(left->value.ptr);
         break;
     case TYPE_V:
-        if (right->type == TYPE_V)
-        {
-            left->type = BOOL_V;
-            left->value.chr = left->value.chr != right->value.chr;
+        left->type = BOOL_V;
+        left->value.chr = right->type != TYPE_V || left->value.chr != right->value.chr;
 
-            return ires_success(left);
-        }
+        value_free(right);
 
-        break;
+        return ires_success(left);
+    case FUNC_V:
+        left->type = BOOL_V;
+        left->value.chr = right->type != FUNC_V || left->value.ptr != right->value.ptr;
+
+        value_free(right);
+
+        return ires_success(left);
     default:
         value_free(left);
         break;
@@ -4161,7 +4184,7 @@ index_err:
         rposs, rpose, context));
 }
 
-ires_t operate_positive(value_p operand)
+ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
     unsigned long long size;
 
@@ -4175,7 +4198,7 @@ ires_t operate_positive(value_p operand)
         return ires_success(operand);
     case OBJECT_V:
         operand->type = INT_V;
-        operand->value.ptr = int_set_ull(1);
+        operand->value.ptr = int_set_ull((unsigned long)operand->value.ptr);
 
         return ires_success(operand);
     case BOOL_V:
@@ -4209,6 +4232,12 @@ ires_t operate_positive(value_p operand)
         operand->value.ptr = int_set_ull(size);
 
         return ires_success(operand);
+    case FUNC_V:
+        if (operand->should_free)
+            func_free(operand->value.ptr);
+
+        return ires_fail(illegal_operation_unary(operand->type, "+",
+            poss, pose, context));
     }
 
     return ires_success(operand);
@@ -4358,7 +4387,7 @@ char operate_equal_compare(const value_p left, const value_p right)
     case NONE_V:
         return right->type == NONE_V;
     case OBJECT_V:
-        return left == right;
+        return right->type == OBJECT_V && left->value.ptr == right->value.ptr;
     case INT_V:
         switch (right->type)
         {
@@ -4466,6 +4495,8 @@ char operate_equal_compare(const value_p left, const value_p right)
         }
 
         break;
+    case FUNC_V:
+        return right->type == FUNC_V && left->value.ptr == right->value.ptr;
     }
 
     return 0;

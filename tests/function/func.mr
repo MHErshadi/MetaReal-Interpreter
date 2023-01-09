@@ -1,0 +1,13 @@
+func isPrime(x)
+{
+    if x < 2:
+        return false
+
+    for i = 2 to x ** 0.5 // 1 + 1:
+        if not (x % i):
+            return false
+
+    return true
+}
+
+isPrime(499)

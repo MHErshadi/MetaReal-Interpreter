@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
 /*/
 
-#include <structures/function.h>
+#include <structure/function.h>
 #include <stdlib.h>
 
 func_p func_set(unsigned char type, unsigned long long min_size, unsigned long long max_size,
@@ -66,13 +66,7 @@ void arg_value_free(arg_value_p args, unsigned long long size)
 void func_table_free(table_p table, unsigned long long arg_size)
 {
     unsigned long long i, j;
-    for (i = 0; i < arg_size; i++)
-    {
-        value_delete(&table->vars[i].value);
-        table->vars[i].value.type = NULL_V;
-    }
-
-    for (j = arg_size; i < table->size; i++)
+    for (i = arg_size, j = arg_size; i < table->size; i++)
     {
         if (VAR_STATIC(table->vars[i].properties))
         {
@@ -94,4 +88,14 @@ void func_table_free(table_p table, unsigned long long arg_size)
     }
 
     table->size = j;
+}
+
+void func_table_free_args(table_p table, unsigned long long arg_size)
+{
+    unsigned long long i;
+    for (i = 0; i < arg_size; i++)
+    {
+        value_delete(&table->vars[i].value);
+        table->vars[i].value.type = NULL_V;
+    }
 }

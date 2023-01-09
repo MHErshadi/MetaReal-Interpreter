@@ -5,7 +5,7 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <structures/function.h>
+#include <structure/function.h>
 #include <setting.h>
 #include <stdlib.h>
 
@@ -112,6 +112,7 @@ void value_delete(value_p value)
         return;
     case STRCUT_V:
         context_free(value->value.ptr);
+        free(value->value.ptr);
         return;
     }
 }

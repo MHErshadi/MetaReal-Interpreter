@@ -1,0 +1,54 @@
+a = []
+
+func int f(x):
+    return x
+
+try
+{
+    f("")
+    a += "FAILED"
+}
+except "Return value must be int (not <str>)":
+    a += "PASSED"
+
+func int f(int x):
+    return x
+
+try
+{
+    f("")
+    a += "FAILED"
+}
+except "Type of variable and type of value do not match (<int> and <str>)":
+    a += "PASSED"
+
+func int f(int x = 100):
+    return x
+
+if f() == 100:
+    a += "PASSED"
+else:
+    a += "FAILED"
+
+func list f(int x, int y, int z):
+    return [x, 2 * y, 3 * z]
+
+if f(5, 8, 11) == [5, 16, 33]:
+    a += "PASSED"
+else:
+    a += "FAILED"
+
+func f(x, y = 10):
+    return y ** x
+
+if f(x: 3) == 1000:
+    a += "PASSED"
+else:
+    a += "FAILED"
+
+if f(y: 3, x: 5) == 243:
+    a += "PASSED"
+else:
+    a += "FAILED"
+
+a

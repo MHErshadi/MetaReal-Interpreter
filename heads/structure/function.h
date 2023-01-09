@@ -46,5 +46,6 @@ void arg_value_free(arg_value_p args, unsigned long long size);
 /* */
 
 void func_table_free(table_p table, unsigned long long arg_size);
+void func_table_free_args(table_p table, unsigned long long arg_size);
 
 #endif /* __M_FUNCTION__ */

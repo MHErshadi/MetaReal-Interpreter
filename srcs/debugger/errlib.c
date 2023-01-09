@@ -111,7 +111,7 @@ runtime_t runtime_set(unsigned char type, char* detail, pos_p poss, pos_p pose, 
     error.detail = detail;
     error.poss = *poss;
     error.pose = *pose;
-    error.context = context;
+    error.context = context_copy_debug(context);
 
     return error;
 }
@@ -123,7 +123,7 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
 
     fprintf(setting.error, "Error Type: %s (#id=%u)\n", runtime_labels[error->type], error->type);
 
-    context_p context = error->context;
+    context_p context = &error->context;
     pos_p pos = &error->poss;
 
     unsigned long long length = strlen(context->fname) + strlen(context->name) + number_length(pos->line) + 23;
@@ -147,6 +147,8 @@ void runtime_print(runtime_p error, const char* code, unsigned long long size)
 
     fprintf(setting.error, "\nTroubleshoot (most recent call last):\n%s\n", troubleshoot);
     free(troubleshoot);
+
+    context_free_debug(&error->context);
 
     if (error->poss.line != error->pose.line)
     {

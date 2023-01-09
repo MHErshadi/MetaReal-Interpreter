@@ -39,7 +39,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
 
 /* */
 
-ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p context);
+ires_t operate_positive(value_p operand);
 ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context);
 
 ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context);

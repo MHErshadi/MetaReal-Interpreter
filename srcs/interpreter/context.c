@@ -48,12 +48,39 @@ context_t context_copy(const context_p context)
     return copy;
 }
 
+context_t context_copy_debug(const context_p context)
+{
+    context_t copy;
+
+    copy.name = malloc(strlen(context->name) + 1);
+    strcpy(copy.name, context->name);
+
+    copy.parent = context->parent;
+    copy.parent_pos = context->parent_pos;
+
+    copy.fname = context->fname;
+
+    if (copy.parent)
+    {
+        copy.parent = malloc(sizeof(context_t));
+        *copy.parent = context_copy_debug(context->parent);
+    }
+
+    return copy;
+}
+
 void context_free(context_p context)
 {
     free(context->name);
     table_delete(&context->table);
+}
 
-    free(context);
+void context_free_debug(context_p context)
+{
+    free(context->name);
+
+    if (context->parent)
+        context_free_debug(context->parent);
 }
 
 void context_print(FILE* stream, const char* label, const context_p context, const char* end)
@@ -70,6 +97,16 @@ value_t context_var_get(context_p context, const char* name)
 
     if (value.type == NULL_V && context->parent)
         return context_var_get(context->parent, name);
+
+    return value;
+}
+
+value_p context_ptr_get(context_p context, unsigned char* type, const char* name, char* flag)
+{
+    value_p value = table_ptr_get(&context->table, type, name, flag);
+
+    if (!value && !*flag && context->parent)
+        return context_ptr_get(context->parent, type, name, flag);
 
     return value;
 }
@@ -330,12 +367,12 @@ value_p table_ptr_add(table_p table, const char* name)
 
     value_t value;
     value.type = NULL_V;
+    value.should_free = 0;
 
     char* copy = malloc(strlen(name) + 1);
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){0, copy, NULL_V, value};
-    table->vars[table->size].value.should_free = 0;
 
     return &table->vars[table->size++].value;
 }

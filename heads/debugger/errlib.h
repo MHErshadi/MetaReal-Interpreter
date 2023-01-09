@@ -34,7 +34,7 @@ struct __runtime__
     pos_t poss;
     pos_t pose;
 
-    context_p context;
+    context_t context;
 };
 typedef struct __runtime__ runtime_t;
 typedef struct __runtime__* runtime_p;

@@ -7,7 +7,7 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <structures/function.h>
+#include <structure/function.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2603,8 +2603,9 @@ ires_t operate_equal(value_p left, value_p right)
 
         return ires_success(left);
     case FUNC_V:
+    case STRCUT_V:
         left->type = BOOL_V;
-        left->value.chr = right->type == FUNC_V && left->value.ptr == right->value.ptr;
+        left->value.chr = left->value.ptr == right->value.ptr;
 
         value_free(right);
 
@@ -2992,8 +2993,9 @@ ires_t operate_nequal(value_p left, value_p right)
 
         return ires_success(left);
     case FUNC_V:
+    case STRCUT_V:
         left->type = BOOL_V;
-        left->value.chr = right->type != FUNC_V || left->value.ptr != right->value.ptr;
+        left->value.chr = left->value.ptr != right->value.ptr;
 
         value_free(right);
 
@@ -4184,7 +4186,7 @@ index_err:
         rposs, rpose, context));
 }
 
-ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p context)
+ires_t operate_positive(value_p operand)
 {
     unsigned long long size;
 
@@ -4210,7 +4212,9 @@ ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p conte
         return ires_success(operand);
     case STR_V:
         size = str_size(operand->value.ptr);
-        str_free(operand->value.ptr);
+
+        if (operand->should_free)
+            str_free(operand->value.ptr);
 
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(size);
@@ -4218,7 +4222,9 @@ ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p conte
         return ires_success(operand);
     case LIST_V:
         size = list_size(operand->value.ptr);
-        list_free(operand->value.ptr);
+
+        if (operand->should_free)
+            list_free(operand->value.ptr);
 
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(size);
@@ -4226,18 +4232,37 @@ ires_t operate_positive(value_p operand, pos_p poss, pos_p pose, context_p conte
         return ires_success(operand);
     case TUPLE_V:
         size = tuple_size(operand->value.ptr);
-        str_free(operand->value.ptr);
+
+        if (operand->should_free)
+            tuple_free(operand->value.ptr);
 
         operand->type = INT_V;
         operand->value.ptr = int_set_ull(size);
 
         return ires_success(operand);
     case FUNC_V:
+        size = (unsigned long)((func_p)operand->value.ptr)->context.name;
+
         if (operand->should_free)
             func_free(operand->value.ptr);
 
-        return ires_fail(illegal_operation_unary(operand->type, "+",
-            poss, pose, context));
+        operand->type = INT_V;
+        operand->value.ptr = int_set_ull(size);
+
+        return ires_success(operand);
+    case STRCUT_V:
+        size = (unsigned long)((context_p)operand->value.ptr)->name;
+
+        if (operand->should_free)
+        {
+            context_free(operand->value.ptr);
+            free(operand->value.ptr);
+        }
+
+        operand->type = INT_V;
+        operand->value.ptr = int_set_ull(size);
+
+        return ires_success(operand);
     }
 
     return ires_success(operand);
@@ -4496,7 +4521,8 @@ char operate_equal_compare(const value_p left, const value_p right)
 
         break;
     case FUNC_V:
-        return right->type == FUNC_V && left->value.ptr == right->value.ptr;
+    case STRCUT_V:
+        return left->value.ptr == right->value.ptr;
     }
 
     return 0;

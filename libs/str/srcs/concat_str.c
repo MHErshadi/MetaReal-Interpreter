@@ -10,15 +10,21 @@
 #include <string.h>
 #include <stdlib.h>
 
-void str_concat_str(str_p str1, const char* str2)
+str_p str_concat_str(const str_p str1, const char* str2)
 {
-    unsigned long long bsize = str1->size;
-    unsigned long long str2_size = strlen(str2);
+    str_p res = malloc(sizeof(str_t));
 
-    str1->size += str2_size;
-    str1->str = realloc(str1->str, str1->size + 1);
+    res->size = str1->size + strlen(str2);
+    res->str = malloc(res->size + 1);
+    res->ref = 0;
 
-    unsigned long long i, j;
-    for (i = bsize, j = 0; j <= str2_size; i++, j++)
-        str1->str[i] = str2[j];
+    unsigned long long i;
+    for (i = 0; i < str1->size; i++)
+        res->str[i] = str1->str[i];
+
+    unsigned long long j;
+    for (j = 0; i <= res->size; i++, j++)
+        res->str[i] = str2[j];
+
+    return res;
 }

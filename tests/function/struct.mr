@@ -1,0 +1,20 @@
+func f(x):
+    x == 1
+
+struct s
+{
+    a = f
+
+    func b(x, y):
+        x == 1 && y == 1
+
+    var c
+}
+
+s.c = func f(x, y, z):
+    x == 1 && y == 1 && z == 1
+
+if s.a(1) == true && s.b(1, 0) == false && s.c(1, 1, 1) == true:
+    "PASSED"
+else:
+    "       FAILED"

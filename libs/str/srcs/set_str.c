@@ -8,16 +8,19 @@
 
 #include <str.h>
 #include <stdlib.h>
-#include <string.h>
 
-str_p str_set_str(const char* src, unsigned long long size)
+str_p str_set_str(const char* src, unsigned long long size, unsigned long long ref)
 {
     str_p dst = malloc(sizeof(str_t));
 
     dst->str = malloc(size + 1);
-    strcpy(dst->str, src);
+
+    unsigned long long i;
+    for (i = 0; i <= size; i++)
+        dst->str[i] = src[i];
 
     dst->size = size;
+    dst->ref = ref;
 
     return dst;
 }

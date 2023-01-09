@@ -1,0 +1,49 @@
+a = []
+c = 0
+
+func f()
+{
+    func g(x, y):
+        x * y
+
+    g
+}
+
+if f()(5.5, 3) == 16.5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+func f(x)
+{
+    func g(y):
+        x * y
+
+    g
+}
+
+if f(3)(4) == 12
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+b = f(6)
+
+if b(5) == 30
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+if c == 3:
+    "PASSED"
+else:
+    "       FAILED"

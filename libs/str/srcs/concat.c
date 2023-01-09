@@ -9,14 +9,21 @@
 #include <str.h>
 #include <stdlib.h>
 
-void str_concat(str_p str1, const str_p str2)
+str_p str_concat(const str_p str1, const str_p str2)
 {
-    unsigned long long bsize = str1->size;
+    str_p res = malloc(sizeof(str_t));
 
-    str1->size += str2->size;
-    str1->str = realloc(str1->str, str1->size + 1);
+    res->size = str1->size + str2->size;
+    res->str = malloc(res->size + 1);
+    res->ref = 0;
 
-    unsigned long long i, j;
-    for (i = bsize, j = 0; j <= str2->size; i++, j++)
-        str1->str[i] = str2->str[j];
+    unsigned long long i;
+    for (i = 0; i < str1->size; i++)
+        res->str[i] = str1->str[i];
+
+    unsigned long long j;
+    for (j = 0; j <= str2->size; i++, j++)
+        res->str[i] = str2->str[j];
+
+    return res;
 }

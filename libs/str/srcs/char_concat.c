@@ -7,22 +7,20 @@
 /*/
 
 #include <str.h>
-#include <string.h>
 #include <stdlib.h>
 
-void str_char_concat(char chr, str_p str)
+str_p str_char_concat(char chr, const str_p str)
 {
-    unsigned long long size = str->size + 1;
+    str_p res = malloc(sizeof(str_t));
 
-    char* res = malloc(size + 1);
+    res->size = str->size + 1;
+    res->str = malloc(res->size + 1);
+    res->ref = 0;
 
+    *res->str = chr;
     unsigned long long i;
-    *res = chr;
     for (i = 0; i <= str->size; i++)
-        res[i + 1] = str->str[i];
+        res->str[i + 1] = str->str[i];
 
-    free(str->str);
-
-    str->size = size;
-    str->str = res;
+    return res;
 }

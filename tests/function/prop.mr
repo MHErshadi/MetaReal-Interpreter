@@ -1,4 +1,5 @@
 a = []
+c = 0
 
 func int f(x):
     return x
@@ -8,8 +9,11 @@ try
     f("")
     a += "FAILED"
 }
-except "Return value must be int (not <str>)":
+except "Return value must be int (not <str>)"
+{
     a += "PASSED"
+    c++
+}
 
 func int f(int x):
     return x
@@ -19,36 +23,76 @@ try
     f("")
     a += "FAILED"
 }
-except "Type of variable and type of value do not match (<int> and <str>)":
+except "Type of variable and type of value do not match (<int> and <str>)"
+{
     a += "PASSED"
+    c++
+}
 
 func int f(int x = 100):
     return x
 
-if f() == 100:
+if f() == 100
+{
     a += "PASSED"
+    c++
+}
 else:
     a += "FAILED"
 
 func list f(int x, int y, int z):
     return [x, 2 * y, 3 * z]
 
-if f(5, 8, 11) == [5, 16, 33]:
+if f(5, 8, 11) == [5, 16, 33]
+{
     a += "PASSED"
+    c++
+}
 else:
     a += "FAILED"
 
 func f(x, y = 10):
     return y ** x
 
-if f(x: 3) == 1000:
+if f(x: 3) == 1000
+{
     a += "PASSED"
+    c++
+}
 else:
     a += "FAILED"
 
-if f(y: 3, x: 5) == 243:
+if f(y: 3, x: 5) == 243
+{
     a += "PASSED"
+    c++
+}
 else:
     a += "FAILED"
 
-a
+func f(x = 10, y = 4):
+    return x ** 2 * y
+
+if f() == 400
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+try
+{
+    f(1, 1, 1)
+    a += "FAILED"
+}
+except "Invalid argument count for function 'f' (argument count is must be between 0 and 2 (inclusive), not 3)"
+{
+    a += "PASSED"
+    c++
+}
+
+if c == 8:
+    "PASSED"
+else:
+    "       FAILED"

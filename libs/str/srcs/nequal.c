@@ -17,5 +17,6 @@ char str_nequal(const str_p str1, const str_p str2)
     for (i = 0; i < str1->size; i++)
         if (str1->str[i] != str2->str[i])
             return 1;
+
     return 0;
 }

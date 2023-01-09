@@ -7,13 +7,22 @@
 /*/
 
 #include <str.h>
-#include <string.h>
 #include <stdlib.h>
 
-void str_concat_char(str_p str, char chr)
+str_p str_concat_char(const str_p str, char chr)
 {
-    str->str = realloc(str->str, str->size + 1);
+    str_p res = malloc(sizeof(str_t));
 
-    str->str[str->size++] = chr;
-    str->str[str->size] = '\0';
+    res->size = str->size + 1;
+    res->str = malloc(res->size + 1);
+    res->ref = 0;
+
+    unsigned long long i;
+    for (i = 0; i < str->size; i++)
+        res->str[i] = str->str[i];
+
+    res->str[i++] = chr;
+    res->str[i] = '\0';
+
+    return res;
 }

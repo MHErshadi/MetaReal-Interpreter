@@ -10,4 +10,7 @@ func isPrime(x)
     return true
 }
 
-isPrime(499)
+if isPrime(499) == true && isPrime(30) == false:
+    "PASSED"
+else:
+    "       FAILED"

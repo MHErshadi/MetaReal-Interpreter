@@ -14,5 +14,6 @@ char str_contains_char(const str_p str, char chr)
     for (i = 0; i < str->size; i++)
         if (str->str[i] == chr)
             return 1;
+
     return 0;
 }

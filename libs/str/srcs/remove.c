@@ -9,20 +9,30 @@
 #include <str.h>
 #include <stdlib.h>
 
-void str_remove(str_p str, unsigned long long pos)
+str_p str_remove(const str_p str, unsigned long long pos)
 {
+    str_p res = malloc(sizeof(str_t));
+
+    res->ref = 0;
+
     if (str->size == 1)
     {
-        str->str = realloc(str->str, 1);
-        *str->str = '\0';
+        res->str = malloc(1);
+        *res->str = '\0';
 
-        str->size = 0;
-        return;
+        res->size = 0;
+
+        return res;
     }
 
-    unsigned long long i, j;
-    for (i = pos, j = pos + 1; j <= str->size; i++, j++)
-        str->str[i] = str->str[j];
+    res->str = malloc(str->size);
+    res->size = str->size - 1;
 
-    str->str = realloc(str->str, str->size--);
+    unsigned long long i;
+    for (i = 0; i < pos; i++)
+        res->str[i] = str->str[i];
+    for (; i < str->size; i++)
+        res->str[i] = str->str[i + 1];
+
+    return res;
 }

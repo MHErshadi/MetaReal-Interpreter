@@ -8,32 +8,32 @@
 
 #include <str.h>
 #include <stdlib.h>
-#include <string.h>
 
-void str_repeat(str_p str, unsigned long long count)
+str_p str_repeat(const str_p str, unsigned long long count)
 {
-    if (!count)
-    {
-        str->str = realloc(str->str, 1);
-        *str->str = '\0';
+    str_p res = malloc(sizeof(str_t));
 
-        str->size = 0;
-        return;
+    res->ref = 0;
+
+    if (!count || !str->size)
+    {
+        res->str = malloc(1);
+        *res->str = '\0';
+
+        res->size = 0;
+
+        return res;
     }
 
-    if (count == 1)
-        return;
+    res->size = str->size * count;
+    res->str = malloc(res->size + 1);
 
-    if (!str->size)
-        return;
+    unsigned long long i, j;
+    for (i = 0; i < res->size;)
+        for (j = 0; j < str->size; i++, j++)
+            res->str[i] = str->str[j];
 
-    unsigned long long bsize = str->size;
+    res->str[i] = '\0';
 
-    str->size *= count;
-    str->str = realloc(str->str, str->size + 1);
-
-    unsigned long long i;
-    for (i = bsize; i < str->size; i += bsize)
-        memcpy(str->str + i, str->str, bsize);
-    str->str[i] = '\0';
+    return res;
 }

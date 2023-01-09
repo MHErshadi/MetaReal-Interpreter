@@ -31,5 +31,6 @@ char str_contains_str(const str_p str1, const char* str2)
                 return 1;
         }
     }
+
     return 0;
 }

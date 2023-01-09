@@ -29,5 +29,6 @@ char str_contains(const str_p str1, const str_p str2)
                 return 1;
         }
     }
+
     return 0;
 }

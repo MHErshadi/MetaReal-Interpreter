@@ -50,7 +50,7 @@ token_p while_parse(pres_p pres, token_p tokens);
 token_p do_while_parse(pres_p pres, token_p tokens);
 token_p try_parse(pres_p pres, token_p tokens);
 
-token_p properties_gen(char *properties, token_p tokens);
+token_p properties_gen(char* properties, token_p tokens);
 token_p body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens);
 token_p switch_case_body_gen(body_p body, unsigned long long size, pres_p pres, token_p tokens);
 
@@ -2856,7 +2856,7 @@ token_p try_parse(pres_p pres, token_p tokens)
     return tokens;
 }
 
-token_p properties_gen(char *properties, token_p tokens)
+token_p properties_gen(char* properties, token_p tokens)
 {
     char public = 0;
     char global = 0;

@@ -7,13 +7,16 @@
 /*/
 
 #include <int.h>
+#include <stdlib.h>
 
-void int_and_ul(int_p num1, unsigned long num2)
+int_p int_and_ul(const int_p num1, unsigned long num2)
 {
-    mpz_t num2i;
-    mpz_init_set_ui(num2i, num2);
+    int_p res = malloc(sizeof(int_t));
 
-    mpz_and(num1->value, num1->value, num2i);
+    mpz_init_set_ui(res->value, num2);
+    res->ref = 0;
 
-    mpz_clear(num2i);
+    mpz_and(res->value, num1->value, res->value);
+
+    return res;
 }

@@ -7,8 +7,16 @@
 /*/
 
 #include <int.h>
+#include <stdlib.h>
 
-void int_modulo(int_p num1, const int_p num2)
+int_p int_modulo(const int_p num1, const int_p num2)
 {
-    mpz_mod(num1->value, num1->value, num2->value);
+    int_p res = malloc(sizeof(int_t));
+
+    mpz_init(res->value);
+    res->ref = 0;
+
+    mpz_mod(res->value, num1->value, num2->value);
+
+    return res;
 }

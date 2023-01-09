@@ -7,8 +7,16 @@
 /*/
 
 #include <int.h>
+#include <stdlib.h>
 
-void int_negate(int_p num)
+int_p int_negate(const int_p num)
 {
-    mpz_neg(num->value, num->value);
+    int_p res = malloc(sizeof(int_t));
+
+    mpz_init(res->value);
+    res->ref = 0;
+
+    mpz_neg(res->value, num->value);
+
+    return res;
 }

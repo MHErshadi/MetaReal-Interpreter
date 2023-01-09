@@ -9,12 +9,14 @@
 #include <int.h>
 #include <stdlib.h>
 
-int_p int_set_ull(unsigned long long src)
+int_p int_set_ull(unsigned long long src, unsigned long long ref)
 {
     int_p dst = malloc(sizeof(int_t));
 
     mpz_init(dst->value);
     mpz_import(dst->value, 1, -1, sizeof(unsigned long long), 0, 0, &src);
+
+    dst->ref = ref;
 
     return dst;
 }

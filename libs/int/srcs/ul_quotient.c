@@ -7,13 +7,16 @@
 /*/
 
 #include <int.h>
+#include <stdlib.h>
 
-void int_ul_quotient(unsigned long num1, int_p num2)
+int_p int_ul_quotient(unsigned long num1, const int_p num2)
 {
-    mpz_t num1i;
-    mpz_init_set_ui(num1i, num1);
+    int_p res = malloc(sizeof(int_t));
 
-    mpz_fdiv_q(num2->value, num1i, num2->value);
+    mpz_init_set_ui(res->value, num1);
+    res->ref = 0;
 
-    mpz_clear(num1i);
+    mpz_fdiv_q(res->value, res->value, num2->value);
+
+    return res;
 }

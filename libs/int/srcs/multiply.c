@@ -7,8 +7,16 @@
 /*/
 
 #include <int.h>
+#include <stdlib.h>
 
-void int_multiply(int_p num1, const int_p num2)
+int_p int_multiply(const int_p num1, const int_p num2)
 {
-    mpz_mul(num1->value, num1->value, num2->value);
+    int_p res = malloc(sizeof(int_t));
+
+    mpz_init(res->value);
+    res->ref = 0;
+
+    mpz_mul(res->value, num1->value, num2->value);
+
+    return res;
 }

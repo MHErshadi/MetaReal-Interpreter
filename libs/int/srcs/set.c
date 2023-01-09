@@ -14,6 +14,7 @@ int_p int_set(const int_p src)
     int_p dst = malloc(sizeof(int_t));
 
     mpz_init_set(dst->value, src->value);
+    dst->ref = src->ref;
 
     return dst;
 }

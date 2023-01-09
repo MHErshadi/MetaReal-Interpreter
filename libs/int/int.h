@@ -13,13 +13,15 @@
 struct __int__
 {
     mpz_t value;
+
+    unsigned long long ref;
 };
 typedef struct __int__ int_t;
 typedef struct __int__* int_p;
 
 int_p int_set(const int_p src);
-int_p int_set_str(const char* str, unsigned long long size);
-int_p int_set_ull(unsigned long long src);
+int_p int_set_str(const char* str, unsigned long long size, unsigned char base, unsigned long long ref);
+int_p int_set_ull(unsigned long long src, unsigned long long ref);
 
 unsigned long long int_get_ull(const int_p src);
 char* int_get_str(const int_p src);
@@ -30,44 +32,44 @@ void int_print(FILE* stream, const int_p num, const char* end);
 
 /* */
 
-void int_add(int_p num1, const int_p num2);
-void int_add_ul(int_p num1, unsigned long num2);
+int_p int_add(const int_p num1, const int_p num2);
+int_p int_add_ul(const int_p num1, unsigned long num2);
 
-void int_subtract(int_p num1, const int_p num2);
-void int_subtract_ul(int_p num1, unsigned long num2);
-void int_ul_subtract(unsigned long num1, int_p num2);
+int_p int_subtract(const int_p num1, const int_p num2);
+int_p int_subtract_ul(const int_p num1, unsigned long num2);
+int_p int_ul_subtract(unsigned long num1, const int_p num2);
 
-void int_multiply(int_p num1, const int_p num2);
-void int_multiply_ul(int_p num1, unsigned long num2);
+int_p int_multiply(const int_p num1, const int_p num2);
+int_p int_multiply_ul(const int_p num1, unsigned long num2);
 
-void int_modulo(int_p num1, const int_p num2);
-void int_modulo_ul(int_p num1, unsigned long num2);
-void int_ul_modulo(unsigned long num1, int_p num2);
+int_p int_modulo(const int_p num1, const int_p num2);
+int_p int_modulo_ul(const int_p num1, unsigned long num2);
+int_p int_ul_modulo(unsigned long num1, const int_p num2);
 
-void int_quotient(int_p num1, const int_p num2);
-void int_quotient_ul(int_p num1, unsigned long num2);
-void int_ul_quotient(unsigned long num1, int_p num2);
+int_p int_quotient(const int_p num1, const int_p num2);
+int_p int_quotient_ul(const int_p num1, unsigned long num2);
+int_p int_ul_quotient(unsigned long num1, const int_p num2);
 
-void int_power(int_p num1, const int_p num2);
-void int_power_ul(int_p num1, unsigned long num2);
-void int_ul_power(unsigned long num1, int_p num2);
+int_p int_power(const int_p num1, const int_p num2);
+int_p int_power_ul(const int_p num1, unsigned long num2);
+int_p int_ul_power(unsigned long num1, const int_p num2);
 
-void int_and(int_p num1, const int_p num2);
-void int_and_ul(int_p num1, unsigned long num2);
+int_p int_and(const int_p num1, const int_p num2);
+int_p int_and_ul(const int_p num1, unsigned long num2);
 
-void int_or(int_p num1, const int_p num2);
-void int_or_ul(int_p num1, unsigned long num2);
+int_p int_or(const int_p num1, const int_p num2);
+int_p int_or_ul(const int_p num1, unsigned long num2);
 
-void int_xor(int_p num1, const int_p num2);
-void int_xor_ul(int_p num1, unsigned long num2);
+int_p int_xor(const int_p num1, const int_p num2);
+int_p int_xor_ul(const int_p num1, unsigned long num2);
 
-void int_lshift(int_p num1, const int_p num2);
-void int_lshift_ul(int_p num1, unsigned long num2);
-void int_ul_lshift(unsigned long num1, int_p num2);
+int_p int_lshift(const int_p num1, const int_p num2);
+int_p int_lshift_ul(const int_p num1, unsigned long num2);
+int_p int_ul_lshift(unsigned long num1, const int_p num2);
 
-void int_rshift(int_p num1, const int_p num2);
-void int_rshift_ul(int_p num1, unsigned long num2);
-void int_ul_rshift(unsigned long num1, int_p num2);
+int_p int_rshift(const int_p num1, const int_p num2);
+int_p int_rshift_ul(const int_p num1, unsigned long num2);
+int_p int_ul_rshift(unsigned long num1, const int_p num2);
 
 char int_equal(const int_p num1, const int_p num2);
 char int_equal_ul(const int_p num1, unsigned long num2);
@@ -93,9 +95,9 @@ char int_ul_greater_equal(unsigned long num1, const int_p num2);
 
 /* */
 
-void int_negate(int_p num);
+int_p int_negate(const int_p num);
 
-void int_not(int_p num);
+int_p int_not(const int_p num);
 
 /* */
 

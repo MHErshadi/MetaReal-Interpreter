@@ -7,8 +7,16 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_add(float_p num1, const float_p num2)
+float_p float_add(const float_p num1, const float_p num2)
 {
-    mpfr_add(num1->value, num1->value, num2->value, MPFR_RNDN);
+    float_p res = malloc(sizeof(float_t));
+
+    mpfr_init2(res->value, prec_bit);
+    res->ref = 0;
+
+    mpfr_add(res->value, num1->value, num2->value, MPFR_RNDN);
+
+    return res;
 }

@@ -10,9 +10,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-char* float_get_str(float_p src, unsigned long long prec)
+char* float_get_str(const float_p src)
 {
-    unsigned long long prec_c = prec;
+    unsigned long long prec_c = prec_show;
     unsigned char length = 0;
 
     do
@@ -22,9 +22,9 @@ char* float_get_str(float_p src, unsigned long long prec)
     } while (prec_c);
 
     char* format = malloc(5 + length);
-    sprintf(format, "%%.%lluRg", prec);
+    sprintf(format, "%%.%lluRg", prec_show);
 
-    char* str = malloc(prec + 100);
+    char* str = malloc(prec_show + 100);
     mpfr_sprintf(str, format, src->value);
 
     str = realloc(str, strlen(str) + 1);

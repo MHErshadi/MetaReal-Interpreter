@@ -19,9 +19,11 @@ struct __int__
 typedef struct __int__ int_t;
 typedef struct __int__* int_p;
 
+#define int_ref(num) (((int_p)(num))->ref)
+
 int_p int_set(const int_p src);
-int_p int_set_str(const char* str, unsigned long long size, unsigned char base, unsigned long long ref);
-int_p int_set_ull(unsigned long long src, unsigned long long ref);
+int_p int_set_str(const char* str, unsigned long long size, unsigned char base);
+int_p int_set_ull(unsigned long long src);
 
 unsigned long long int_get_ull(const int_p src);
 char* int_get_str(const int_p src);

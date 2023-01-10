@@ -9,14 +9,20 @@
 #include <float.h>
 #include <stdlib.h>
 
-int_p float_quotient(float_p num1, const float_p num2)
+int_p float_quotient(const float_p num1, const float_p num2)
 {
-    mpfr_div(num1->value, num1->value, num2->value, MPFR_RNDN);
-
     int_p res = malloc(sizeof(float_t));
 
     mpz_init(res->value);
-    mpfr_get_z(res->value, num1->value, MPFR_RNDD);
+    res->ref = 0;
 
+    mpfr_t resf;
+    mpfr_init2(resf, prec_bit);
+
+    mpfr_div(resf, num1->value, num2->value, MPFR_RNDN);
+
+    mpfr_get_z(res->value, resf, MPFR_RNDD);
+
+    mpfr_clear(resf);
     return res;
 }

@@ -7,8 +7,16 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_add_ul(float_p num1, unsigned long num2)
+float_p float_add_ul(const float_p num1, unsigned long num2)
 {
-    mpfr_add_ui(num1->value, num1->value, num2, MPFR_RNDN);
+    float_p res = malloc(sizeof(float_t));
+
+    mpfr_init2(res->value, prec_bit);
+    res->ref = 0;
+
+    mpfr_add_ui(res->value, num1->value, num2, MPFR_RNDN);
+
+    return res;
 }

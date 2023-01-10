@@ -7,14 +7,18 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_modulo_ul(float_p num1, unsigned long num2)
+float_p float_modulo_ul(const float_p num1, unsigned long num2)
 {
-    mpfr_t num2f;
-    mpfr_init2(num2f, mpfr_get_prec(num1->value));
-    mpfr_set_ui(num2f, num2, MPFR_RNDN);
+    float_p res = malloc(sizeof(float_t));
 
-    mpfr_remainder(num1->value, num1->value, num2f, MPFR_RNDN);
+    mpfr_init2(res->value, prec_bit);
+    mpfr_set_ui(res->value, num2, MPFR_RNDN);
 
-    mpfr_clear(num2f);
+    res->ref = 0;
+
+    mpfr_remainder(res->value, num1->value, res->value, MPFR_RNDN);
+
+    return res;
 }

@@ -7,13 +7,22 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_quotient_int(float_p num1, int_p num2)
+int_p float_quotient_int(const float_p num1, const int_p num2)
 {
-    mpfr_div_z(num1->value, num1->value, num2->value, MPFR_RNDN);
+    int_p res = malloc(sizeof(int_t));
 
-    mpz_clear(num2->value);
+    mpz_init(res->value);
+    res->ref = 0;
 
-    mpz_init(num2->value);
-    mpfr_get_z(num2->value, num1->value, MPFR_RNDD);
+    mpfr_t resf;
+    mpfr_init2(resf, prec_bit);
+
+    mpfr_div_z(resf, num1->value, num2->value, MPFR_RNDN);
+
+    mpfr_get_z(res->value, resf, MPFR_RNDD);
+
+    mpfr_clear(resf);
+    return res;
 }

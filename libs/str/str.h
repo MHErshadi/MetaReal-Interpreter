@@ -20,11 +20,12 @@ typedef struct __str__ str_t;
 typedef struct __str__* str_p;
 
 #define str_size(str) (((str_p)(str))->size)
+#define str_ref(str) (((str_p)(str))->ref)
 
 /* */
 
 str_p str_set(const str_p src);
-str_p str_set_str(const char* src, unsigned long long size, unsigned long long ref);
+str_p str_set_str(const char* src, unsigned long long size);
 
 void str_free(str_p str);
 

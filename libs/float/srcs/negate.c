@@ -7,8 +7,16 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_negate(float_p num)
+float_p float_negate(const float_p num)
 {
-    mpfr_neg(num->value, num->value, MPFR_RNDN);
+    float_p res = malloc(sizeof(float_t));
+
+    mpfr_init2(res->value, prec_bit);
+    res->ref = 0;
+
+    mpfr_neg(res->value, num->value, MPFR_RNDN);
+
+    return res;
 }

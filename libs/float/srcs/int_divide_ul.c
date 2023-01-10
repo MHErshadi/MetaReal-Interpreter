@@ -9,12 +9,14 @@
 #include <float.h>
 #include <stdlib.h>
 
-float_p float_int_divide_ul(const int_p num1, unsigned long num2, unsigned long long prec)
+float_p float_int_divide_ul(const int_p num1, unsigned long num2)
 {
     float_p res = malloc(sizeof(float_t));
 
-    mpfr_init2(res->value, prec);
+    mpfr_init2(res->value, prec_bit);
     mpfr_set_z(res->value, num1->value, MPFR_RNDN);
+
+    res->ref = 0;
 
     mpfr_div_ui(res->value, res->value, num2, MPFR_RNDN);
 

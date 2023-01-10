@@ -7,8 +7,16 @@
 /*/
 
 #include <float.h>
+#include <stdlib.h>
 
-void float_power(float_p num1, const float_p num2)
+float_p float_power(const float_p num1, const float_p num2)
 {
-    mpfr_pow(num1->value, num1->value, num2->value, MPFR_RNDN);
+    float_p res = malloc(sizeof(float_t));
+
+    mpfr_init2(res->value, prec_bit);
+    res->ref = 0;
+
+    mpfr_pow(res->value, num1->value, num2->value, MPFR_RNDN);
+
+    return res;
 }

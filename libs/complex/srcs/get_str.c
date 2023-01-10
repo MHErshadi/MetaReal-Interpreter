@@ -10,9 +10,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-char* complex_get_str(const complex_p src, unsigned long long prec)
+char* complex_get_str(const complex_p src)
 {
-    unsigned long long prec_c = prec;
+    unsigned long long prec_c = complex_prec_show;
     unsigned char length = 0;
 
     do
@@ -24,9 +24,9 @@ char* complex_get_str(const complex_p src, unsigned long long prec)
     if (mpfr_sgn(mpc_realref(src->value)))
     {
         char* format = malloc(13 + length * 2);
-        sprintf(format, "(%%.%lluRg%%+.%lluRgi)", prec, prec);
+        sprintf(format, "(%%.%lluRg%%+.%lluRgi)", complex_prec_show, complex_prec_show);
 
-        char* str = malloc(prec * 2 + 100);
+        char* str = malloc(complex_prec_show * 2 + 100);
         mpfr_sprintf(str, format, mpc_realref(src->value), mpc_imagref(src->value));
 
         str = realloc(str, strlen(str) + 1);
@@ -37,9 +37,9 @@ char* complex_get_str(const complex_p src, unsigned long long prec)
     else
     {
         char* format = malloc(6 + length);
-        sprintf(format, "%%.%lluRgi", prec);
+        sprintf(format, "%%.%lluRgi", complex_prec_show);
 
-        char* str = malloc(prec + 100);
+        char* str = malloc(complex_prec_show + 100);
         mpfr_sprintf(str, format, mpc_imagref(src->value));
 
         str = realloc(str, strlen(str) + 1);

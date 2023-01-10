@@ -20,8 +20,8 @@ struct __float__
 typedef struct __float__ float_t;
 typedef struct __float__* float_p;
 
-unsigned long long prec_bit;
-unsigned long long prec_show;
+unsigned long long float_prec_bit;
+unsigned long long float_prec_show;
 
 #define float_ref(num) (((float_p)(num))->ref)
 

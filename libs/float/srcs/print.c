@@ -11,7 +11,7 @@
 
 void float_print(FILE* stream, const float_p num, const char* end)
 {
-    unsigned long long prec_c = prec_show;
+    unsigned long long prec_c = float_prec_show;
     unsigned char length = 0;
 
     do
@@ -21,7 +21,7 @@ void float_print(FILE* stream, const float_p num, const char* end)
     } while (prec_c);
 
     char* format = malloc(7 + length);
-    sprintf(format, "%%.%lluRg%%s", prec_show);
+    sprintf(format, "%%.%lluRg%%s", float_prec_show);
 
     mpfr_fprintf(stream, format, num->value, end);
 

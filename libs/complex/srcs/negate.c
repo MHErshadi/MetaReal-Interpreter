@@ -7,8 +7,16 @@
 /*/
 
 #include <complex.h>
+#include <stdlib.h>
 
-void complex_negate(complex_p num)
+complex_p complex_negate(const complex_p num)
 {
-    mpc_neg(num->value, num->value, MPC_RNDNN);
+    complex_p res = malloc(sizeof(complex_t));
+
+    mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
+    res->ref = 0;
+
+    mpc_neg(res->value, num->value, MPC_RNDNN);
+
+    return res;
 }

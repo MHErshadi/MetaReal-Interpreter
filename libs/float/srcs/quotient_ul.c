@@ -17,7 +17,7 @@ int_p float_quotient_ul(const float_p num1, unsigned long num2)
     res->ref = 0;
 
     mpfr_t resf;
-    mpfr_init2(resf, prec_bit);
+    mpfr_init2(resf, float_prec_bit);
 
     mpfr_div_ui(resf, num1->value, num2, MPFR_RNDN);
 

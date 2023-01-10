@@ -7,8 +7,16 @@
 /*/
 
 #include <complex.h>
+#include <stdlib.h>
 
-void complex_power(complex_p num1, const complex_p num2)
+complex_p complex_power(const complex_p num1, const complex_p num2)
 {
-    mpc_pow(num1->value, num1->value, num2->value, MPC_RNDNN);
+    complex_p res = malloc(sizeof(complex_t));
+
+    mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
+    res->ref = 0;
+
+    mpc_pow(res->value, num1->value, num2->value, MPC_RNDNN);
+
+    return res;
 }

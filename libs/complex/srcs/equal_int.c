@@ -11,12 +11,11 @@
 char complex_equal_int(const complex_p num1, const int_p num2)
 {
     mpc_t num2c;
-    mpc_init3(num2c, mpfr_get_prec(mpc_realref(num1->value)), mpfr_get_prec(mpc_imagref(num1->value)));
+    mpc_init3(num2c, complex_prec_bit, complex_prec_bit);
     mpc_set_z(num2c, num2->value, MPC_RNDNN);
 
     char res = !mpc_cmp(num1->value, num2c);
 
     mpc_clear(num2c);
-
     return res;
 }

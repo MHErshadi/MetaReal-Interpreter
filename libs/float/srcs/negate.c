@@ -13,7 +13,7 @@ float_p float_negate(const float_p num)
 {
     float_p res = malloc(sizeof(float_t));
 
-    mpfr_init2(res->value, prec_bit);
+    mpfr_init2(res->value, float_prec_bit);
     res->ref = 0;
 
     mpfr_neg(res->value, num->value, MPFR_RNDN);

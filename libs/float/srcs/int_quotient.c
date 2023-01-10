@@ -17,7 +17,7 @@ int_p float_int_quotient(const int_p num1, const float_p num2)
     res->ref = 0;
 
     mpfr_t num1f;
-    mpfr_init2(num1f, prec_bit);
+    mpfr_init2(num1f, float_prec_bit);
     mpfr_set_z(num1f, num1->value, MPFR_RNDN);
 
     mpfr_div(num1f, num1f, num2->value, MPFR_RNDN);

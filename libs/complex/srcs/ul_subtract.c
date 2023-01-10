@@ -7,8 +7,16 @@
 /*/
 
 #include <complex.h>
+#include <stdlib.h>
 
-void complex_ul_subtract(unsigned long num1, complex_p num2)
+complex_p complex_ul_subtract(unsigned long num1, const complex_p num2)
 {
-    mpc_ui_sub(num2->value, num1, num2->value, MPC_RNDNN);
+    complex_p res = malloc(sizeof(complex_t));
+
+    mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
+    res->ref = 0;
+
+    mpc_ui_sub(res->value, num1, num2->value, MPC_RNDNN);
+
+    return res;
 }

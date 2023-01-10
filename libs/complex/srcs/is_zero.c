@@ -8,7 +8,7 @@
 
 #include <complex.h>
 
-char complex_is_zero(complex_p num)
+char complex_is_zero(const complex_p num)
 {
     return !mpfr_sgn(mpc_realref(num->value)) && !mpfr_sgn(mpc_imagref(num->value));
 }

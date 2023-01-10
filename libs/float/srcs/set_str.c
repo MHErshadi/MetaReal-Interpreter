@@ -13,7 +13,7 @@ float_p float_set_str(const char* str, unsigned long long size, unsigned char ba
 {
     float_p dst = malloc(sizeof(float_t));
 
-    mpfr_init2(dst->value, prec_bit);
+    mpfr_init2(dst->value, float_prec_bit);
     mpfr_set_str(dst->value, str, base, MPFR_RNDN);
 
     dst->ref = 0;

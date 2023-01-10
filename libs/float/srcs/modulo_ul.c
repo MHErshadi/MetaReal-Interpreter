@@ -13,7 +13,7 @@ float_p float_modulo_ul(const float_p num1, unsigned long num2)
 {
     float_p res = malloc(sizeof(float_t));
 
-    mpfr_init2(res->value, prec_bit);
+    mpfr_init2(res->value, float_prec_bit);
     mpfr_set_ui(res->value, num2, MPFR_RNDN);
 
     res->ref = 0;

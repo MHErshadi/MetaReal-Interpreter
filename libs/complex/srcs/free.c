@@ -11,6 +11,12 @@
 
 void complex_free(complex_p num)
 {
+    if (num->ref)
+    {
+        num->ref--;
+        return;
+    }
+
     mpc_clear(num->value);
     free(num);
 }

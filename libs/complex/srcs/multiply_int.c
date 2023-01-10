@@ -7,14 +7,18 @@
 /*/
 
 #include <complex.h>
+#include <stdlib.h>
 
-void complex_multiply_int(complex_p num1, const int_p num2)
+complex_p complex_multiply_int(const complex_p num1, const int_p num2)
 {
-    mpfr_t num2f;
-    mpfr_init2(num2f, mpfr_get_prec(mpc_realref(num1->value)));
-    mpfr_set_z(num2f, num2->value, MPFR_RNDN);
+    complex_p res = malloc(sizeof(complex_t));
 
-    mpc_mul_fr(num1->value, num1->value, num2f, MPC_RNDNN);
+    mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
+    mpc_set_z(res->value, num2->value, MPC_RNDNN);
 
-    mpfr_clear(num2f);
+    res->ref = 0;
+
+    mpc_mul(res->value, num1->value, res->value, MPC_RNDNN);
+
+    return res;
 }

@@ -8,7 +8,7 @@
 
 #include <int.h>
 
-char* int_get_str(const int_p src)
+char* int_get_str(const int_p src, unsigned char base)
 {
-    return mpz_get_str(NULL, 10, src->value);
+    return mpz_get_str(NULL, base, src->value);
 }

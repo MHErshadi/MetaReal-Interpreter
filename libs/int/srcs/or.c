@@ -14,9 +14,13 @@ int_p int_or(const int_p num1, const int_p num2)
     int_p res = malloc(sizeof(int_t));
 
     mpz_init(res->value);
-    res->ref = 0;
 
     mpz_ior(res->value, num1->value, num2->value);
 
     return res;
+}
+
+void int_or_self(int_p num1, const int_p num2)
+{
+    mpz_ior(num1->value, num1->value, num2->value);
 }

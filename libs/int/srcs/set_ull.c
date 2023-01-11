@@ -16,7 +16,5 @@ int_p int_set_ull(unsigned long long src)
     mpz_init(dst->value);
     mpz_import(dst->value, 1, -1, sizeof(unsigned long long), 0, 0, &src);
 
-    dst->ref = 0;
-
     return dst;
 }

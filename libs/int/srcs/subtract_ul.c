@@ -14,9 +14,13 @@ int_p int_subtract_ul(const int_p num1, unsigned long num2)
     int_p res = malloc(sizeof(int_t));
 
     mpz_init(res->value);
-    res->ref = 0;
 
     mpz_sub_ui(res->value, num1->value, num2);
 
     return res;
+}
+
+void int_subtract_ul_self(int_p num1, unsigned long num2)
+{
+    mpz_sub_ui(num1->value, num1->value, num2);
 }

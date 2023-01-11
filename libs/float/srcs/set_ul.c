@@ -16,7 +16,5 @@ float_p float_set_ul(unsigned long src)
     mpfr_init2(dst->value, float_prec_bit);
     mpfr_set_ui(dst->value, src, MPFR_RNDN);
 
-    dst->ref = 0;
-
     return dst;
 }

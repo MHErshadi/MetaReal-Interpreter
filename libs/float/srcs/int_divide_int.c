@@ -16,8 +16,6 @@ float_p float_int_divide_int(const int_p num1, const int_p num2)
     mpfr_init2(res->value, float_prec_bit);
     mpfr_set_z(res->value, num1->value, MPFR_RNDN);
 
-    res->ref = 0;
-
     mpfr_div_z(res->value, res->value, num2->value, MPFR_RNDN);
 
     return res;

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-char* float_get_str(const float_p src)
+char* float_get_str(const float_p src, unsigned char base)
 {
     unsigned long long prec_c = float_prec_show;
     unsigned char length = 0;

@@ -14,9 +14,13 @@ float_p float_power_int(const float_p num1, const int_p num2)
     float_p res = malloc(sizeof(float_t));
 
     mpfr_init2(res->value, float_prec_bit);
-    res->ref = 0;
 
     mpfr_pow_z(res->value, num1->value, num2->value, MPFR_RNDN);
 
     return res;
+}
+
+void float_power_int_self(float_p num1, const int_p num2)
+{
+    mpfr_pow_z(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

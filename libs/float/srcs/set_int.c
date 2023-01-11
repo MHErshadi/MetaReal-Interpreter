@@ -16,7 +16,5 @@ float_p float_set_int(const int_p src)
     mpfr_init2(dst->value, float_prec_bit);
     mpfr_set_z(dst->value, src->value, MPFR_RNDN);
 
-    dst->ref = 0;
-
     return dst;
 }

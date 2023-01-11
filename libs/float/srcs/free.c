@@ -11,12 +11,6 @@
 
 void float_free(float_p num)
 {
-    if (num->ref)
-    {
-        num->ref--;
-        return;
-    }
-
     mpfr_clear(num->value);
     free(num);
 }

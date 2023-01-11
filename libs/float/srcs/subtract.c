@@ -14,9 +14,13 @@ float_p float_subtract(const float_p num1, const float_p num2)
     float_p res = malloc(sizeof(float_t));
 
     mpfr_init2(res->value, float_prec_bit);
-    res->ref = 0;
 
     mpfr_sub(res->value, num1->value, num2->value, MPFR_RNDN);
 
     return res;
+}
+
+void float_subtract_self(float_p num1, const float_p num2)
+{
+    mpfr_sub(num1->value, num1->value, num2->value, MPFR_RNDN);
 }

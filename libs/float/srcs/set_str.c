@@ -16,7 +16,5 @@ float_p float_set_str(const char* str, unsigned long long size, unsigned char ba
     mpfr_init2(dst->value, float_prec_bit);
     mpfr_set_str(dst->value, str, base, MPFR_RNDN);
 
-    dst->ref = 0;
-
     return dst;
 }

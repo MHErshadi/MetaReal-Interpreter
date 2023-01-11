@@ -16,8 +16,6 @@ float_p float_int_divide_ul(const int_p num1, unsigned long num2)
     mpfr_init2(res->value, float_prec_bit);
     mpfr_set_z(res->value, num1->value, MPFR_RNDN);
 
-    res->ref = 0;
-
     mpfr_div_ui(res->value, res->value, num2, MPFR_RNDN);
 
     return res;

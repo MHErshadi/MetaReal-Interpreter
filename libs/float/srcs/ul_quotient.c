@@ -14,7 +14,6 @@ int_p float_ul_quotient(unsigned long num1, const float_p num2)
     int_p res = malloc(sizeof(int_t));
 
     mpz_init(res->value);
-    res->ref = 0;
 
     mpfr_t resf;
     mpfr_init2(resf, float_prec_bit);

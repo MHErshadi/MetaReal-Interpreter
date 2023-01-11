@@ -20,6 +20,8 @@ struct _complex__
 typedef struct _complex__ complex_t;
 typedef struct _complex__* complex_p;
 
+#define complex_ref(num) (((complex_p)(num))->ref)
+
 unsigned long long complex_prec_bit;
 unsigned long long complex_prec_show;
 

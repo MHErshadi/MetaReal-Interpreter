@@ -18,7 +18,6 @@ str_p str_str_concat(const char* str1, const str_p str2)
 
     res->size = str1_size + str2->size;
     res->str = malloc(res->size + 1);
-    res->ref = 0;
 
     unsigned long long i;
     for (i = 0; i < str1_size; i++)
@@ -29,4 +28,32 @@ str_p str_str_concat(const char* str1, const str_p str2)
         res->str[i] = str2->str[j];
 
     return res;
+}
+
+void str_str_concat_self(char* str1, str_p str2)
+{
+    unsigned long long str1_size = strlen(str1);
+
+    if (!str2->size)
+    {
+        str2->str = malloc(str1_size + 1);
+        str2->size = str1_size;
+
+        unsigned long long i;
+        for (i = 0; i <= str1_size; i++)
+            str2->str[i] = str1[i];
+
+        return;
+    }
+
+    str2->size += str1_size;
+
+    str1 = realloc(str1, str2->size + 1);
+
+    unsigned long long i, j;
+    for (i = str1_size, j = 0; i <= str2->size; i++, j++)
+        str1[i] = str2->str[j];
+
+    free(str2->str);
+    str2->str = str1;
 }

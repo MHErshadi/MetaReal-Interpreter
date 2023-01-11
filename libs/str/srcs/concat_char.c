@@ -15,7 +15,6 @@ str_p str_concat_char(const str_p str, char chr)
 
     res->size = str->size + 1;
     res->str = malloc(res->size + 1);
-    res->ref = 0;
 
     unsigned long long i;
     for (i = 0; i < str->size; i++)
@@ -25,4 +24,22 @@ str_p str_concat_char(const str_p str, char chr)
     res->str[i] = '\0';
 
     return res;
+}
+
+void str_concat_char_self(str_p str, char chr)
+{
+    if (!str->size)
+    {
+        str->str = malloc(2);
+        str->size = 1;
+
+        *str->str = chr;
+        str->str[1] = '\0';
+
+        return;
+    }
+
+    str->str = realloc(str->str, str->size + 2);
+    str->str[str->size++] = chr;
+    str->str[str->size] = '\0';
 }

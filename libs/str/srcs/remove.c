@@ -13,8 +13,6 @@ str_p str_remove(const str_p str, unsigned long long pos)
 {
     str_p res = malloc(sizeof(str_t));
 
-    res->ref = 0;
-
     if (str->size == 1)
     {
         res->str = malloc(1);
@@ -35,4 +33,21 @@ str_p str_remove(const str_p str, unsigned long long pos)
         res->str[i] = str->str[i + 1];
 
     return res;
+}
+
+void str_remove_self(str_p str, unsigned long long pos)
+{
+    if (str->size == 1)
+    {
+        free(str->str);
+        str->size = 0;
+        return;
+    }
+
+    unsigned long long i;
+    for (i = pos; i < str->size; i++)
+        str->str[i] = str->str[i + 1];
+
+    str->str = realloc(str->str, str->size);
+    str->size--;
 }

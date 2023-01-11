@@ -11,7 +11,6 @@
 #include <array/list.h>
 #include <structure/function.h>
 #include <stdlib.h>
-#include <setting.h>
 #include <string.h>
 #include <lexer/token.h>
 #include <def.h>
@@ -262,7 +261,7 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
         return ires_fail(invalid_access_object(INT_V, poss, pose, context));
     }
 
-    int_p ptr = int_set_str(node->value, node->size);
+    int_p ptr = int_set_str(node->value, node->size, 10);
     value_t value = value_set1(INT_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
@@ -281,7 +280,7 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
         return ires_fail(invalid_access_object(FLOAT_V, poss, pose, context));
     }
 
-    float_p ptr = float_set_str(node->value, node->size, setting.float_prec_bit);
+    float_p ptr = float_set_str(node->value, node->size, 10);
     value_t value = value_set1(FLOAT_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
@@ -300,7 +299,7 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
         return ires_fail(invalid_access_object(COMPLEX_V, poss, pose, context));
     }
 
-    complex_p ptr = complex_set_str(node->value, node->size, setting.complex_prec_bit);
+    complex_p ptr = complex_set_str(NULL, 0, node->value, node->size, 10);
     value_t value = value_set1(COMPLEX_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
@@ -497,9 +496,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     ires_t ires;
     ires.response = 0;
 
-    char mask = IPROP_COVER(properties, 0, 0, node->operator >= PLUS_T && node->operator <= B_NOT_T);
-
-    value_t left = ires_merge(&ires, interpret_node(&node->left, context, mask));
+    value_t left = ires_merge(&ires, interpret_node(&node->left, context, IPROP_COVER(properties, 0, 0, 0)));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -586,7 +583,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         goto ret;
     }
 
-    right = ires_merge(&ires, interpret_node(&node->right, context, mask));
+    right = ires_merge(&ires, interpret_node(&node->right, context, IPROP_COVER(properties, 0, 0, 0)));
     if (IRES_HAS_ERROR(ires.response))
     {
         value_free(&left);
@@ -695,9 +692,7 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     ires_t ires;
     ires.response = 0;
 
-    char mask = IPROP_COVER(properties, 0, 0, node->operator == MINUS_T || node->operator == B_NOT_T);
-
-    value_t operand = ires_merge(&ires, interpret_node(&node->operand, context, mask));
+    value_t operand = ires_merge(&ires, interpret_node(&node->operand, context, IPROP_COVER(properties, 0, 0, 0)));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))

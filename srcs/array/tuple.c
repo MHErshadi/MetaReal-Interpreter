@@ -12,41 +12,21 @@ tuple_p tuple_set(value_p elements, unsigned long long size)
 
     array->elements = elements;
     array->size = size;
+    array->ref = 0;
 
     return array;
 }
 
-tuple_p tuple_copy(const tuple_p array)
-{
-    tuple_p copy = malloc(sizeof(tuple_t));
-
-    copy->elements = malloc(array->size * sizeof(value_t));
-
-    unsigned long long i;
-    for (i = 0; i < array->size; i++)
-        copy->elements[i] = value_copy(&array->elements[i]);
-
-    copy->size = array->size;
-
-    return copy;
-}
-
 void tuple_free(tuple_p array)
 {
-    while (array->size)
-        value_delete(&array->elements[--array->size]);
-    free(array);
-}
-
-void tuple_free_exception(tuple_p array, unsigned long long exception)
-{
-    while (array->size)
+    if (array->ref)
     {
-        if (--array->size == exception)
-            continue;
-        value_free(&array->elements[array->size]);
+        array->ref--;
+        return;
     }
 
+    while (array->size)
+        value_delete(array->elements + --array->size);
     free(array);
 }
 
@@ -108,9 +88,4 @@ char tuple_contains(const tuple_p array, const value_p value)
             return 1;
 
     return 0;
-}
-
-unsigned long long tuple_size(const tuple_p array)
-{
-    return array->size;
 }

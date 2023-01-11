@@ -10,6 +10,12 @@
 
 void str_label(FILE* stream, const str_p str, const char* end)
 {
+    if (!str->size)
+    {
+        fputs("\"\"", stream);
+        return;
+    }
+
     fputc('"', stream);
 
     unsigned long long i;

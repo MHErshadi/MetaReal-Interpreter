@@ -4,8 +4,7 @@
 
 #include <interpreter/dollar_func.h>
 #include <debugger/runtime_error.h>
-#include <setting.h>
-#include <int.h>
+#include <complex.h>
 #include <str.h>
 #include <stdlib.h>
 #include <string.h>
@@ -298,28 +297,28 @@ ires_t df_param_get(unsigned char* id, const char* param_name, pos_p poss, pos_p
     if (!strcmp(param_name, "float_prec_bit"))
     {
         res.type = INT_V;
-        res.value.ptr = int_set_ull(setting.float_prec_bit);
+        res.value.ptr = int_set_ull(float_prec_bit);
 
         return ires_success(&res);
     }
     if (!strcmp(param_name, "float_prec_show"))
     {
         res.type = INT_V;
-        res.value.ptr = int_set_ull(setting.float_prec_show);
+        res.value.ptr = int_set_ull(float_prec_show);
 
         return ires_success(&res);
     }
     if (!strcmp(param_name, "complex_prec_bit"))
     {
         res.type = INT_V;
-        res.value.ptr = int_set_ull(setting.complex_prec_bit);
+        res.value.ptr = int_set_ull(complex_prec_bit);
 
         return ires_success(&res);
     }
     if (!strcmp(param_name, "complex_prec_show"))
     {
         res.type = INT_V;
-        res.value.ptr = int_set_ull(setting.complex_prec_show);
+        res.value.ptr = int_set_ull(complex_prec_show);
 
         return ires_success(&res);
     }
@@ -331,32 +330,32 @@ ires_t df_param_get(unsigned char* id, const char* param_name, pos_p poss, pos_p
 
 void df_float_prec(unsigned long long prec_bit)
 {
-    setting.float_prec_bit = prec_bit;
-    setting.float_prec_show = prec_bit >> 2;
+    float_prec_bit = prec_bit;
+    float_prec_show = prec_bit >> 2;
 }
 
 void df_float_prec_bit(unsigned long long prec_bit)
 {
-    setting.float_prec_bit = prec_bit;
+    float_prec_bit = prec_bit;
 }
 
 void df_float_prec_show(unsigned long long prec_bit)
 {
-    setting.float_prec_show = prec_bit;
+    float_prec_show = prec_bit;
 }
 
 void df_complex_prec(unsigned long long prec_bit)
 {
-    setting.complex_prec_bit = prec_bit;
-    setting.complex_prec_show = prec_bit >> 2;
+    complex_prec_bit = prec_bit;
+    complex_prec_show = prec_bit >> 2;
 }
 
 void df_complex_prec_bit(unsigned long long prec_bit)
 {
-    setting.complex_prec_bit = prec_bit;
+    complex_prec_bit = prec_bit;
 }
 
 void df_complex_prec_show(unsigned long long prec_bit)
 {
-    setting.complex_prec_show = prec_bit;
+    complex_prec_show = prec_bit;
 }

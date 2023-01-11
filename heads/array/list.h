@@ -11,29 +11,33 @@ struct __list__
 {
     value_p elements;
     unsigned long long size;
+
+    unsigned long long ref;
 };
 typedef struct __list__ list_t;
 typedef struct __list__* list_p;
 
+#define list_size(array) (((list_p)(array))->size)
+#define list_ref(array) (((list_p)(array))->ref)
+
+/* */
+
 list_p list_set(value_p elements, unsigned long long size);
 
-list_p list_copy(const list_p array);
-
 void list_free(list_p array);
-void list_free_exception(list_p array, unsigned long long exception);
 
 void list_print(FILE* stream, const list_p array, const char* end);
 
 /* */
 
-void list_append(list_p array1, value_p value);
+list_p list_append(const list_p array, value_p value);
 
-void list_concat(list_p array1, list_p array2);
-void list_concat_tuple(list_p array1, tuple_p array2);
+list_p list_concat(const list_p array1, const list_p array2);
+list_p list_concat_tuple(const list_p array1, const tuple_p array2);
 
-void list_remove(list_p array, unsigned long long pos);
+list_p list_remove(const list_p array, unsigned long long pos);
 
-void list_repeat(list_p array, unsigned long long count);
+list_p list_repeat(const list_p array, unsigned long long count);
 
 char list_equal(const list_p array1, const list_p array2);
 char list_equal_tuple(const list_p array1, const tuple_p array2);
@@ -45,10 +49,6 @@ char list_contains(const list_p array, const value_p value);
 
 /* */
 
-void list_reverse(list_p array);
-
-/* */
-
-unsigned long long list_size(const list_p array);
+list_p list_reverse(const list_p array);
 
 #endif /* __M_LIST__ */

@@ -20,7 +20,6 @@ str_p str_set_str(const char* src, unsigned long long size)
         dst->str[i] = src[i];
 
     dst->size = size;
-    dst->ref = 0;
 
     return dst;
 }

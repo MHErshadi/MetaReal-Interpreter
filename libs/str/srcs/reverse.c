@@ -14,7 +14,6 @@ str_p str_reverse(const str_p str)
     str_p res = malloc(sizeof(str_t));
 
     res->size = str->size;
-    res->ref = 0;
 
     if (!str->size)
     {
@@ -35,16 +34,28 @@ str_p str_reverse(const str_p str)
 
     res->str = malloc(str->size + 1);
 
-    char* start = res->str;
-    char* end = res->str + str->size - 1;
-
-    while (start < end)
-    {
-        char temp = *start;
-
-        *start++ = *end;
-        *end-- = temp;
-    }
+    unsigned long long i, j;
+    for (i = 0, j = str->size - 1; i < str->size; i++, j--)
+        res->str[i] = str->str[j];
+    res->str[i] = '\0';
 
     return res;
+}
+
+void str_reverse_self(str_p str)
+{
+    if (str->size <= 1)
+        return;
+
+    char* start = str->str;
+    char* end = str->str + str->size - 1;
+
+    char tmp;
+    while (start < end)
+    {
+        tmp = *start;
+
+        *start++ = *end;
+        *end-- = tmp;
+    }
 }

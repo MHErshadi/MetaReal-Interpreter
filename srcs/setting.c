@@ -3,6 +3,7 @@
 /*/
 
 #include <setting.h>
+#include <complex.h>
 
 void setting_init()
 {
@@ -10,9 +11,9 @@ void setting_init()
     setting.input = stdin;
     setting.error = stderr;
 
-    setting.float_prec_bit = 64;
-    setting.float_prec_show = 16;
+    float_prec_bit = 64;
+    float_prec_show = 16;
 
-    setting.complex_prec_bit = 64;
-    setting.complex_prec_show = 16;
+    complex_prec_bit = 64;
+    complex_prec_show = 16;
 }

@@ -11,11 +11,8 @@
 
 void str_free(str_p str)
 {
-    if (str->ref)
-    {
-        str->ref--;
+    if (!str->size)
         return;
-    }
 
     free(str->str);
     free(str);

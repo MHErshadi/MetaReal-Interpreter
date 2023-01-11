@@ -2,6 +2,7 @@
  * MetaReal version 1.0.0
 /*/
 
+#include <int.h>
 #include <array/list.h>
 #include <interpreter/operation.h>
 #include <stdlib.h>
@@ -12,41 +13,21 @@ list_p list_set(value_p elements, unsigned long long size)
 
     array->elements = elements;
     array->size = size;
+    array->ref = 0;
 
     return array;
 }
 
-list_p list_copy(const list_p array)
-{
-    list_p copy = malloc(sizeof(list_t));
-
-    copy->elements = malloc(array->size * sizeof(value_t));
-
-    unsigned long long i;
-    for (i = 0; i < array->size; i++)
-        copy->elements[i] = value_copy(&array->elements[i]);
-
-    copy->size = array->size;
-
-    return copy;
-}
-
 void list_free(list_p array)
 {
-    while (array->size)
-        value_free(&array->elements[--array->size]);
-    free(array);
-}
-
-void list_free_exception(list_p array, unsigned long long exception)
-{
-    while (array->size)
+    if (array->ref)
     {
-        if (--array->size == exception)
-            continue;
-        value_delete(&array->elements[array->size]);
+        array->ref--;
+        return;
     }
 
+    while (array->size)
+        value_free(array->elements + --array->size);
     free(array);
 }
 
@@ -71,116 +52,174 @@ void list_print(FILE* stream, const list_p array, const char* end)
     fprintf(stream, "]%s", end);
 }
 
-void list_append(list_p array1, value_p value)
+list_p list_append(const list_p array, value_p value)
 {
-    if (!array1->size)
-    {
-        array1->size = 1;
-        array1->elements = malloc(sizeof(value_t));
+    list_p res = malloc(sizeof(list_t));
 
-        *array1->elements = *value;
-        return;
-    }
-
-    array1->size++;
-    array1->elements = realloc(array1->elements, array1->size * sizeof(value_t));
-
-    array1->elements[array1->size - 1] = *value;
-}
-
-void list_concat(list_p array1, const list_p array2)
-{
-    if (!array1->size)
-    {
-        array1->elements = array2->elements;
-        array1->size = array2->size;
-        return;
-    }
-
-    unsigned long long size = array1->size + array2->size;
-    array1->elements = realloc(array1->elements, size * sizeof(value_t));
-
-    unsigned long long i;
-    for (i = 0; i < array2->size; i++)
-        array1->elements[array1->size + i] = array2->elements[i];
-
-    array1->size = size;
-}
-
-void list_concat_tuple(list_p array1, const tuple_p array2)
-{
-    if (!array1->size)
-    {
-        array1->elements = array2->elements;
-        array1->size = array2->size;
-        return;
-    }
-
-    unsigned long long size = array1->size + array2->size;
-    array1->elements = realloc(array1->elements, size * sizeof(value_t));
-
-    unsigned long long i;
-    for (i = 0; i < array2->size; i++)
-        array1->elements[array1->size + i] = array2->elements[i];
-
-    array1->size = size;
-}
-
-void list_remove(list_p array, unsigned long long pos)
-{
-    if (array->size == 1)
-    {
-        free(array->elements);
-        array->size = 0;
-        return;
-    }
-
-    array->size--;
-
-    unsigned long long i;
-    for (i = pos; i < array->size; i++)
-        array->elements[i] = array->elements[i + 1];
-
-    array->elements = realloc(array->elements, array->size * sizeof(value_t));
-}
-
-void list_repeat(list_p array, unsigned long long count)
-{
-    if (!count)
-    {
-        if (array->size)
-        {
-            free(array->elements);
-            array->size = 0;
-        }
-        return;
-    }
-
-    if (count == 1)
-        return;
+    res->ref = 0;
 
     if (!array->size)
-        return;
+    {
+        res->elements = malloc(sizeof(value_t));
+        res->size = 1;
 
-    unsigned long long size = array->size * count;
-    array->elements = realloc(array->elements, size * sizeof(value_t));
+        *res->elements = *value;
+
+        return res;
+    }
+
+    res->size = array->size + 1;
+    res->elements = malloc(res->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < array->size; i++)
+        res->elements[i] = value_copy(array->elements + i);
+    res->elements[i] = *value;
+
+    return res;
+}
+
+list_p list_concat(const list_p array1, const list_p array2)
+{
+    list_p res = malloc(sizeof(list_t));
+
+    res->ref = 0;
+
+    if (!array1->size)
+    {
+        if (!array2->size)
+        {
+            res->size = 0;
+            return res;
+        }
+
+        unsigned long long i;
+        for (i = 0; i < array2->size; i++)
+            res->elements[i] = value_copy(array2->elements + i);
+
+        res->size = array2->size;
+
+        return res;
+    }
+
+    if (!array2->size)
+    {
+        unsigned long long i;
+        for (i = 0; i < array1->size; i++)
+            res->elements[i] = value_copy(array1->elements + i);
+
+        res->size = array1->size;
+
+        return res;
+    }
+
+    res->size = array1->size + array2->size;
+    res->elements = malloc(res->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < array1->size; i++)
+        res->elements[i] = value_copy(array1->elements + i);
+
+    unsigned long long j;
+    for (j = 0; j < array2->size; i++, j++)
+        res->elements[i] = value_copy(array2->elements + j);
+
+    return res;
+}
+
+list_p list_concat_tuple(const list_p array1, const tuple_p array2)
+{
+    list_p res = malloc(sizeof(list_t));
+
+    res->ref = 0;
+
+    if (!array1->size)
+    {
+        if (!array2->size)
+        {
+            res->size = 0;
+            return res;
+        }
+
+        unsigned long long i;
+        for (i = 0; i < array2->size; i++)
+            res->elements[i] = value_copy(array2->elements + i);
+
+        res->size = array2->size;
+
+        return res;
+    }
+
+    if (!array2->size)
+    {
+        unsigned long long i;
+        for (i = 0; i < array1->size; i++)
+            res->elements[i] = value_copy(array1->elements + i);
+
+        res->size = array1->size;
+
+        return res;
+    }
+
+    res->size = array1->size + array2->size;
+    res->elements = malloc(res->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < array1->size; i++)
+        res->elements[i] = value_copy(array1->elements + i);
+
+    unsigned long long j;
+    for (j = 0; j < array2->size; i++, j++)
+        res->elements[i] = value_copy(array2->elements + j);
+
+    return res;
+}
+
+list_p list_remove(const list_p array, unsigned long long pos)
+{
+    list_p res = malloc(sizeof(list_t));
+
+    res->ref = 0;
 
     if (array->size == 1)
     {
-        unsigned long long i;
-        for (i = 1; i < size; i++)
-            array->elements[i] = value_copy(array->elements);
-
-        array->size = size;
-        return;
+        res->size = 0;
+        return res;
     }
 
-    unsigned long long i, j;
-    for (i = array->size; i < size;)
-        for (j = 0; j < array->size; i++, j++)
-            array->elements[i] = value_copy(&array->elements[j]);
+    res->size = array->size - 1;
+    res->elements = malloc(res->size * sizeof(value_t));
 
-    array->size = size;
+    unsigned long long i;
+    for (i = 0; i < pos; i++)
+        res->elements[i] = value_copy(array->elements + i);
+    for (; i < array->size - 1; i++)
+        res->elements[i] = value_copy(array->elements + i + 1);
+
+    return res;
+}
+
+list_p list_repeat(const list_p array, unsigned long long count)
+{
+    list_p res = malloc(sizeof(list_t));
+
+    res->ref = 0;
+
+    if (!count || !array->size)
+    {
+        res->size = 0;
+        return res;
+    }
+
+    res->size = array->size * count;
+    res->elements = malloc(res->size * sizeof(value_t));
+
+    unsigned long long i, j;
+    for (i = 0; i < res->size;)
+        for (j = 0; j < array->size; i++, j++)
+            res->elements[i] = value_copy(array->elements + j);
+
+    return res;
 }
 
 char list_equal(const list_p array1, const list_p array2)
@@ -248,24 +287,29 @@ char list_contains(const list_p array, const value_p value)
     return 0;
 }
 
-void list_reverse(list_p array)
+list_p list_reverse(const list_p array)
 {
-    if (array->size <= 1)
-        return;
+    list_p res = malloc(sizeof(list_t));
 
-    value_p start = array->elements;
-    value_p end = array->elements + array->size - 1;
+    res->size = array->size;
+    res->ref = 0;
 
-    while (start < end)
+    if (!array->size)
+        return res;
+    
+    if (array->size == 1)
     {
-        value_t temp = *start;
+        res->elements = malloc(sizeof(value_t));
+        *res->elements = value_copy(array->elements);
 
-        *start++ = *end;
-        *end-- = temp;
+        return res;
     }
-}
 
-unsigned long long list_size(const list_p array)
-{
-    return array->size;
+    res->elements = malloc(array->size * sizeof(value_t));
+
+    unsigned long long i;
+    for (i = 0; i < array->size; i++)
+        res->elements[i] = value_copy(array->elements + array->size - i - 1);
+
+    return res;
 }

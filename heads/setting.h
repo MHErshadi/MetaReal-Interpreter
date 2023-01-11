@@ -12,12 +12,6 @@ struct __setting__
     FILE* output;
     FILE* input;
     FILE* error;
-
-    unsigned long long float_prec_bit;
-    unsigned long long float_prec_show;
-
-    unsigned long long complex_prec_bit;
-    unsigned long long complex_prec_show;
 };
 typedef struct __setting__ setting_t;
 typedef struct __setting__* setting_p;

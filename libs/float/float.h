@@ -20,10 +20,10 @@ struct __float__
 typedef struct __float__ float_t;
 typedef struct __float__* float_p;
 
+#define float_ref(num) (((float_p)(num))->ref)
+
 unsigned long long float_prec_bit;
 unsigned long long float_prec_show;
-
-#define float_ref(num) (((float_p)(num))->ref)
 
 float_p float_set(const float_p src);
 float_p float_set_str(const char* str, unsigned long long size, unsigned char base);

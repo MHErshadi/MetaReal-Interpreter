@@ -10,5 +10,11 @@
 
 void str_print(FILE* stream, const str_p str, const char* end)
 {
+    if (!str->size)
+    {
+        fputs(end, stream);
+        return;
+    }
+
     fprintf(stream, "%s%s", str->str, end);
 }

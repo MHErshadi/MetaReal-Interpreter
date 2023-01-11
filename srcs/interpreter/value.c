@@ -49,22 +49,22 @@ value_t value_copy(const value_p value)
     switch (value->type)
     {
     case INT_V:
-        copy.value.ptr = int_set(copy.value.ptr);
+        int_ref(value->value.ptr)++;
         return copy;
     case FLOAT_V:
-        copy.value.ptr = float_set(copy.value.ptr, setting.float_prec_bit);
+        float_ref(value->value.ptr)++;
         return copy;
     case COMPLEX_V:
-        copy.value.ptr = complex_set(copy.value.ptr, setting.complex_prec_bit);
+        complex_ref(value->value.ptr)++;
         return copy;
     case STR_V:
-        copy.value.ptr = str_set(copy.value.ptr);
+        str_ref(value->value.ptr)++;
         return copy;
     case LIST_V:
-        copy.value.ptr = list_copy(copy.value.ptr);
+        list_ref(value->value.ptr)++;
         return copy;
     case TUPLE_V:
-        copy.value.ptr = tuple_copy(copy.value.ptr);
+        tuple_ref(value->value.ptr)++;
         return copy;
     case FUNC_V:
         copy.value.ptr = func_copy(copy.value.ptr);
@@ -141,10 +141,10 @@ void value_label(value_p value, const char* end)
         int_print(setting.output, value->value.ptr, end);
         return;
     case FLOAT_V:
-        float_print(setting.output, value->value.ptr, setting.float_prec_show, end);
+        float_print(setting.output, value->value.ptr, end);
         return;
     case COMPLEX_V:
-        complex_print(setting.output, value->value.ptr, setting.complex_prec_show, end);
+        complex_print(setting.output, value->value.ptr, end);
         return;
     case BOOL_V:
         fprintf(setting.output, value->value.chr ? "true%s" : "false%s", end);

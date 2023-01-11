@@ -14,9 +14,13 @@ complex_p complex_add_ul(const complex_p num1, unsigned long num2)
     complex_p res = malloc(sizeof(complex_t));
 
     mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
-    res->ref = 0;
 
     mpc_add_ui(res->value, num1->value, num2, MPC_RNDNN);
 
     return res;
+}
+
+void complex_add_ul_self(complex_p num1, unsigned long num2)
+{
+    mpc_add_ui(num1->value, num1->value, num2, MPC_RNDNN);
 }

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-char* complex_get_str(const complex_p src)
+char* complex_get_str(const complex_p src, unsigned char base)
 {
     unsigned long long prec_c = complex_prec_show;
     unsigned char length = 0;

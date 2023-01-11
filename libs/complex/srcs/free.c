@@ -3,7 +3,7 @@
  *
  * Complex Library version 1.0.0
  *
- * Frees (num) from (cellular) and its data from (heap)
+ * Frees (num)
 /*/
 
 #include <complex.h>
@@ -11,12 +11,6 @@
 
 void complex_free(complex_p num)
 {
-    if (num->ref)
-    {
-        num->ref--;
-        return;
-    }
-
     mpc_clear(num->value);
     free(num);
 }

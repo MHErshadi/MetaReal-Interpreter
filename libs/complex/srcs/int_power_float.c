@@ -16,8 +16,6 @@ complex_p complex_int_power_float(const int_p num1, const float_p num2)
     mpc_init3(res->value, complex_prec_bit, complex_prec_bit);
     mpc_set_z(res->value, num1->value, MPC_RNDNN);
 
-    res->ref = 0;
-
     mpc_pow_fr(res->value, res->value, num2->value, MPC_RNDNN);
 
     return res;

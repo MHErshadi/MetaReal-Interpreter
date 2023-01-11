@@ -16,7 +16,5 @@ complex_p complex_set_ul(unsigned long src)
     mpc_init3(dst->value, complex_prec_bit, complex_prec_bit);
     mpc_set_ui(dst->value, src, MPC_RNDNN);
 
-    dst->ref = 0;
-
     return dst;
 }

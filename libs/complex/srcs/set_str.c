@@ -27,7 +27,5 @@ complex_p complex_set_str(const char* str1, unsigned long long size1,
     else
         mpfr_set_zero(mpc_imagref(dst->value), 0);
 
-    dst->ref = 0;
-
     return dst;
 }

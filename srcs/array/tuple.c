@@ -6,27 +6,22 @@
 #include <interpreter/operation.h>
 #include <stdlib.h>
 
-tuple_p tuple_set(value_p elements, unsigned long long size)
+tuple_p tuple_set(value_p* elements, unsigned long long size)
 {
     tuple_p array = malloc(sizeof(tuple_t));
 
     array->elements = elements;
     array->size = size;
-    array->ref = 0;
 
     return array;
 }
 
 void tuple_free(tuple_p array)
 {
-    if (array->ref)
-    {
-        array->ref--;
-        return;
-    }
-
     while (array->size)
-        value_delete(array->elements + --array->size);
+        value_free(array->elements[--array->size]);
+
+    free(array->elements);
     free(array);
 }
 
@@ -39,13 +34,13 @@ void tuple_print(FILE* stream, const tuple_p array, const char* end)
     }
 
     fputc('(', stream);
-    value_label(array->elements, "");
+    value_label(*array->elements, "");
 
     unsigned long long i;
     for (i = 1; i < array->size; i++)
     {
         fprintf(stream, ", ");
-        value_label(&array->elements[i], "");
+        value_label(array->elements[i], "");
     }
 
     fprintf(stream, ")%s", end);
@@ -58,7 +53,7 @@ char tuple_equal(const tuple_p array1, const tuple_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
+        //if (!operate_equal_compare(array1->elements[i], array2->elements[i]))
             return 0;
 
     return 1;
@@ -71,7 +66,7 @@ char tuple_nequal(const tuple_p array1, const tuple_p array2)
 
     unsigned long long i;
     for (i = 0; i < array1->size; i++)
-        if (!operate_equal_compare(&array1->elements[i], &array2->elements[i]))
+        //if (!operate_equal_compare(array1->elements[i], array2->elements[i]))
             return 1;
 
     return 0;
@@ -84,7 +79,7 @@ char tuple_contains(const tuple_p array, const value_p value)
 
     unsigned long long i;
     for (i = 0; i < array->size; i++)
-        if (operate_equal_compare(&array->elements[i], value))
+        //if (operate_equal_compare(array->elements[i], value))
             return 1;
 
     return 0;

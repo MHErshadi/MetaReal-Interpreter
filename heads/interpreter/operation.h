@@ -37,7 +37,7 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
 ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose);
 ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose);
 
-/* */
+
 
 ires_t operate_positive(value_p operand);
 ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context);
@@ -49,7 +49,7 @@ ires_t operate_not(value_p operand);
 ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context);
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context);
 
-/* */
+
 
 void operate_success(value_p left, const value_p right);
 char operate_success_type_change(const value_p left, const value_p right);
@@ -58,7 +58,7 @@ char operate_equal_compare(const value_p left, const value_p right);
 char operate_less_compare(const value_p left, const value_p right);
 char operate_greater_compare(const value_p left, const value_p right);
 
-/* */
+
 
 char operate_sign(const value_p operand);
 

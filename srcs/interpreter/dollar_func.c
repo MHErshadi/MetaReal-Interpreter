@@ -77,8 +77,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_float_prec(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
     if (!strcmp(name, "float_prec_bit"))
     {
@@ -120,8 +119,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_float_prec_bit(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
     if (!strcmp(name, "float_prec_show"))
     {
@@ -157,8 +155,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_float_prec_show(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
     if (!strcmp(name, "complex_prec"))
     {
@@ -201,8 +198,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_complex_prec(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
     if (!strcmp(name, "complex_prec_bit"))
     {
@@ -245,8 +241,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_complex_prec_bit(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
     if (!strcmp(name, "complex_prec_show"))
     {
@@ -282,8 +277,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
 
         df_complex_prec_show(prec_bit);
 
-        res.type = NULL_V;
-        return ires_success(&res);
+        return ires_success(NULL);
     }
 
     return ires_fail(invalid_dollar_function(name,

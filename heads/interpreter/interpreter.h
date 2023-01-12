@@ -5,6 +5,7 @@
 #ifndef __M_INTERPRETER__
 #define __M_INTERPRETER__
 
+#include <parser/node.h>
 #include <debugger/errlib.h>
 
 #define IRES_RESPONSE_SET(has_error, func_return, loop_continue, loop_break, char_ptr) ((has_error) | (func_return) << 1 | (loop_continue) << 2 | (loop_break) << 3 | (char_ptr) << 4)
@@ -17,7 +18,7 @@
 
 struct __ires__
 {
-    value_t value;
+    value_p value;
     char response;
 
     runtime_t error;

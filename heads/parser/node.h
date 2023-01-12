@@ -6,6 +6,7 @@
 #define __M_NODE__
 
 #include <debugger/pos.h>
+#include <def.h>
 #include <stdio.h>
 
 #define PROP_PUBLIC(x) (x & 1)
@@ -90,13 +91,6 @@ enum _node_types_
     CONTINUE_N,
     BREAK_N
 };
-
-union __union_value__
-{
-    void* ptr;
-    unsigned char chr;
-};
-typedef union __union_value__ union_value_t;
 
 struct __node__
 {

@@ -65,4 +65,13 @@
 #define FUNC_CONTEXT_SIZE 16
 #define STRUCT_CONTEXT_SIZE 16
 
+/* */
+
+union __union_value__
+{
+    void* ptr;
+    unsigned char chr;
+};
+typedef union __union_value__ union_value_t;
+
 #endif /* __M_DEF__ */

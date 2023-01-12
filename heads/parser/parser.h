@@ -7,6 +7,7 @@
 
 #include <lexer/token.h>
 #include <debugger/errlib.h>
+#include <parser/node.h>
 
 struct __pres__
 {

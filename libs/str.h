@@ -34,7 +34,7 @@ str_p str_concat(const str_p str1, const str_p str2);
 void str_concat_self(str_p str1, str_p str2);
 
 str_p str_concat_str(const str_p str1, const char* str2);
-void str_concat_str_self(str_p str1, const char* str2);
+void str_concat_str_self(str_p str1, char* str2);
 
 str_p str_str_concat(const char* str1, const str_p str2);
 void str_str_concat_self(char* str1, str_p str2);

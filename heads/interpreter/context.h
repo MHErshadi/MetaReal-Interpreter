@@ -6,6 +6,8 @@
 #define __M_CONTEXT__
 
 #include "value.h"
+#include <debugger/pos.h>
+#include <stdio.h>
 
 #define VAR_PUBLIC(x) (x & 1)
 #define VAR_CONST(x)  (x >> 2 & 1)
@@ -17,7 +19,7 @@ struct __var__
     char* name;
 
     unsigned char type;
-    value_t value;
+    value_p value;
 };
 typedef struct __var__ var_t;
 typedef struct __var__* var_p;
@@ -56,8 +58,7 @@ void context_free_debug(context_p context);
 
 void context_print(FILE* stream, const char* label, const context_p context, const char* end);
 
-value_t context_var_get(context_p context, const char* name);
-value_p context_ptr_get(context_p context, unsigned char* type, const char* name, char* flag);
+value_p context_var_get(context_p context, unsigned char* type, const char* name, char* flag);
 
 /* */
 
@@ -68,13 +69,9 @@ table_t table_copy(const table_p table);
 void table_delete(table_p table);
 void table_free(table_p table);
 
-value_t table_var_get(table_p table, const char* name);
-value_p table_ptr_get(table_p table, unsigned char* type, const char* name, char* flag);
+value_p table_var_get(table_p table, unsigned char* type, const char* name, char* flag);
 
-char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value);
-value_p table_ptr_set(table_p table, unsigned char* ptype, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
-var_p table_ptr_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
-
-value_p table_ptr_add(table_p table, const char* name);
+var_p table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
+var_p table_var_add(table_p table, const char* name);
 
 #endif /* __M_CONTEXT__ */

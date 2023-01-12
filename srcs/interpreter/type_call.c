@@ -3,14 +3,9 @@
 /*/
 
 #include <interpreter/type_call.h>
+#include <stdlib.h>
 
 ires_t object_call(void* ptr)
 {
-    value_t res;
-
-    res.type = OBJECT_V;
-    res.value.ptr = ptr;
-    res.should_free = 0;
-
-    return ires_success(&res);
+    return ires_success(value_set1(OBJECT_V, ptr));
 }

@@ -6,6 +6,7 @@
 #define __M_FUNCTION__
 
 #include <interpreter/context.h>
+#include <parser/node.h>
 
 struct __arg_value_t__
 {

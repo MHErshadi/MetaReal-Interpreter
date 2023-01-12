@@ -5,21 +5,41 @@
 #ifndef __M_VALUE__
 #define __M_VALUE__
 
-#include <parser/node.h>
+#include <def.h>
 
 struct __value__
 {
     unsigned char type;
     union_value_t value;
 
-    unsigned char should_free;
+    unsigned long long ref;
 };
 typedef struct __value__ value_t;
 typedef struct __value__* value_p;
 
+#define value_copy(v) (v)->ref++;
+
+#define value_free_type(v, vt)         \
+    {                                  \
+        if ((v)->ref)                  \
+            (v)->ref--;                \
+        else                           \
+        {                              \
+            vt##_free((v)->value.ptr); \
+            free(v);                   \
+        }                              \
+    }
+
+#define value_free_shell(v) \
+    {                       \
+        if ((v)->ref)       \
+            (v)->ref--;     \
+        else                \
+            free(v);        \
+    }
+
 enum _value_types_
 {
-    NULL_V,
     NONE_V,
 
     OBJECT_V,
@@ -48,9 +68,9 @@ enum _value_types_
     STRCUT_V
 };
 
-static const char* value_labels[16] =
+static const char* value_labels[15] =
 {
-    "null", "none",
+    "none",
     "object",
     "int", "float", "complex",
     "bool",
@@ -63,9 +83,9 @@ static const char* value_labels[16] =
     "struct"
 };
 
-static const int value_label_lens[16] =
+static const int value_label_lens[15] =
 {
-    4, 4,
+    4,
     6,
     3, 5, 7,
     4,
@@ -78,13 +98,9 @@ static const int value_label_lens[16] =
     6
 };
 
-value_t value_set1(unsigned char type, void* ptr);
-value_t value_set2(unsigned char type, char chr);
-value_t value_set3(unsigned char type);
+value_p value_set1(unsigned char type, void* ptr);
+value_p value_set2(unsigned char type, char chr);
 
-value_t value_copy(const value_p value);
-
-void value_delete(value_p value);
 void value_free(value_p value);
 
 void value_label(value_p value, const char* end);

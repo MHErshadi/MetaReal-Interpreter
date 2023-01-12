@@ -36,13 +36,8 @@ void str_str_concat_self(char* str1, str_p str2)
 
     if (!str2->size)
     {
-        str2->str = malloc(str1_size + 1);
+        str2->str = str1;
         str2->size = str1_size;
-
-        unsigned long long i;
-        for (i = 0; i <= str1_size; i++)
-            str2->str[i] = str1[i];
-
         return;
     }
 

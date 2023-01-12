@@ -33,7 +33,7 @@ func_p func_copy(const func_p func)
 
     copy->size = func->size;
 
-    copy->context = context_copy(&func->context);
+    //copy->context = context_copy(&func->context);
 
     copy->body.nodes = node_p_copy(func->body.nodes, func->body.size);
     copy->body.size = func->body.size;
@@ -44,7 +44,7 @@ func_p func_copy(const func_p func)
 void func_free(func_p func)
 {
     free(func->context.name);
-    table_delete(&func->context.table);
+    //table_delete(&func->context.table);
 
     arg_value_free(func->args, func->size);
 
@@ -83,7 +83,7 @@ void func_table_free(table_p table, unsigned long long arg_size)
             continue;
         }
 
-        value_delete(&table->vars[i].value);
+        value_free(table->vars[i].value);
         free(table->vars[i].name);
     }
 
@@ -95,7 +95,7 @@ void func_table_free_args(table_p table, unsigned long long arg_size)
     unsigned long long i;
     for (i = 0; i < arg_size; i++)
     {
-        value_delete(&table->vars[i].value);
-        table->vars[i].value.type = NULL_V;
+        value_free(table->vars[i].value);
+        //table->vars[i].value = NULL;
     }
 }

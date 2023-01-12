@@ -203,6 +203,6 @@ void run_code(const char* code, unsigned long long size, context_p context)
 
     printf("time: %ld milliseconds\n", clock() - s);
 
-    value_label(&ires.value, "\n");
-    value_free(&ires.value);
+    value_label(ires.value, "\n");
+    value_free(ires.value);
 }

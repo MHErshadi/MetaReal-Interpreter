@@ -28,8 +28,15 @@ str_p str_concat_str(const str_p str1, const char* str2)
     return res;
 }
 
-void str_concat_str_self(str_p str1, const char* str2)
+void str_concat_str_self(str_p str1, char* str2)
 {
+    if (!str1->size)
+    {
+        str1->str = str2;
+        str1->size = strlen(str2);
+        return;
+    }
+
     unsigned long long size = str1->size + strlen(str2);
     str1->str = realloc(str1->str, size + 1);
 
@@ -38,4 +45,6 @@ void str_concat_str_self(str_p str1, const char* str2)
         str1->str[i] = str2[j];
 
     str1->size = size;
+
+    free(str2);
 }

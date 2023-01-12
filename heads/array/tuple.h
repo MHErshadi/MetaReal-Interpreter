@@ -6,23 +6,21 @@
 #define __M_TUPLE__
 
 #include <interpreter/value.h>
+#include <stdio.h>
 
 struct __tuple__
 {
-    value_p elements;
+    value_p* elements;
     unsigned long long size;
-
-    unsigned long long ref;
 };
 typedef struct __tuple__ tuple_t;
 typedef struct __tuple__* tuple_p;
 
 #define tuple_size(array) (((tuple_p)(array))->size)
-#define tuple_ref(array) (((tuple_p)(array))->ref)
 
 /* */
 
-tuple_p tuple_set(value_p elements, unsigned long long size);
+tuple_p tuple_set(value_p* elements, unsigned long long size);
 
 void tuple_free(tuple_p array);
 

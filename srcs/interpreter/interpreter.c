@@ -683,17 +683,17 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     switch (node->operator)
     {
     case PLUS_T:
-        //ires = operate_positive(&operand);
+        ires = operate_positive(operand);
         break;
     case MINUS_T:
-        //ires = operate_negate(&operand, poss, pose, context);
+        ires = operate_negate(operand, poss, pose, context);
         break;
     case B_NOT_T:
-        //ires = operate_b_not(&operand, poss, pose, context);
+        ires = operate_b_not(operand, poss, pose, context);
         break;
     case NOT_T:
     case NOT_TK:
-        //ires = operate_not(&operand);
+        ires = operate_not(operand);
         break;
     }
 

@@ -151,6 +151,37 @@
         return ires_success(l);                            \
     }
 
+#define base_unary_operation(t, f, o)                 \
+    {                                                 \
+        if ((o)->ref)                                 \
+        {                                             \
+            res = value_set1((t), f((o)->value.ptr)); \
+                                                      \
+            (o)->ref--;                               \
+                                                      \
+            return ires_success(res);                 \
+        }                                             \
+                                                      \
+        f##_self((o)->value.ptr);                     \
+                                                      \
+        return ires_success(o);                       \
+    }
+
+#define base_unary_operation_char(t, op, o)                \
+    {                                                      \
+        if ((o)->ref)                                      \
+        {                                                  \
+            res_chr = op(o)->value.chr;                    \
+                                                           \
+            (o)->ref--;                                    \
+                                                           \
+            return ires_success(value_set2((t), res_chr)); \
+        }                                                  \
+                                                           \
+        (o)->value.chr = op(o)->value.chr;                 \
+                                                           \
+        return ires_success(o);                            \
+    }
 ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
     char ltype;
@@ -4018,63 +4049,51 @@ index_err:
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
         rposs, rpose, context));
 }
+*/
 
 ires_t operate_positive(value_p operand)
 {
     if (!operand)
         return ires_success(value_set1(INT_V, int_set_ull(0)));
 
+    value_p res;
     unsigned long long size;
 
     switch (operand->type)
     {
-    case NONE_V:
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(0);
-
-        return ires_success(operand);
     case OBJECT_V:
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull((unsigned long)operand->value.ptr);
+        res = value_set1(INT_V, int_set_ull((unsigned long)operand->value.ptr));
 
-        return ires_success(operand);
+        value_free_shell(operand);
+
+        return ires_success(res);
     case BOOL_V:
     case CHAR_V:
     case TYPE_V:
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(operand->value.chr);
+        res = value_set1(INT_V, int_set_ull(operand->value.chr));
 
-        return ires_success(operand);
+        value_free_shell(operand);
+
+        return ires_success(res);
     case STR_V:
-        size = str_size(operand->value.ptr);
+        res = value_set1(INT_V, int_set_ull(str_size(operand->value.ptr)));
 
-        if (operand->should_free)
-            str_free(operand->value.ptr);
+        value_free_type(operand, str);
 
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(size);
-
-        return ires_success(operand);
+        return ires_success(res);
     case LIST_V:
-        size = list_size(operand->value.ptr);
+        res = value_set1(INT_V, int_set_ull(list_size(operand->value.ptr)));
 
-        if (operand->should_free)
-            list_free(operand->value.ptr);
+        value_free_type(operand, list);
 
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(size);
-
-        return ires_success(operand);
+        return ires_success(res);
     case TUPLE_V:
-        size = tuple_size(operand->value.ptr);
+        res = value_set1(INT_V, int_set_ull(tuple_size(operand->value.ptr)));
 
-        if (operand->should_free)
-            tuple_free(operand->value.ptr);
+        value_free_type(operand, tuple);
 
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(size);
-
-        return ires_success(operand);
+        return ires_success(res);
+    /*
     case FUNC_V:
         size = (unsigned long)((func_p)operand->value.ptr)->context.name;
 
@@ -4098,6 +4117,7 @@ ires_t operate_positive(value_p operand)
         operand->value.ptr = int_set_ull(size);
 
         return ires_success(operand);
+    */
     }
 
     return ires_success(operand);
@@ -4105,36 +4125,29 @@ ires_t operate_positive(value_p operand)
 
 ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    if (!operand)
+        return ires_fail(illegal_operation_unary(NONE_V, "-",
+            poss, pose, context));
+
+    value_p res;
+    char res_chr;
+
     switch (operand->type)
     {
     case INT_V:
-        int_negate(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(INT_V, int_negate, operand);
     case FLOAT_V:
-        float_negate(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(FLOAT_V, float_negate, operand);
     case COMPLEX_V:
-        complex_negate(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(COMPLEX_V, complex_negate, operand);
     case BOOL_V:
-        operand->value.chr = !operand->value.chr;
-
-        return ires_success(operand);
+        base_unary_operation_char(BOOL_V, !, operand);
     case CHAR_V:
-        operand->value.chr = -operand->value.chr;
-
-        return ires_success(operand);
+        base_unary_operation_char(BOOL_V, -, operand);
     case STR_V:
-        str_reverse(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(COMPLEX_V, str_reverse, operand);
     case LIST_V:
-        list_reverse(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(COMPLEX_V, list_reverse, operand);
     }
 
     value_free(operand);
@@ -4145,39 +4158,39 @@ ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context
 
 ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    if (!operand)
+        return ires_fail(illegal_operation_unary(NONE_V, "~",
+            poss, pose, context));
+
+    value_p res;
+    char res_chr;
+
     switch (operand->type)
     {
     case INT_V:
-        int_not(operand->value.ptr);
-
-        return ires_success(operand);
+        base_unary_operation(INT_V, int_not, operand);
     case BOOL_V:
-        operand->value.chr = !operand->value.chr;
-
-        return ires_success(operand);
     case CHAR_V:
-        operand->value.chr = ~operand->value.chr;
-
-        return ires_success(operand);
+        base_unary_operation_char(operand->type, ~, operand);
     }
 
+    char otype = operand->type;
     value_free(operand);
 
-    return ires_fail(illegal_operation_unary(operand->type, "~",
+    return ires_fail(illegal_operation_unary(otype, "~",
         poss, pose, context));
 }
 
 ires_t operate_not(value_p operand)
 {
-    char res = !value_is_true(operand);
+    value_p res = value_set2(BOOL_V, !value_is_true(operand));
+
     value_free(operand);
 
-    operand->type = BOOL_V;
-    operand->value.chr = res;
-
-    return ires_success(operand);
+    return ires_success(res);
 }
 
+/*
 ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
     switch (operand->type)
@@ -4237,16 +4250,18 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
     return ires_fail(illegal_operation_unary(operand->type, "--",
         poss, pose, context));
 }
+*/
 
 char operate_equal_compare(const value_p left, const value_p right)
 {
     if (!left)
         return !right;
 
+    if (!right)
+        return 0;
+
     switch (left->type)
     {
-    case NONE_V:
-        return right->type == NONE_V;
     case OBJECT_V:
         return right->type == OBJECT_V && left->value.ptr == right->value.ptr;
     case INT_V:
@@ -4356,9 +4371,9 @@ char operate_equal_compare(const value_p left, const value_p right)
         }
 
         break;
-    case FUNC_V:
-    case STRCUT_V:
-        return left->value.ptr == right->value.ptr;
+    //case FUNC_V:
+    //case STRCUT_V:
+    //    return left->value.ptr == right->value.ptr;
     }
 
     return 0;
@@ -4366,6 +4381,9 @@ char operate_equal_compare(const value_p left, const value_p right)
 
 char operate_less_compare(const value_p left, const value_p right)
 {
+    if (!left || !right)
+        return 0;
+
     switch (left->type)
     {
     case INT_V:
@@ -4415,6 +4433,9 @@ char operate_less_compare(const value_p left, const value_p right)
 
 char operate_greater_compare(const value_p left, const value_p right)
 {
+    if (!left || !right)
+        return 0;
+
     switch (left->type)
     {
     case INT_V:
@@ -4462,6 +4483,7 @@ char operate_greater_compare(const value_p left, const value_p right)
     return 0;
 }
 
+/*
 void operate_success(value_p left, const value_p right)
 {
     switch (left->type)

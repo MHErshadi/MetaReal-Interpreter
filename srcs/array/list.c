@@ -432,6 +432,29 @@ char list_contains(const list_p array, const value_p value)
     return 0;
 }
 
+char list_are_type(const list_p array, unsigned char type)
+{
+    if (!array->size)
+        return 1;
+
+    if (type == NONE_V)
+    {
+        unsigned long long i;
+        for (i = 0; i < array->size; i++)
+            if (array->elements[i])
+                return 0;
+
+        return 1;
+    }
+
+    unsigned long long i;
+    for (i = 0; i < array->size; i++)
+        if (!array->elements[i] || array->elements[i]->type != type)
+            return 0;
+
+    return 1;
+}
+
 list_p list_reverse(const list_p array)
 {
     list_p res = malloc(sizeof(list_t));

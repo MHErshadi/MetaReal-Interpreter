@@ -50,6 +50,8 @@ char list_nequal_tuple(const list_p array1, const tuple_p array2);
 
 char list_contains(const list_p array, const value_p value);
 
+char list_are_type(const list_p array, unsigned char type);
+
 /* */
 
 list_p list_reverse(const list_p array);

@@ -34,4 +34,6 @@ char tuple_nequal(const tuple_p array1, const tuple_p array2);
 
 char tuple_contains(const tuple_p array, const value_p value);
 
+char tuple_are_type(const tuple_p array, unsigned char type);
+
 #endif /* __M_TUPLE__ */

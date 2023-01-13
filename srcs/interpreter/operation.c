@@ -2702,7 +2702,6 @@ ires_t operate_equal(value_p left, value_p right)
     return ires_success(value_set2(BOOL_V, 0));
 }
 
-/*
 ires_t operate_nequal(value_p left, value_p right)
 {
     if (!left)
@@ -2714,374 +2713,289 @@ ires_t operate_nequal(value_p left, value_p right)
         return ires_success(value_set2(BOOL_V, 1));
     }
 
-    char res;
+    if (!right)
+    {
+        value_free(left);
+        return ires_success(value_set2(BOOL_V, 1));
+    }
+
+    value_p res;
+    char res_chr;
 
     switch (left->type)
     {
-    case NONE_V:
-        left->type = BOOL_V;
-        left->value.chr = right->type != NONE_V;
-
-        value_free(right);
-
-        return ires_success(left);
     case OBJECT_V:
-        left->type = BOOL_V;
-        left->value.chr = right->type != OBJECT_V || left->value.ptr != right->value.ptr;
+        res = value_set2(BOOL_V, right->type != OBJECT_V || left->value.ptr != right->value.ptr);
 
+        value_free_shell(left);
         value_free(right);
 
-        return ires_success(left);
+        return ires_success(res);
     case INT_V:
         switch (right->type)
         {
         case INT_V:
-            res = int_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, int_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_nequal_int(right->value.ptr, left->value.ptr);
+            res = value_set2(BOOL_V, float_nequal_int(right->value.ptr, left->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
-            res = complex_nequal_int(right->value.ptr, left->value.ptr);
+            res = value_set2(BOOL_V, complex_nequal_int(right->value.ptr, left->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                complex_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, complex);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = int_nequal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, int_nequal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            int_free(left->value.ptr);
+        value_free_type(left, int);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
-            res = float_nequal_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_nequal_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
-            res = complex_nequal_float(right->value.ptr, left->value.ptr);
+            res = value_set2(COMPLEX_V, complex_nequal_int(right->value.ptr, left->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                complex_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, complex);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = float_nequal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, float_nequal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            float_free(left->value.ptr);
+        value_free_type(left, float);
         break;
     case COMPLEX_V:
         switch (right->type)
         {
         case INT_V:
-            res = complex_nequal_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, complex_nequal_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                complex_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, complex);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = complex_nequal_float(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, complex_nequal_float(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                complex_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, complex);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
-            res = complex_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(COMPLEX_V, complex_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                complex_free(left->value.ptr);
-            if (right->should_free)
-                complex_free(right->value.ptr);
+            value_free_type(left, complex);
+            value_free_type(right, complex);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = complex_nequal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, complex_nequal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                complex_free(left->value.ptr);
+            value_free_type(left, complex);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            complex_free(left->value.ptr);
+        value_free_type(left, complex);
         break;
     case BOOL_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, int_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, float_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
-            left->value.chr = complex_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, complex_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                complex_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, complex);
 
-            return ires_success(left);
+            return ires_success(res);
         case BOOL_V:
-            left->value.chr ^= right->value.chr;
-
-            return ires_success(left);
         case CHAR_V:
-            left->value.chr = left->value.chr != right->value.chr;
+            res = value_set2(BOOL_V, left->value.chr != right->value.chr);
 
-            return ires_success(left);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     case CHAR_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, int_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, float_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
-            left->value.chr = complex_nequal_ul(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, complex_nequal_ul(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                complex_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, complex);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
-        case CHAR_V:
-            right->type = BOOL_V;
+            return ires_success(res);
         case BOOL_V:
-            right->value.chr = left->value.chr != right->value.chr;
+        case CHAR_V:
+            res = value_set2(BOOL_V, left->value.chr != right->value.chr);
 
-            return ires_success(right);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         case STR_V:
-            left->value.chr = str_nequal_char(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, str_nequal_char(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, str);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     case STR_V:
         switch (right->type)
         {
         case CHAR_V:
-            right->value.chr = str_nequal_char(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, str_nequal_char(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                str_free(left->value.ptr);
+            value_free_type(left, str);
+            value_free_shell(right);
 
-            right->type = BOOL_V;
-
-            return ires_success(right);
+            return ires_success(res);
         case STR_V:
-            res = str_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, str_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                str_free(left->value.ptr);
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_type(left, str);
+            value_free_type(right, str);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            str_free(left->value.ptr);
+        value_free_type(left, str);
         break;
     case LIST_V:
         switch (right->type)
         {
         case LIST_V:
-            res = list_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, list_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                list_free(left->value.ptr);
-            if (right->should_free)
-                list_free(right->value.ptr);
+            value_free_type(left, list);
+            value_free_type(right, list);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case TUPLE_V:
-            res = list_nequal_tuple(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, list_nequal_tuple(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                list_free(left->value.ptr);
-            if (right->should_free)
-                tuple_free(right->value.ptr);
+            value_free_type(left, list);
+            value_free_type(right, tuple);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            list_free(left->value.ptr);
+        value_free_type(left, list);
         break;
     case TUPLE_V:
         switch (right->type)
         {
         case LIST_V:
-            res = list_nequal_tuple(right->value.ptr, left->value.ptr);
+            res = value_set2(BOOL_V, list_nequal_tuple(right->value.ptr, left->value.ptr));
 
-            if (left->should_free)
-                tuple_free(left->value.ptr);
-            if (right->should_free)
-                list_free(right->value.ptr);
+            value_free_type(left, tuple);
+            value_free_type(right, list);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case TUPLE_V:
-            res = tuple_nequal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, tuple_nequal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                tuple_free(left->value.ptr);
-            if (right->should_free)
-                tuple_free(right->value.ptr);
+            value_free_type(left, tuple);
+            value_free_type(right, tuple);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            tuple_free(left->value.ptr);
+        value_free_type(left, tuple);
         break;
     case TYPE_V:
-        left->type = BOOL_V;
-        left->value.chr = right->type != TYPE_V || left->value.chr != right->value.chr;
+        res = value_set2(BOOL_V, right->type != TYPE_V || left->value.chr != right->value.chr);
 
+        value_free_shell(left);
         value_free(right);
 
-        return ires_success(left);
-    case FUNC_V:
-    case STRCUT_V:
-        left->type = BOOL_V;
-        left->value.chr = left->value.ptr != right->value.ptr;
+        return ires_success(res);
+    //case FUNC_V:
+    //case STRCUT_V:
+    //    left->type = BOOL_V;
+    //    left->value.chr = left->value.ptr == right->value.ptr;
 
-        value_free(right);
+    //    value_free(right);
 
-        return ires_success(left);
+    //    return ires_success(left);
     default:
         value_free(left);
         break;
@@ -3089,15 +3003,20 @@ ires_t operate_nequal(value_p left, value_p right)
 
     value_free(right);
 
-    left->type = BOOL_V;
-    left->value.chr = 1;
-
-    return ires_success(left);
+    return ires_success(value_set2(BOOL_V, 1));
 }
 
 ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
-    char res;
+    char ltype;
+    char rtype;
+
+    check_none_type("<");
+
+    ltype = left->type;
+    rtype = right->type;
+
+    value_p res;
 
     switch (left->type)
     {
@@ -3105,138 +3024,89 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
         switch (right->type)
         {
         case INT_V:
-            res = int_less(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, int_less(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_int_less(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_int_less(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = int_less_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, int_less_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            int_free(left->value.ptr);
+        value_free_type(left, int);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
-            res = float_less_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_less_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_less(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_less(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = float_less_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, float_less_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            float_free(left->value.ptr);
+        value_free_type(left, float);
         break;
     case BOOL_V:
-        switch (right->type)
-        {
-        case INT_V:
-            left->value.chr = int_ul_less(left->value.chr, right->value.ptr);
-
-            if (right->should_free)
-                int_free(right->value.ptr);
-
-            return ires_success(left);
-        case FLOAT_V:
-            left->value.chr = float_ul_less(left->value.chr, right->value.ptr);
-
-            if (right->should_free)
-                float_free(right->value.ptr);
-
-            return ires_success(left);
-        case BOOL_V:
-        case CHAR_V:
-            left->value.chr = left->value.chr < right->value.chr;
-
-            return ires_success(left);
-        }
-
-        break;
     case CHAR_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_ul_less(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, int_ul_less(left->value.chr, right->value.ptr));
 
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_ul_less(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, float_ul_less(left->value.chr, right->value.ptr));
 
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
-        case CHAR_V:
-            right->type = BOOL_V;
+            return ires_success(res);
         case BOOL_V:
-            right->value.chr = left->value.chr < right->value.chr;
+        case CHAR_V:
+            res = value_set2(BOOL_V, left->value.chr < right->value.chr);
 
-            return ires_success(right);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     default:
         value_free(left);
@@ -3245,13 +3115,21 @@ ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context
 
     value_free(right);
 
-    return ires_fail(illegal_operation(left->type, right->type, "<",
+    return ires_fail(illegal_operation(ltype, rtype, "<",
         poss, pose, context));
 }
 
 ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
-    char res;
+    char ltype;
+    char rtype;
+
+    check_none_type(">");
+
+    ltype = left->type;
+    rtype = right->type;
+
+    value_p res;
 
     switch (left->type)
     {
@@ -3259,138 +3137,89 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
         switch (right->type)
         {
         case INT_V:
-            res = int_greater(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, int_greater(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_int_greater(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_int_greater(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = int_greater_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, int_greater_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            int_free(left->value.ptr);
+        value_free_type(left, int);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
-            res = float_greater_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_greater_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_greater(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_greater(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = float_greater_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, float_greater_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            float_free(left->value.ptr);
+        value_free_type(left, float);
         break;
     case BOOL_V:
-        switch (right->type)
-        {
-        case INT_V:
-            left->value.chr = int_ul_greater(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                int_free(right->value.ptr);
-
-            return ires_success(left);
-        case FLOAT_V:
-            left->value.chr = float_ul_greater(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                float_free(right->value.ptr);
-
-            return ires_success(left);
-        case BOOL_V:
-        case CHAR_V:
-            left->value.chr = left->value.chr > right->value.chr;
-
-            return ires_success(left);
-        }
-
-        break;
     case CHAR_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_ul_greater(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, int_ul_greater(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_ul_greater(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, float_ul_greater(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
-        case CHAR_V:
-            right->type = BOOL_V;
+            return ires_success(res);
         case BOOL_V:
-            right->value.chr = left->value.chr > right->value.chr;
+        case CHAR_V:
+            res = value_set2(BOOL_V, left->value.chr > right->value.chr);
 
-            return ires_success(right);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     default:
         value_free(left);
@@ -3399,13 +3228,21 @@ ires_t operate_greater(value_p left, value_p right, pos_p poss, pos_p pose, cont
 
     value_free(right);
 
-    return ires_fail(illegal_operation(left->type, right->type, ">",
+    return ires_fail(illegal_operation(ltype, rtype, ">",
         poss, pose, context));
 }
 
 ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
-    char res;
+    char ltype;
+    char rtype;
+
+    check_none_type("<=");
+
+    ltype = left->type;
+    rtype = right->type;
+
+    value_p res;
 
     switch (left->type)
     {
@@ -3413,138 +3250,89 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
         switch (right->type)
         {
         case INT_V:
-            res = int_less_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, int_less_equal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_int_less_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_int_less_equal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = int_less_equal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, int_less_equal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            int_free(left->value.ptr);
+        value_free_type(left, int);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
-            res = float_less_equal_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_less_equal_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_less_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_less_equal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = float_less_equal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, float_less_equal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            float_free(left->value.ptr);
+        value_free_type(left, float);
         break;
     case BOOL_V:
-        switch (right->type)
-        {
-        case INT_V:
-            left->value.chr = int_ul_less_equal(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                int_free(right->value.ptr);
-
-            return ires_success(left);
-        case FLOAT_V:
-            left->value.chr = float_ul_less_equal(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                float_free(right->value.ptr);
-
-            return ires_success(left);
-        case BOOL_V:
-        case CHAR_V:
-            left->value.chr = left->value.chr <= right->value.chr;
-
-            return ires_success(left);
-        }
-
-        break;
     case CHAR_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_ul_less_equal(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, int_ul_less_equal(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_ul_less_equal(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, float_ul_less_equal(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
-        case CHAR_V:
-            right->type = BOOL_V;
+            return ires_success(res);
         case BOOL_V:
-            right->value.chr = left->value.chr <= right->value.chr;
+        case CHAR_V:
+            res = value_set2(BOOL_V, left->value.chr <= right->value.chr);
 
-            return ires_success(right);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     default:
         value_free(left);
@@ -3553,13 +3341,21 @@ ires_t operate_less_eq(value_p left, value_p right, pos_p poss, pos_p pose, cont
 
     value_free(right);
 
-    return ires_fail(illegal_operation(left->type, right->type, "<=",
+    return ires_fail(illegal_operation(ltype, rtype, "<=",
         poss, pose, context));
 }
 
 ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
-    char res;
+    char ltype;
+    char rtype;
+
+    check_none_type(">=");
+
+    ltype = left->type;
+    rtype = right->type;
+
+    value_p res;
 
     switch (left->type)
     {
@@ -3567,138 +3363,89 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
         switch (right->type)
         {
         case INT_V:
-            res = int_greater_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, int_greater_equal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_int_greater_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_int_greater_equal(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, int);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = int_greater_equal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, int_greater_equal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            int_free(left->value.ptr);
+        value_free_type(left, int);
         break;
     case FLOAT_V:
         switch (right->type)
         {
         case INT_V:
-            res = float_greater_equal_int(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_greater_equal_int(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            res = float_greater_equal(left->value.ptr, right->value.ptr);
+            res = value_set2(BOOL_V, float_greater(left->value.ptr, right->value.ptr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
-            if (right->should_free)
-                float_free(right->value.ptr);
+            value_free_type(left, float);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         case CHAR_V:
-            right->type = BOOL_V;
         case BOOL_V:
-            right->value.chr = float_greater_equal_ul(left->value.ptr, right->value.chr);
+            res = value_set2(BOOL_V, float_greater_equal_ul(left->value.ptr, right->value.chr));
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            float_free(left->value.ptr);
+        value_free_type(left, float);
         break;
     case BOOL_V:
-        switch (right->type)
-        {
-        case INT_V:
-            left->value.chr = int_ul_greater_equal(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                int_free(right->value.ptr);
-
-            return ires_success(left);
-        case FLOAT_V:
-            left->value.chr = float_ul_greater_equal(left->value.chr, right->value.ptr);
-
-            if (right->value.ptr)
-                float_free(right->value.ptr);
-
-            return ires_success(left);
-        case BOOL_V:
-        case CHAR_V:
-            left->value.chr = left->value.chr >= right->value.chr;
-
-            return ires_success(left);
-        }
-
-        break;
     case CHAR_V:
         switch (right->type)
         {
         case INT_V:
-            left->value.chr = int_ul_greater_equal(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, int_ul_greater_equal(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                int_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, int);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
-            left->value.chr = float_ul_greater_equal(left->value.chr, right->value.ptr);
+            res = value_set2(BOOL_V, float_ul_greater_equal(left->value.chr, right->value.ptr));
 
-            if (right->value.ptr)
-                float_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, float);
 
-            left->type = BOOL_V;
-
-            return ires_success(left);
-        case CHAR_V:
-            right->type = BOOL_V;
+            return ires_success(res);
         case BOOL_V:
-            right->value.chr = left->value.chr >= right->value.chr;
+        case CHAR_V:
+            res = value_set2(BOOL_V, left->value.chr >= right->value.chr);
 
-            return ires_success(right);
+            value_free_shell(left);
+            value_free_shell(right);
+
+            return ires_success(res);
         }
 
+        value_free_shell(left);
         break;
     default:
         value_free(left);
@@ -3707,137 +3454,169 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
 
     value_free(right);
 
-    return ires_fail(illegal_operation(left->type, right->type, ">=",
+    return ires_fail(illegal_operation(ltype, rtype, ">=",
         poss, pose, context));
 }
 
 ires_t operate_xor(value_p left, value_p right)
 {
-    char res = value_is_true(left) ^ value_is_true(right);
+    value_p res = value_set2(BOOL_V, value_is_true(left) ^ value_is_true(right));
 
     value_free(left);
     value_free(right);
 
-    left->type = BOOL_V;
-    left->value.chr = res;
-
-    return ires_success(left);
+    return ires_success(res);
 }
 
 ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
+    char ltype;
+    char rtype;
+
+    value_p res;
     char* str;
-    char res;
+
+    if (!left)
+    {
+        if (!right)
+            return ires_fail(illegal_operation(NONE_V, NONE_V, "in",
+                poss, pose, context));
+
+        switch (right->type)
+        {
+        case STR_V:
+            str = malloc(5);
+            strcpy(str, "none");
+
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
+
+            value_free_type(right, str);
+            free(str);
+
+            return ires_success(res);
+        case LIST_V:
+            res = value_set2(BOOL_V, list_contains(right->value.ptr, NULL));
+
+            value_free_type(right, list);
+
+            return ires_success(res);
+        case TUPLE_V:
+            res = value_set2(BOOL_V, tuple_contains(right->value.ptr, NULL));
+
+            value_free_type(right, tuple);
+
+            return ires_success(res);
+        }
+
+        rtype = right->type;
+        value_free(right);
+
+        return ires_fail(illegal_operation(NONE_V, rtype, "in",
+            poss, pose, context));
+    }
+
+    if (!right)
+    {
+        ltype = left->type;
+        value_free(left);
+
+        return ires_fail(illegal_operation(ltype, NONE_V, "in",
+            poss, pose, context));
+    }
+
+    ltype = left->type;
+    rtype = right->type;
 
     switch (right->type)
     {
     case STR_V:
         switch (left->type)
         {
-        case NONE_V:
-            left->type = BOOL_V;
-            left->value.chr = str_contains_str(right->value.ptr, "none");
-
-            if (right->should_free)
-                str_free(right->value.ptr);
-
-            return ires_success(left);
         case INT_V:
             str = int_get_str(left->value.ptr, 10);
 
-            if (left->should_free)
-                int_free(left->value.ptr);
+            value_free_type(left, int);
 
-            left->type = BOOL_V;
-            left->value.chr = str_contains_str(right->value.ptr, str);
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_type(right, str);
             free(str);
 
-            return ires_success(left);
+            return ires_success(res);
         case FLOAT_V:
             str = float_get_str(left->value.ptr, 10);
 
-            if (left->should_free)
-                float_free(left->value.ptr);
+            value_free_type(left, float);
 
-            left->type = BOOL_V;
-            left->value.chr = str_contains_str(right->value.ptr, str);
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_type(right, str);
             free(str);
 
-            return ires_success(left);
+            return ires_success(res);
         case COMPLEX_V:
             str = complex_get_str(left->value.ptr, 10);
 
-            if (left->should_free)
-                complex_free(left->value.ptr);
+            value_free_type(left, complex);
 
-            left->type = BOOL_V;
-            left->value.chr = str_contains_str(right->value.ptr, str);
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_type(right, str);
             free(str);
 
-            return ires_success(left);
+            return ires_success(res);
         case BOOL_V:
-            left->value.chr = str_contains_str(right->value.ptr, left->value.chr ? "true" : "false");
+            if (left->value.chr)
+            {
+                str = malloc(5);
+                strcpy(str, "true");
+            }
+            else
+            {
+                str = malloc(6);
+                strcpy(str, "false");
+            }
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_shell(left);
 
-            return ires_success(left);
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
+
+            value_free_type(right, str);
+            free(str);
+
+            return ires_success(res);
         case CHAR_V:
-            left->type = BOOL_V;
-            left->value.chr = str_contains_char(right->value.ptr, left->value.chr);
+            res = value_set2(BOOL_V, str_contains_char(right->value.ptr, left->value.chr));
 
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_shell(left);
+            value_free_type(right, str);
 
-            return ires_success(left);
+            return ires_success(res);
         case STR_V:
-            res = str_contains(right->value.ptr, left->value.ptr);
+            res = value_set2(BOOL_V, str_contains(right->value.ptr, left->value.ptr));
 
-            if (left->should_free)
-                str_free(left->value.ptr);
-            if (right->should_free)
-                str_free(right->value.ptr);
+            value_free_type(left, str);
+            value_free_type(right, str);
 
-            left->type = BOOL_V;
-            left->value.chr = res;
-
-            return ires_success(left);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            str_free(left->value.ptr);
+        value_free_type(right, str);
         break;
     case LIST_V:
-        res = list_contains(right->value.ptr, left);
+        res = value_set2(BOOL_V, list_contains(right->value.ptr, left));
 
-        if (right->should_free)
-            list_free(right->value.ptr);
         value_free(left);
+        value_free_type(right, list);
 
-        left->type = BOOL_V;
-        left->value.chr = res;
-
-        return ires_success(left);
+        return ires_success(res);
     case TUPLE_V:
-        res = tuple_contains(right->value.ptr, left);
+        res = value_set2(BOOL_V, tuple_contains(right->value.ptr, left));
 
-        if (right->should_free)
-            tuple_free(right->value.ptr);
         value_free(left);
+        value_free_type(right, tuple);
 
-        left->type = BOOL_V;
-        left->value.chr = res;
-
-        return ires_success(left);
+        return ires_success(res);
     default:
         value_free(left);
         break;
@@ -3845,104 +3624,83 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
 
     value_free(right);
 
-    return ires_fail(illegal_operation(left->type, right->type, "in",
+    return ires_fail(illegal_operation(ltype, rtype, "in",
         poss, pose, context));
 }
 
 ires_t operate_is(value_p left, value_p right)
 {
-    char res;
+    if (!left)
+    {
+        if (!right)
+            return ires_success(value_set2(BOOL_V, 1));
+
+        value_free(right);
+        return ires_success(value_set2(BOOL_V, 0));
+    }
+
+    if (!right)
+    {
+        value_free(left);
+        return ires_success(value_set2(BOOL_V, 0));
+    }
+
+    value_p res;
 
     if (left->type == TYPE_V)
-    {
-        res = right->type == left->value.chr;
-
-        value_free(right);
-    }
+        res = value_set2(BOOL_V, right->type == left->value.chr);
     else if (right->type == TYPE_V)
-    {
-        res = left->type == right->value.chr;
-
-        value_free(left);
-    }
+        res = value_set2(BOOL_V, left->type == right->value.chr);
     else
-    {
-        res = left->type == right->type;
+        res = value_set2(BOOL_V, left->type == right->type);
 
-        value_free(left);
-        value_free(right);
-    }
+    value_free(left);
+    value_free(right);
 
-    left->type = BOOL_V;
-    left->value.chr = res;
-
-    return ires_success(left);
+    return ires_success(res);
 }
 
 ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_p context, pos_p lposs, pos_p lpose)
 {
-    char type;
-    unsigned long long i;
+    if (!left)
+    {
+        value_free(right);
+
+        return ires_fail(invalid_type("Left operand in operator (are)", "<list> or <tuple>", NONE_V,
+            lposs, lpose, context));
+    }
+
+    char ltype = left->type;
+
+    value_p res;
+    unsigned char type = right ? right->type == TYPE_V ? right->value.chr : right->type : NONE_V;
 
     switch (left->type)
     {
     case LIST_V:
-        type = right->type == TYPE_V ? right->value.chr : right->type;
+        res = value_set2(BOOL_V, list_are_type(left->value.ptr, type));
 
-        for (i = 0; i < ((list_p)left->value.ptr)->size; i++)
-            if (((list_p)left->value.ptr)->elements[i]->type != type)
-            {
-                if (left->should_free)
-                    list_free(left->value.ptr);
-                value_free(right);
-
-                left->type = BOOL_V;
-                left->value.chr = 0;
-
-                return ires_success(left);
-            }
-
-        if (left->should_free)
-            list_free(left->value.ptr);
+        value_free_type(left, list);
         value_free(right);
 
-        left->type = BOOL_V;
-        left->value.chr = 1;
-
-        return ires_success(left);
+        return ires_success(res);
     case TUPLE_V:
-        type = right->type == TYPE_V ? right->value.chr : right->type;
+        res = value_set2(BOOL_V, tuple_are_type(left->value.ptr, type));
 
-        for (i = 0; i < ((tuple_p)left->value.ptr)->size; i++)
-            if (((tuple_p)left->value.ptr)->elements[i]->type != type)
-            {
-                if (left->should_free)
-                    tuple_free(left->value.ptr);
-                value_free(right);
-
-                left->type = BOOL_V;
-                left->value.chr = 0;
-
-                return ires_success(left);
-            }
-
-        if (left->should_free)
-            tuple_free(left->value.ptr);
+        value_free_type(left, tuple);
         value_free(right);
 
-        left->type = BOOL_V;
-        left->value.chr = 1;
-
-        return ires_success(left);
+        return ires_success(res);
     }
 
     value_free(left);
     value_free(right);
 
-    return ires_fail(invalid_type("Left operand", "<list> or <tuple>", left->type,
+    return ires_fail(invalid_type("Left operand", "<list> or <tuple>", ltype,
         lposs, lpose, context));
 }
 
+/*
 ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
 {
     unsigned long long index;

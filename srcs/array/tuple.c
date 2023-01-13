@@ -84,3 +84,26 @@ char tuple_contains(const tuple_p array, const value_p value)
 
     return 0;
 }
+
+char tuple_are_type(const tuple_p array, unsigned char type)
+{
+    if (!array->size)
+        return 1;
+
+    if (type == NONE_V)
+    {
+        unsigned long long i;
+        for (i = 0; i < array->size; i++)
+            if (array->elements[i])
+                return 0;
+
+        return 1;
+    }
+
+    unsigned long long i;
+    for (i = 0; i < array->size; i++)
+        if (!array->elements[i] || array->elements[i]->type != type)
+            return 0;
+
+    return 1;
+}

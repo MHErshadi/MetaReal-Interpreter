@@ -247,7 +247,6 @@ ires_t interpret_none(pos_p poss, pos_p pose, context_p context, char properties
     if (IPROP_PTR(properties))
         return ires_fail(invalid_access_object(NONE_V, poss, pose, context));
 
-    printf("!!\n");
     return ires_success(NULL);
 }
 
@@ -616,7 +615,6 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     case EQUAL_T:
         ires = operate_equal(left, right);
         break;
-    /*
     case NEQUAL_T:
         ires = operate_nequal(left, right);
         break;
@@ -637,15 +635,14 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         ires = operate_xor(left, right);
         break;
     case IN_TK:
-        ires = operate_contain(&left, &right, poss, pose, context);
+        ires = operate_contain(left, right, poss, pose, context);
         break;
     case IS_TK:
-        ires = operate_is(&left, &right);
+        ires = operate_is(left, right);
         break;
     case ARE_TK:
-        ires = operate_are(&left, &right, poss, pose, context, &node->left.poss, &node->right.pose);
+        ires = operate_are(left, right, poss, pose, context, &node->left.poss, &node->right.pose);
         break;
-    */
     }
 
     if (IRES_HAS_ERROR(ires.response))

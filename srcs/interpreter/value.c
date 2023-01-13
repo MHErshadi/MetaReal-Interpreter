@@ -84,7 +84,10 @@ void value_free(value_p value)
 void value_label(value_p value, const char* end)
 {
     if (!value)
+    {
+        fprintf(setting.output, "none%s", end);
         return;
+    }
 
     switch (value->type)
     {

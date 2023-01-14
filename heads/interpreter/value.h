@@ -17,7 +17,11 @@ struct __value__
 typedef struct __value__ value_t;
 typedef struct __value__* value_p;
 
-#define value_copy(v) (v)->ref++;
+#define value_copy(v)   \
+    {                   \
+        if (v)          \
+            (v)->ref++; \
+    }
 
 #define value_free_type(v, vt)         \
     {                                  \

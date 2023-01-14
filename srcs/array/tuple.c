@@ -16,6 +16,24 @@ tuple_p tuple_set(value_p* elements, unsigned long long size)
     return array;
 }
 
+tuple_p tuple_copy(const tuple_p src)
+{
+    tuple_p dst = malloc(sizeof(tuple_t));
+
+    dst->elements = malloc(src->size * sizeof(value_p));
+
+    unsigned long long i;
+    for (i = 0; i < src->size; i++)
+    {
+        dst->elements[i] = src->elements[i];
+        value_copy(src->elements[i]);
+    }
+
+    dst->size = src->size;
+
+    return dst;
+}
+
 void tuple_free(tuple_p array)
 {
     while (array->size)

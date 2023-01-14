@@ -9,7 +9,7 @@
 runtime_t invalid_access_object(unsigned char type,
     pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = malloc(44 + value_label_lens[type]);
+    char* detail = malloc(46 + value_label_lens[type]);
     sprintf(detail, "<%s> object can not be accessed like a variable",
         value_labels[type]);
 

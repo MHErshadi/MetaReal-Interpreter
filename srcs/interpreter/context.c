@@ -91,14 +91,24 @@ void context_print(FILE* stream, const char* label, const context_p context, con
         fprintf(stream, "<%s anonymous>%s", label, end);
 }
 
-value_p context_var_get(context_p context, unsigned char* type, const char* name, char* flag)
+value_p context_var_get(context_p context, const char* name)
 {
-    value_p value = table_var_get(&context->table, type, name, flag);
+    value_p value = table_var_get(&context->table, name);
 
     if (!value && context->parent)
-        return context_var_get(context->parent, type, name, flag);
+        return context_var_get(context->parent, name);
 
     return value;
+}
+
+var_p context_ptr_get(context_p context, const char* name, char* flag)
+{
+    var_p ptr = table_ptr_get(&context->table, name, flag);
+
+    if (!ptr && !*flag && context->parent)
+        return context_ptr_get(context->parent, name, flag);
+
+    return ptr;
 }
 
 table_t table_set(unsigned long long alloc)
@@ -176,23 +186,67 @@ void table_free(table_p table)
     table->size = j;
 }
 
-value_p table_var_get(table_p table, unsigned char* type, const char* name, char* flag)
+value_p table_var_get(table_p table, const char* name)
+{
+    unsigned long long i;
+    for (i = 0; i < table->size; i++)
+        if (!strcmp(name, table->vars[i].name))
+            return table->vars[i].value;
+
+    return NULL;
+}
+
+var_p table_ptr_get(table_p table, const char* name, char* flag)
 {
     unsigned long long i;
     for (i = 0; i < table->size; i++)
         if (!strcmp(name, table->vars[i].name))
         {
             if (VAR_CONST(table->vars[i].properties) && table->vars[i].value)
+            {
                 *flag = 1;
+                return NULL;
+            }
 
-            *type = table->vars[i].type;
-            return table->vars[i].value;
+            return table->vars + i;
         }
 
     return NULL;
 }
 
-var_p table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag)
+char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value)
+{
+    unsigned long long i;
+    for (i = 0; i < table->size; i++)
+        if (!strcmp(name, table->vars[i].name))
+        {
+            if (VAR_CONST(table->vars[i].properties) && table->vars[i].value)
+                return -1;
+
+            if (table->vars[i].type != NONE_V && value && value->type != table->vars[i].type)
+                return table->vars[i].type;
+
+            value_free(table->vars[i].value);
+
+            table->vars[i].properties |= properties;
+            if (table->vars[i].type == NONE_V)
+                table->vars[i].type = type;
+
+            table->vars[i].value = value;
+            return 0;
+        }
+
+    if (table->alloc == table->size)
+        table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
+
+    char* copy = malloc(strlen(name) + 1);
+    strcpy(copy, name);
+
+    table->vars[table->size++] = (var_t){properties, copy, type, value};
+    return 0;
+}
+
+var_p table_ptr_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag)
 {
     unsigned long long i;
     for (i = 0; i < table->size; i++)
@@ -228,11 +282,10 @@ var_p table_var_set(table_p table, unsigned char properties, const char* name, u
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){properties, copy, type, value};
-
     return table->vars + table->size++;
 }
 
-var_p table_var_add(table_p table, const char* name)
+var_p table_ptr_add(table_p table, const char* name)
 {
     if (table->alloc == table->size)
         table->vars = realloc(table->vars, (table->alloc *= 2) * sizeof(var_t));
@@ -241,6 +294,5 @@ var_p table_var_add(table_p table, const char* name)
     strcpy(copy, name);
 
     table->vars[table->size] = (var_t){0, copy, NONE_V, NULL};
-
     return table->vars + table->size++;
 }

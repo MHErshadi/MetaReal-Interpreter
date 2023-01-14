@@ -17,6 +17,24 @@ list_p list_set(value_p* elements, unsigned long long size)
     return array;
 }
 
+list_p list_copy(const list_p src)
+{
+    list_p dst = malloc(sizeof(list_t));
+
+    dst->elements = malloc(src->size * sizeof(value_p));
+
+    unsigned long long i;
+    for (i = 0; i < src->size; i++)
+    {
+        dst->elements[i] = src->elements[i];
+        value_copy(src->elements[i]);
+    }
+
+    dst->size = src->size;
+
+    return dst;
+}
+
 void list_free(list_p array)
 {
     while (array->size)

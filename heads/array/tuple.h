@@ -16,11 +16,13 @@ struct __tuple__
 typedef struct __tuple__ tuple_t;
 typedef struct __tuple__* tuple_p;
 
+#define tuple_elements(array) (((tuple_p)(array))->elements)
 #define tuple_size(array) (((tuple_p)(array))->size)
 
 /* */
 
 tuple_p tuple_set(value_p* elements, unsigned long long size);
+tuple_p tuple_copy(const tuple_p src);
 
 void tuple_free(tuple_p array);
 

@@ -58,7 +58,8 @@ void context_free_debug(context_p context);
 
 void context_print(FILE* stream, const char* label, const context_p context, const char* end);
 
-value_p context_var_get(context_p context, unsigned char* type, const char* name, char* flag);
+value_p context_var_get(context_p context, const char* name);
+var_p context_ptr_get(context_p context, const char* name, char* flag);
 
 /* */
 
@@ -69,9 +70,11 @@ table_t table_copy(const table_p table);
 void table_delete(table_p table);
 void table_free(table_p table);
 
-value_p table_var_get(table_p table, unsigned char* type, const char* name, char* flag);
+value_p table_var_get(table_p table, const char* name);
+var_p table_ptr_get(table_p table, const char* name, char* flag);
 
-var_p table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
-var_p table_var_add(table_p table, const char* name);
+char table_var_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value);
+var_p table_ptr_set(table_p table, unsigned char properties, const char* name, unsigned char type, value_p value, char* flag);
+var_p table_ptr_add(table_p table, const char* name);
 
 #endif /* __M_CONTEXT__ */

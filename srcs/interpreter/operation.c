@@ -3731,11 +3731,29 @@ ires_t operate_are(value_p left, value_p right, pos_p poss, pos_p pose, context_
         lposs, lpose, context));
 }
 
-/*
 ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
 {
+    if (!left)
+    {
+        value_free(right);
+
+        return ires_fail(invalid_type("Operand", "<str>, <list> or <tuple>", NONE_V,
+            lposs, lpose, context));
+    }
+
+    if (!right)
+    {
+        value_free(left);
+
+        return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", NONE_V,
+            rposs, rpose, context));
+    }
+
+    unsigned char rtype = right->type;
+    unsigned char ltype = left->type;
+
     unsigned long long index;
-    value_p value;
+    value_p res;
 
     switch (left->type)
     {
@@ -3745,10 +3763,8 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                if (left->should_free)
-                    str_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, str);
+                value_free_type(right, int);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
@@ -3756,50 +3772,41 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
             index = int_get_ull(right->value.ptr);
 
             if (int_sign(right->value.ptr) < 0)
-                index = ((str_p)left->value.ptr)->size - index;
+                index = str_size(left->value.ptr) - index;
 
-            if (index >= ((str_p)left->value.ptr)->size)
+            value_free_type(right, int);
+
+            if (index >= str_size(left->value.ptr))
             {
-                if (left->should_free)
-                    str_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, str);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            char chr = ((str_p)left->value.ptr)->str[index];
+            res = value_set2(CHAR_V, str_str(left)[index]);
 
-            if (left->should_free)
-                str_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, str);
 
-            left->type = CHAR_V;
-            left->value.chr = chr;
-
-            return ires_success(left);
+            return ires_success(res);
         case BOOL_V:
-            right->type = CHAR_V;
         case CHAR_V:
-            if (right->value.chr >= ((str_p)left->value.ptr)->size)
+            if (right->value.chr >= str_size(left->value.ptr))
             {
-                if (left->should_free)
-                    str_free(left->value.ptr);
+                value_free_type(left, str);
+                value_free_shell(right);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            right->value.chr = ((str_p)left->value.ptr)->str[right->value.chr];
+            res = value_set2(CHAR_V, str_str(left)[right->value.chr]);
 
-            if (left->should_free)
-                str_free(left->value.ptr);
+            value_free_type(left, str);
+            value_free_shell(right);
 
-            return ires_success(right);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            str_free(left->value.ptr);
+        value_free_type(left, str);
         goto index_err;
     case LIST_V:
         switch (right->type)
@@ -3807,10 +3814,8 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                if (left->should_free)
-                    list_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, list);
+                value_free_type(right, int);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
@@ -3818,46 +3823,43 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
             index = int_get_ull(right->value.ptr);
 
             if (int_sign(right->value.ptr) < 0)
-                index = ((list_p)left->value.ptr)->size - index;
+                index = list_size(left->value.ptr) - index;
 
-            if (index >= ((list_p)left->value.ptr)->size)
+            value_free_type(right, int);
+
+            if (index >= list_size(left->value.ptr))
             {
-                if (left->should_free)
-                    list_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, list);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            value = ((list_p)left->value.ptr)->elements[index];
+            res = list_elements(left->value.ptr)[index];
+            value_copy(res);
 
-            if (left->should_free)
-                list_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, list);
 
-            return ires_success(&value);
+            return ires_success(res);
         case BOOL_V:
         case CHAR_V:
-            if (right->value.chr >= ((list_p)left->value.ptr)->size)
+            if (right->value.chr >= list_size(left->value.ptr))
             {
-                if (left->should_free)
-                    list_free(left->value.ptr);
+                value_free_type(left, list);
+                value_free_shell(right);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            value = ((list_p)left->value.ptr)->elements[right->value.chr];
+            res = list_elements(left->value.ptr)[right->value.chr];
+            value_copy(res);
 
-            if (left->should_free)
-                list_free(left->value.ptr);
+            value_free_type(left, list);
+            value_free_shell(right);
 
-            return ires_success(&value);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            list_free(left->value.ptr);
+        value_free_type(left, list);
         goto index_err;
     case TUPLE_V:
         switch (right->type)
@@ -3865,10 +3867,8 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                if (left->should_free)
-                    tuple_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, tuple);
+                value_free_type(right, int);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
@@ -3876,67 +3876,78 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
             index = int_get_ull(right->value.ptr);
 
             if (int_sign(right->value.ptr) < 0)
-                index = ((tuple_p)left->value.ptr)->size - index;
+                index = tuple_size(left->value.ptr) - index;
 
-            if (index >= ((tuple_p)left->value.ptr)->size)
+            value_free_type(right, int);
+
+            if (index >= tuple_size(left->value.ptr))
             {
-                if (left->should_free)
-                    tuple_free(left->value.ptr);
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, tuple);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            value = ((tuple_p)left->value.ptr)->elements[index];
+            res = tuple_elements(left->value.ptr)[index];
+            value_copy(res);
 
-            if (left->should_free)
-                tuple_free(left->value.ptr);
-            if (right->should_free)
-                int_free(right->value.ptr);
+            value_free_type(left, tuple);
 
-            return ires_success(&value);
+            return ires_success(res);
         case BOOL_V:
         case CHAR_V:
-            if (right->value.chr >= ((tuple_p)left->value.ptr)->size)
+            if (right->value.chr >= tuple_size(left->value.ptr))
             {
-                if (left->should_free)
-                    tuple_free(left->value.ptr);
+                value_free_type(left, tuple);
+                value_free_shell(right);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            value = ((tuple_p)left->value.ptr)->elements[right->value.chr];
+            res = tuple_elements(left->value.ptr)[right->value.chr];
+            value_copy(res);
 
-            if (left->should_free)
-                tuple_free(left->value.ptr);
+            value_free_type(left, tuple);
+            value_free_shell(right);
 
-            return ires_success(&value);
+            return ires_success(res);
         }
 
-        if (left->should_free)
-            tuple_free(left->value.ptr);
+        value_free_type(left, tuple);
         goto index_err;
     }
 
     value_free(left);
     value_free(right);
 
-    return ires_fail(invalid_type("Operand", "<str>, <list> or <tuple>", left->type,
+    return ires_fail(invalid_type("Operand", "<str>, <list> or <tuple>", ltype,
         lposs, lpose, context));
 
 index_err:
     value_free(right);
 
-    return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
+    return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", rtype,
         rposs, rpose, context));
 }
 
-ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
+ires_t operate_subscript_ptr(value_p* ptr, value_p right, context_p context, pos_p lposs, pos_p lpose, pos_p rposs, pos_p rpose)
 {
+    value_p left = *ptr;
+
+    if (!left)
+    {
+        value_free(right);
+
+        return ires_fail(invalid_type("Operand", "<str> or <list>", NONE_V,
+            lposs, lpose, context));
+    }
+
+    if (!right)
+        return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", NONE_V,
+            rposs, rpose, context));
+
     ires_t ires;
+
     unsigned long long index;
-    void* ptr;
 
     switch (left->type)
     {
@@ -3946,8 +3957,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(right, int);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
@@ -3955,36 +3965,48 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
             index = int_get_ull(right->value.ptr);
 
             if (int_sign(right->value.ptr) < 0)
-                index = ((str_p)left->value.ptr)->size - index;
+                index = str_size(left->value.ptr) - index;
 
-            if (index >= ((str_p)left->value.ptr)->size)
+            value_free_type(right, int);
+
+            if (index >= str_size(left->value.ptr))
             {
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(left, str);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            if (right->should_free)
-                int_free(right->value.ptr);
+            if (left->ref)
+            {
+                left->ref--;
 
-            right->type = CHAR_V;
-            right->value.ptr = ((str_p)left->value.ptr)->str + index;
+                left = value_set1(STR_V, str_set(left->value.ptr));
+                *ptr = left;
+            }
 
-            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1);
-            ires.value = right;
+            ires.value = (value_p)(str_str(left) + index);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 0, 1);
 
             return ires;
         case BOOL_V:
         case CHAR_V:
-            if (right->value.chr >= ((str_p)left->value.ptr)->size)
+            if (right->value.chr >= str_size(left))
+            {
+                value_free_shell(right);
+
                 return ires_fail(out_of_range(rposs, rpose, context));
+            }
 
-            right->type = CHAR_V;
-            right->value.ptr = ((str_p)left->value.ptr)->str + right->value.chr;
+            if (left->ref)
+            {
+                left->ref--;
 
-            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1);
-            ires.value = right;
+                left = value_set1(STR_V, str_set(left->value.ptr));
+                *ptr = left;
+            }
+
+            ires.value = (value_p)(str_str(left) + right->value.chr);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 0, 1);
 
             return ires;
         }
@@ -3996,8 +4018,7 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
         case INT_V:
             if (!int_fits_ull(right->value.ptr))
             {
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                value_free_type(right, int);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
@@ -4005,34 +4026,46 @@ ires_t operate_subscript_ptr(value_p left, value_p right, context_p context, pos
             index = int_get_ull(right->value.ptr);
 
             if (int_sign(right->value.ptr) < 0)
-                index = ((list_p)left->value.ptr)->size - index;
+                index = list_size(left->value.ptr) - index;
 
-            if (index >= ((list_p)left->value.ptr)->size)
+            value_free_type(right, int);
+
+            if (index >= list_size(left->value.ptr))
+                return ires_fail(out_of_range(rposs, rpose, context));
+
+            if (left->ref)
             {
-                if (right->should_free)
-                    int_free(right->value.ptr);
+                left->ref--;
+
+                left = value_set1(LIST_V, list_copy(left->value.ptr));
+                *ptr = left;
+            }
+
+            ires.value = (value_p)(list_elements(left->value.ptr) + index);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1, 0);
+
+            return ires;
+        case BOOL_V:
+        case CHAR_V:
+            if (right->value.chr >= list_size(left->value.ptr))
+            {
+                value_free_shell(right);
 
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            ptr = ((list_p)left->value.ptr)->elements + index;
+            if (left->ref)
+            {
+                left->ref--;
 
-            if (right->should_free)
-                int_free(right->value.ptr);
+                left = value_set1(LIST_V, list_copy(left->value.ptr));
+                *ptr = left;
+            }
 
-            right->type = NONE_V;
-            right->value.ptr = ptr;
+            ires.value = (value_p)(list_elements(left->value.ptr) + right->value.chr);
+            ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 1, 0);
 
-            return ires_success(right);
-        case BOOL_V:
-        case CHAR_V:
-            if (right->value.chr >= ((list_p)left->value.ptr)->size)
-                return ires_fail(out_of_range(rposs, rpose, context));
-
-            right->type = NONE_V;
-            right->value.ptr = ((list_p)left->value.ptr)->elements + right->value.chr;
-
-            return ires_success(right);
+            return ires;
         }
 
         goto index_err;
@@ -4049,7 +4082,6 @@ index_err:
     return ires_fail(invalid_type("Index", "<int>, <bool> or <char>", right->type,
         rposs, rpose, context));
 }
-*/
 
 ires_t operate_positive(value_p operand)
 {
@@ -4190,28 +4222,46 @@ ires_t operate_not(value_p operand)
     return ires_success(res);
 }
 
-/*
 ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    if (!operand)
+        return ires_fail(illegal_operation_unary(NONE_V, "++",
+            poss, pose, context));
+
     switch (operand->type)
     {
     case INT_V:
-        int_add_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(INT_V, int_add_ul(operand->value.ptr, 1)));
+
+        int_add_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case FLOAT_V:
-        float_add_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(FLOAT_V, float_add_ul(operand->value.ptr, 1)));
+
+        float_add_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case COMPLEX_V:
-        complex_add_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(COMPLEX_V, complex_add_ul(operand->value.ptr, 1)));
+
+        complex_add_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case BOOL_V:
+        if (operand->ref)
+            return ires_success(value_set2(BOOL_V, !operand->value.chr));
+
         operand->value.chr = !operand->value.chr;
 
         return ires_success(operand);
     case CHAR_V:
+        if (operand->ref)
+            return ires_success(value_set2(CHAR_V, operand->value.chr + 1));
+
         operand->value.chr++;
 
         return ires_success(operand);
@@ -4223,25 +4273,44 @@ ires_t operate_increment(value_p operand, pos_p poss, pos_p pose, context_p cont
 
 ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p context)
 {
+    if (!operand)
+        return ires_fail(illegal_operation_unary(NONE_V, "--",
+            poss, pose, context));
+
     switch (operand->type)
     {
     case INT_V:
-        int_subtract_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(INT_V, int_subtract_ul(operand->value.ptr, 1)));
+
+        int_subtract_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case FLOAT_V:
-        float_subtract_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(FLOAT_V, float_subtract_ul(operand->value.ptr, 1)));
+
+        float_subtract_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case COMPLEX_V:
-        complex_subtract_ul(operand->value.ptr, 1);
+        if (operand->ref)
+            return ires_success(value_set1(COMPLEX_V, complex_subtract_ul(operand->value.ptr, 1)));
+
+        complex_subtract_ul_self(operand->value.ptr, 1);
 
         return ires_success(operand);
     case BOOL_V:
+        if (operand->ref)
+            return ires_success(value_set2(BOOL_V, !operand->value.chr));
+
         operand->value.chr = !operand->value.chr;
 
         return ires_success(operand);
     case CHAR_V:
+        if (operand->ref)
+            return ires_success(value_set2(CHAR_V, operand->value.chr - 1));
+
         operand->value.chr--;
 
         return ires_success(operand);
@@ -4250,7 +4319,6 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
     return ires_fail(illegal_operation_unary(operand->type, "--",
         poss, pose, context));
 }
-*/
 
 char operate_equal_compare(const value_p left, const value_p right)
 {

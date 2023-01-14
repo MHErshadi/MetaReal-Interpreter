@@ -8,13 +8,14 @@
 #include <parser/node.h>
 #include <debugger/errlib.h>
 
-#define IRES_RESPONSE_SET(has_error, func_return, loop_continue, loop_break, char_ptr) ((has_error) | (func_return) << 1 | (loop_continue) << 2 | (loop_break) << 3 | (char_ptr) << 4)
+#define IRES_RESPONSE_SET(has_error, func_return, loop_continue, loop_break, val_ptr, char_ptr) ((has_error) | (func_return) << 1 | (loop_continue) << 2 | (loop_break) << 3 | (val_ptr) << 4 | (char_ptr) << 5)
 
 #define IRES_HAS_ERROR(x) ((x) & 1)
 #define IRES_FUNC_RETURN(x) ((x) >> 1 & 1)
 #define IRES_LOOP_CONTINUE(x) ((x) >> 2 & 1)
 #define IRES_LOOP_BREAK(x) ((x) >> 3 & 1)
-#define IRES_CHAR_PTR(x) ((x) >> 4 & 1)
+#define IRES_VAL_PTR(x) ((x) >> 4 & 1)
+#define IRES_CHAR_PTR(x) ((x) >> 5 & 1)
 
 struct __ires__
 {

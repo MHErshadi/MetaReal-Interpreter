@@ -35,7 +35,7 @@ ires_t handle_dollar_func(unsigned char* id, const char* name, value_p args, uns
                 poss, pose, context));
         }
 
-        return df_param_get(id, ((str_p)args->value.ptr)->str, poss, pose, context);
+        return df_param_get(id, str_str(args->value.ptr), poss, pose, context);
     }
     if (!strcmp(name, "float_prec"))
     {

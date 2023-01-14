@@ -15,11 +15,13 @@ struct __list__
 typedef struct __list__ list_t;
 typedef struct __list__* list_p;
 
+#define list_elements(array) (((list_p)(array))->elements)
 #define list_size(array) (((list_p)(array))->size)
 
 /* */
 
 list_p list_set(value_p* elements, unsigned long long size);
+list_p list_copy(const list_p src);
 
 void list_free(list_p array);
 

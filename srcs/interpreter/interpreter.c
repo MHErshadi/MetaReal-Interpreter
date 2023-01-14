@@ -14,18 +14,18 @@
 #include <string.h>
 #include <lexer/token.h>
 
-#define IPROP_SET(ptr, assign, not_free, in_func, in_loop, should_copy) ((ptr) | (assign) << 1 | (not_free) << 2 | (in_func) << 3 | (in_loop) << 4 | (should_copy) << 5)
+#define IPROP_SET(ptr, assign, not_free, in_func, in_loop) ((ptr) | (assign) << 1 | (not_free) << 2 | (in_func) << 3 | (in_loop) << 4)
 #define IPROP_MASK 0b11100
-#define IPROP_SUBSCRIPT_MASK 0b11111
+
+#define VFA_IPROP 0b00001
 
 #define IPROP_PTR(x) ((x) & 1)
 #define IPROP_ASSIGN(x) ((x) >> 1 & 1)
 #define IPROP_NOT_FREE(x) ((x) >> 2 & 1)
 #define IPROP_IN_FUNC(x) ((x) >> 3 & 1)
 #define IPROP_IN_LOOP(x) ((x) >> 4 & 1)
-#define IPROP_SHOULD_COPY(x) ((x) >> 5 & 1)
 
-#define IPROP_COVER(x, ptr, assign, should_copy) IPROP_SET(ptr, assign, IPROP_NOT_FREE(x), IPROP_IN_FUNC(x), IPROP_IN_LOOP(x), should_copy)
+//#define IPROP_COVER(x, ptr, assign) IPROP_SET(ptr, assign, IPROP_NOT_FREE(x), IPROP_IN_FUNC(x), IPROP_IN_LOOP(x))
 
 value_p ires_merge(ires_p ires, ires_t other);
 
@@ -157,7 +157,6 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_unary_operation(node->value.ptr, &node->poss, &node->pose, context, properties);
     case TERNARY_CONDITION_N:
         return interpret_ternary_condition(node->value.ptr, &node->poss, &node->pose, context, properties);
-/*
     case SUBSCRIPT_N:
         return interpret_subscript(node->value.ptr, &node->poss, &node->pose, context, properties);
     case ACCESS_N:
@@ -166,10 +165,11 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_var_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_FIXED_ASSIGN_N:
         return interpret_var_fixed_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
-    case VAR_REASSIGN_N:
-        return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
+    //case VAR_REASSIGN_N:
+        //return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ACCESS_N:
         return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context, properties);
+/*
     case FUNC_DEF_N:
         return interpret_func_def(node->value.ptr, &node->poss, &node->pose, context, properties);
     case FUNC_CALL_N:
@@ -224,7 +224,7 @@ ires_t interpret_body(body_p body, context_p context, char properties)
             if (!IPROP_NOT_FREE(properties))
             {
                 while (body->size > i)
-                node_free(body->nodes + --body->size);
+                    node_free(body->nodes + --body->size);
 
                 free(body->nodes);
             }
@@ -261,12 +261,11 @@ ires_t interpret_int(int_np node, pos_p poss, pos_p pose, context_p context, cha
     }
 
     int_p ptr = int_set_str(node->value, node->size, 10);
-    value_p value = value_set1(INT_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
         int_n_free(node);
 
-    return ires_success(value);
+    return ires_success(value_set1(INT_V, ptr));
 }
 
 ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -280,12 +279,11 @@ ires_t interpret_float(float_np node, pos_p poss, pos_p pose, context_p context,
     }
 
     float_p ptr = float_set_str(node->value, node->size, 10);
-    value_p value = value_set1(FLOAT_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
         float_n_free(node);
 
-    return ires_success(value);
+    return ires_success(value_set1(FLOAT_V, ptr));
 }
 
 ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -299,12 +297,11 @@ ires_t interpret_complex(complex_np node, pos_p poss, pos_p pose, context_p cont
     }
 
     complex_p ptr = complex_set_str(NULL, 0, node->value, node->size, 10);
-    value_p value = value_set1(COMPLEX_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
         complex_n_free(node);
 
-    return ires_success(value);
+    return ires_success(value_set1(COMPLEX_V, ptr));
 }
 
 ires_t interpret_bool(char node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -312,9 +309,7 @@ ires_t interpret_bool(char node, pos_p poss, pos_p pose, context_p context, char
     if (IPROP_PTR(properties))
         return ires_fail(invalid_access_object(BOOL_V, poss, pose, context));
 
-    value_p value = value_set2(BOOL_V, node);
-
-    return ires_success(value);
+    return ires_success(value_set2(BOOL_V, node));
 }
 
 ires_t interpret_char(char node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -322,9 +317,7 @@ ires_t interpret_char(char node, pos_p poss, pos_p pose, context_p context, char
     if (IPROP_PTR(properties))
         return ires_fail(invalid_access_object(CHAR_V, poss, pose, context));
 
-    value_p value = value_set2(CHAR_V, node);
-
-    return ires_success(value);
+    return ires_success(value_set2(CHAR_V, node));
 }
 
 ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -338,12 +331,11 @@ ires_t interpret_str(str_np node, pos_p poss, pos_p pose, context_p context, cha
     }
 
     str_p ptr = str_set_str(node->value, node->size);
-    value_p value = value_set1(STR_V, ptr);
 
     if (!IPROP_NOT_FREE(properties))
         str_n_free(node);
 
-    return ires_success(value);
+    return ires_success(value_set1(STR_V, ptr));
 }
 
 ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -361,9 +353,7 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
 
     if (!node)
     {
-        list_p ptr = list_set(NULL, 0);
-        ires.value = value_set1(LIST_V, ptr);
-
+        ires.value = value_set1(LIST_V, list_set(NULL, 0));
         return ires;
     }
 
@@ -372,13 +362,9 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
     unsigned long long i;
     for (i = 0; i < node->size; i++)
     {
-        value_p element = ires_merge(&ires, interpret_node(&node->elements[i], context, IPROP_COVER(properties, 0, 0, 1)));
+        value_p element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties));
         if (IRES_HAS_ERROR(ires.response))
         {
-            while (i)
-                value_free(elements[--i]);
-            free(elements);
-
             if (!IPROP_NOT_FREE(properties))
             {
                 i++;
@@ -390,14 +376,17 @@ ires_t interpret_list(list_np node, pos_p poss, pos_p pose, context_p context, c
                 free(node);
             }
 
+            while (i)
+                value_free(elements[--i]);
+            free(elements);
+
             return ires;
         }
 
         elements[i] = element;
     }
 
-    list_p ptr = list_set(elements, i);
-    ires.value = value_set1(LIST_V, ptr);
+    ires.value = value_set1(LIST_V, list_set(elements, i));
 
     if (!IPROP_NOT_FREE(properties))
     {
@@ -426,13 +415,9 @@ ires_t interpret_tuple(tuple_np node, pos_p poss, pos_p pose, context_p context,
     unsigned long long i;
     for (i = 0; i < node->size; i++)
     {
-        value_p element = ires_merge(&ires, interpret_node(&node->elements[i], context, IPROP_COVER(properties, 0, 0, 1)));
+        value_p element = ires_merge(&ires, interpret_node(&node->elements[i], context, properties));
         if (IRES_HAS_ERROR(ires.response))
         {
-            while (i)
-                value_free(elements[--i]);
-            free(elements);
-
             if (!IPROP_NOT_FREE(properties))
             {
                 i++;
@@ -444,14 +429,17 @@ ires_t interpret_tuple(tuple_np node, pos_p poss, pos_p pose, context_p context,
                 free(node);
             }
 
+            while (i)
+                value_free(elements[--i]);
+            free(elements);
+
             return ires;
         }
 
         elements[i] = element;
     }
 
-    tuple_p ptr = tuple_set(elements, i);
-    ires.value = value_set1(TUPLE_V, ptr);
+    ires.value = value_set1(TUPLE_V, tuple_set(elements, i));
 
     if (!IPROP_NOT_FREE(properties))
     {
@@ -477,9 +465,7 @@ ires_t interpret_type(char node, pos_p poss, pos_p pose, context_p context, char
     if (IPROP_PTR(properties))
         return ires_fail(invalid_access_object(TYPE_V, poss, pose, context));
 
-    value_p value = value_set2(TYPE_V, node - OBJECT_TT + OBJECT_V);
-
-    return ires_success(value);
+    return ires_success(value_set2(TYPE_V, node - OBJECT_TT + OBJECT_V));
 }
 
 ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -495,7 +481,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     ires_t ires;
     ires.response = 0;
 
-    value_p left = ires_merge(&ires, interpret_node(&node->left, context, IPROP_COVER(properties, 0, 0, 0)));
+    value_p left = ires_merge(&ires, interpret_node(&node->left, context, properties));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -503,6 +489,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
             node_free(&node->right);
             free(node);
         }
+
         return ires;
     }
 
@@ -516,7 +503,7 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         res = value_is_true(left);
         if (res)
         {
-            right = ires_merge(&ires, interpret_node(&node->right, context, properties & IPROP_MASK));
+            right = ires_merge(&ires, interpret_node(&node->right, context, properties));
             if (IRES_HAS_ERROR(ires.response))
             {
                 value_free(left);
@@ -527,21 +514,27 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
                 return ires;
             }
 
-            res &= value_is_true(right);
+            res = value_is_true(right);
 
             value_free(right);
         }
+        else if (!IPROP_NOT_FREE(properties))
+            node_free(&node->right);
 
         value_free(left);
 
         ires.value = value_set2(BOOL_V, res);
-        goto ret;
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires;
     case OR_T:
     case OR_TK:
         res = value_is_true(left);
         if (!res)
         {
-            right = ires_merge(&ires, interpret_node(&node->right, context, properties & IPROP_MASK));
+            right = ires_merge(&ires, interpret_node(&node->right, context, properties));
             if (IRES_HAS_ERROR(ires.response))
             {
                 value_free(left);
@@ -552,18 +545,24 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
                 return ires;
             }
 
-            res |= value_is_true(right);
+            res = value_is_true(right);
 
             value_free(right);
         }
+        else if (!IPROP_NOT_FREE(properties))
+            node_free(&node->right);
 
         value_free(left);
 
         ires.value = value_set2(BOOL_V, res);
-        goto ret;
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires;
     }
 
-    right = ires_merge(&ires, interpret_node(&node->right, context, IPROP_COVER(properties, 0, 0, 0)));
+    right = ires_merge(&ires, interpret_node(&node->right, context, properties));
     if (IRES_HAS_ERROR(ires.response))
     {
         value_free(left);
@@ -645,14 +644,6 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
         break;
     }
 
-    if (IRES_HAS_ERROR(ires.response))
-    {
-        if (!IPROP_NOT_FREE(properties))
-            free(node);
-        return ires;
-    }
-
-ret:
     if (!IPROP_NOT_FREE(properties))
         free(node);
 
@@ -672,11 +663,12 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     ires_t ires;
     ires.response = 0;
 
-    value_p operand = ires_merge(&ires, interpret_node(&node->operand, context, IPROP_COVER(properties, 0, 0, 0)));
+    value_p operand = ires_merge(&ires, interpret_node(&node->operand, context, properties));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
 
@@ -695,13 +687,6 @@ ires_t interpret_unary_operation(unary_operation_np node, pos_p poss, pos_p pose
     case NOT_TK:
         ires = operate_not(operand);
         break;
-    }
-
-    if (IRES_HAS_ERROR(ires.response))
-    {
-        if (!IPROP_NOT_FREE(properties))
-            free(node);
-        return ires;
     }
 
     if (!IPROP_NOT_FREE(properties))
@@ -724,23 +709,23 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
             node_free(&node->right);
             free(node);
         }
+
         return ires;
     }
-
-    value_p res;
 
     if (value_is_true(condition))
     {
         if (!IPROP_NOT_FREE(properties))
             node_free(&node->right);
 
-        res = ires_merge(&ires, interpret_node(&node->left, context, properties));
+        ires.value = ires_merge(&ires, interpret_node(&node->left, context, properties));
         if (IRES_HAS_ERROR(ires.response))
         {
             value_free(condition);
 
             if (!IPROP_NOT_FREE(properties))
                 free(node);
+
             return ires;
         }
     }
@@ -749,18 +734,17 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (!IPROP_NOT_FREE(properties))
             node_free(&node->left);
 
-        res = ires_merge(&ires, interpret_node(&node->right, context, properties));
+        ires.value = ires_merge(&ires, interpret_node(&node->right, context, properties));
         if (IRES_HAS_ERROR(ires.response))
         {
             value_free(condition);
 
             if (!IPROP_NOT_FREE(properties))
                 free(node);
+
             return ires;
         }
     }
-
-    ires.value = res;
 
     value_free(condition);
 
@@ -775,7 +759,7 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
     ires_t ires;
     ires.response = 0;
 
-    value_p value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_SUBSCRIPT_MASK));
+    value_p value = ires_merge(&ires, interpret_node(&node->value, context, properties));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -783,41 +767,46 @@ ires_t interpret_subscript(subscript_np node, pos_p poss, pos_p pose, context_p 
             node_free(&node->pos);
             free(node);
         }
+
         return ires;
     }
 
     value_p pos = ires_merge(&ires, interpret_node(&node->pos, context, properties & IPROP_MASK));
     if (IRES_HAS_ERROR(ires.response))
     {
-        if (!IPROP_PTR(properties))
-            value_free(value);
+        value_free(value);
+
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
 
     if (IPROP_PTR(properties))
     {
-        //ires = operate_subscript_ptr(value->value.ptr, &pos, context, &node->value.poss, &node->value.pose, &node->pos.poss, &node->pos.pose);
-
-        if (IRES_HAS_ERROR(ires.response))
+        if (IRES_CHAR_PTR(ires.response))
         {
+            value_free(pos);
+
+            runtime_t error = invalid_type("Operand", "<str> or <list>", CHAR_V,
+                &node->value.poss, &node->value.pose, context);
+
             if (!IPROP_NOT_FREE(properties))
                 free(node);
-            return ires;
+
+            return ires_fail(error);
         }
+
+        value_p* ptr;
+        if (IRES_VAL_PTR(ires.response))
+            ptr = (value_p*)value;
+        else
+            ptr = &((var_p)value)->value;
+
+        ires = operate_subscript_ptr(ptr, pos, context, &node->value.poss, &node->value.pose, &node->pos.poss, &node->pos.pose);
     }
     else
-    {
-        //ires = operate_subscript(&value, &pos, context, &node->value.poss, &node->value.pose, &node->pos.poss, &node->pos.pose);
-
-        if (IRES_HAS_ERROR(ires.response))
-        {
-            if (!IPROP_NOT_FREE(properties))
-                free(node);
-            return ires;
-        }
-    }
+        ires = operate_subscript(value, pos, context, &node->value.poss, &node->value.pose, &node->pos.poss, &node->pos.pose);
 
     if (!IPROP_NOT_FREE(properties))
         free(node);
@@ -830,7 +819,7 @@ ires_t interpret_access(access_np node, pos_p poss, pos_p pose, context_p contex
     ires_t ires;
     ires.response = 0;
 
-    value_p value = ires_merge(&ires, interpret_node(&node->value, context, IPROP_COVER(properties, 0, 0, 0)));
+    value_p value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -900,7 +889,7 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
 
     if (node->value.type)
     {
-        ires.value = ires_merge(&ires, interpret_node(&node->value, context, IPROP_COVER(properties, 0, 0, 1)));
+        ires.value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
         if (IRES_HAS_ERROR(ires.response))
         {
             if (!IPROP_NOT_FREE(properties))
@@ -908,11 +897,14 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
                 free(node->name);
                 free(node);
             }
+
             return ires;
         }
 
         if (node->type != NULL_N && node->type != ires.value->type)
         {
+            runtime_t error = type_match(node->type, ires.value->type, poss, pose, context);
+
             value_free(ires.value);
 
             if (!IPROP_NOT_FREE(properties))
@@ -921,7 +913,7 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
                 free(node);
             }
 
-            return ires_fail(type_match(node->type, ires.value->type, poss, pose, context));
+            return ires_fail(error);
         }
     }
     else
@@ -933,11 +925,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
         while (copy->parent)
             copy = copy->parent;
 
-    char res = 0;
+    char flag = 0;
     if (IPROP_PTR(properties))
     {
-        value_p ptr = NULL;//table_ptr_set(&copy->table, &ires.value->type, node->properties, node->name, node->type, &ires.value, &res);
-        if (res == -1)
+        var_p ptr = table_ptr_set(&copy->table, node->properties, node->name, node->type, ires.value, &flag);
+        if (flag == -1)
         {
             value_free(ires.value);
 
@@ -951,11 +943,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
 
             return ires_fail(error);
         }
-        if (res)
+        if (flag)
         {
             value_free(ires.value);
 
-            runtime_t error = type_specified_variable(node->name, res, poss, pose, context);
+            runtime_t error = type_specified_variable(node->name, flag, poss, pose, context);
 
             if (!IPROP_NOT_FREE(properties))
             {
@@ -966,12 +958,12 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             return ires_fail(error);
         }
 
-        ires.value->value.ptr = ptr;
+        ires.value = (value_p)ptr;
     }
     else
     {
-        res = 0;//table_var_set(&copy->table, node->properties, node->name, node->type, &ires.value);
-        if (res == -1)
+        flag = table_var_set(&copy->table, node->properties, node->name, node->type, ires.value);
+        if (flag == -1)
         {
             value_free(ires.value);
 
@@ -985,11 +977,11 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
 
             return ires_fail(error);
         }
-        if (res)
+        if (flag)
         {
             value_free(ires.value);
 
-            runtime_t error = type_specified_variable(node->name, res, poss, pose, context);
+            runtime_t error = type_specified_variable(node->name, flag, poss, pose, context);
 
             if (!IPROP_NOT_FREE(properties))
             {
@@ -1000,8 +992,7 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
             return ires_fail(error);
         }
 
-        if (IPROP_SHOULD_COPY(properties))
-            ires.value->ref++;
+        value_copy(ires.value);
     }
 
     if (!IPROP_NOT_FREE(properties))
@@ -1013,107 +1004,103 @@ ires_t interpret_var_assign(var_assign_np node, pos_p poss, pos_p pose, context_
     return ires;
 }
 
-/*
-
 ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
     ires_t ires;
     ires.response = 0;
 
-    value_p var = ires_merge(&ires, interpret_node(&node->var, context, IPROP_COVER(properties, 1, 0, 0)));
+    value_p ptr = ires_merge(&ires, interpret_node(&node->var, context, properties | VFA_IPROP));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
 
-    value_p res;
+    value_p res = NULL;
     if (node->properties)
     {
         if (IPROP_PTR(properties))
-        {
-            res->type = var->type;
-            res->value.ptr = var->value.ptr;
-        }
+            res = ptr;
         else
         {
             if (IRES_CHAR_PTR(ires.response))
+                res = value_set2(CHAR_V, *(char*)ptr);
+            else if (IRES_VAL_PTR(ires.response))
             {
-                res->type = CHAR_V;
-                res->value.chr = *(char*)var->value.ptr;
+                res = *(value_p*)ptr;
+                value_copy(res);
             }
             else
             {
-                if (IPROP_SHOULD_COPY(properties))
-                {
-                    res = var->value.ptr;
-                    res->ref++;
-                }
-                else
-                    res = var->value.ptr;
+                res = ((var_p)ptr)->value;
+                value_copy(res);
             }
         }
     }
+
+    char response = ires.response;
 
     switch (node->operator)
     {
     case INCREMENT_T:
         if (IRES_CHAR_PTR(ires.response))
-            (*(char*)var->value.ptr)++;
+            (*(char*)ptr)++;
+        else if (IRES_VAL_PTR(ires.response))
+            ires = operate_increment(*(value_p*)ptr, poss, pose, context);
         else
-            ires = operate_increment(var.value.ptr, poss, pose, context);
+            ires = operate_increment(((var_p)ptr)->value, poss, pose, context);
         break;
     case DECREMENT_T:
         if (IRES_CHAR_PTR(ires.response))
-            (*(char*)var.value.ptr)--;
+            (*(char*)ptr)--;
+        else if (IRES_VAL_PTR(ires.response))
+            ires = operate_decrement(*(value_p*)ptr, poss, pose, context);
         else
-            ires = operate_decrement(var.value.ptr, poss, pose, context);
+            ires = operate_decrement(((var_p)ptr)->value, poss, pose, context);
         break;
     }
 
     if (IRES_HAS_ERROR(ires.response))
     {
-        value_free(&res);
+        if (!IPROP_PTR(properties))
+            value_free(res);
 
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
+
+    if (IRES_VAL_PTR(response))
+        *(value_p*)ptr = ires.value;
+    else if (!IRES_CHAR_PTR(response))
+        ((var_p)ptr)->value = ires.value;
 
     if (node->properties)
         ires.value = res;
     else
     {
         if (IPROP_PTR(properties))
-        {
-            ires.value->type = var->type;
-            ires.value->value.ptr = var->value.ptr;
-        }
+            ires.value = ptr;
         else
         {
-            if (IRES_CHAR_PTR(ires.response))
-            {
-                ires.value->type = CHAR_V;
-                ires.value->value.chr = *(char*)var->value.ptr;
-            }
+            if (IRES_CHAR_PTR(response))
+                ires.value = value_set2(CHAR_V, *(char*)ptr);
             else
-            {
-                if (IPROP_SHOULD_COPY(properties))
-                    ires.value = value_copy(var->value.ptr);
-                else
-                    ires.value = *(value_p)var->value.ptr;
-            }
+                value_copy(ires.value);
         }
     }
 
     if (!IPROP_NOT_FREE(properties))
         free(node);
 
-    ires.response &= IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties));
+    ires.response &= IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
     return ires;
 }
 
+/*
 ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
     ires_t ires;
@@ -1283,6 +1270,7 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     ires.response &= IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties));
     return ires;
 }
+*/
 
 ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p context, char properties)
 {
@@ -1292,12 +1280,10 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
     if (IPROP_PTR(properties))
     {
         char flag = 0;
-        value_p value;
-
         if (IPROP_ASSIGN(properties))
-            value = table_ptr_get(&context->table, &ires.value.type, node, &flag);
+            ires.value = (value_p)table_ptr_get(&context->table, node, &flag);
         else
-            value = context_ptr_get(context, &ires.value.type, node, &flag);
+            ires.value = (value_p)context_ptr_get(context, node, &flag);
 
         if (flag)
         {
@@ -1308,35 +1294,31 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
 
             return ires_fail(error);
         }
-        if (!value)
+
+        if (!ires.value)
         {
             if (IPROP_ASSIGN(properties))
             {
-                ires.value.type = NULL_V;
-                ires.value.value.ptr = table_ptr_add(&context->table, node);
+                ires.value = (value_p)table_ptr_add(&context->table, node);
 
                 if (!IPROP_NOT_FREE(properties))
                     free(node);
 
                 return ires;
             }
-            else
-            {
-                runtime_t error = not_defined(node, poss, pose, context);
 
-                if (!IPROP_NOT_FREE(properties))
-                    free(node);
+            runtime_t error = not_defined(node, poss, pose, context);
 
-                return ires_fail(error);
-            }
+            if (!IPROP_NOT_FREE(properties))
+                free(node);
+
+            return ires_fail(error);
         }
-
-        ires.value.value.ptr = value;
     }
     else
     {
         ires.value = context_var_get(context, node);
-        if (ires.value.type == NULL_V)
+        if (!ires.value)
         {
             runtime_t error = not_defined(node, poss, pose, context);
 
@@ -1346,8 +1328,7 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
             return ires_fail(error);
         }
 
-        if (IPROP_SHOULD_COPY(properties))
-            ires.value = value_copy(&ires.value);
+        ires.value->ref++;
     }
 
     if (!IPROP_NOT_FREE(properties))
@@ -1356,6 +1337,7 @@ ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p contex
     return ires;
 }
 
+/*
 ires_t interpret_func_def(func_def_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
     if (IPROP_PTR(properties))

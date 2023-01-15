@@ -11,6 +11,7 @@
 #define IRES_RESPONSE_SET(has_error, func_return, loop_continue, loop_break, val_ptr, char_ptr) ((has_error) | (func_return) << 1 | (loop_continue) << 2 | (loop_break) << 3 | (val_ptr) << 4 | (char_ptr) << 5)
 
 #define IRES_RESPONSE_MASK 0b1110
+#define LOOP_RESPONSE_MASK 0b10
 
 #define IRES_HAS_ERROR(x) ((x) & 1)
 #define IRES_FUNC_RETURN(x) ((x) >> 1 & 1)

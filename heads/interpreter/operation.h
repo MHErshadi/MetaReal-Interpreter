@@ -51,7 +51,7 @@ ires_t operate_decrement(value_p operand, pos_p poss, pos_p pose, context_p cont
 
 /* */
 
-void operate_success(value_p left, const value_p right);
+ires_t operate_success(value_p left, const value_p right, pos_p poss, pos_p pose, context_p context);
 char operate_success_type_change(const value_p left, const value_p right);
 
 char operate_equal_compare(const value_p left, const value_p right);
@@ -63,6 +63,6 @@ char operate_greater_compare(const value_p left, const value_p right);
 char operate_sign(const value_p operand);
 
 unsigned long long operate_size(const value_p operand);
-value_t operate_index(const value_p operand, unsigned long long index);
+value_p operate_index(const value_p operand, unsigned long long index);
 
 #endif /* __M_OPERATION__ */

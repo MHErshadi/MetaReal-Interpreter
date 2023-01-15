@@ -4552,32 +4552,46 @@ char operate_greater_compare(const value_p left, const value_p right)
     return 0;
 }
 
-/*
-void operate_success(value_p left, const value_p right)
+ires_t operate_success(value_p left, const value_p right, pos_p poss, pos_p pose, context_p context)
 {
+    if (!left)
+        return ires_fail(illegal_operation(NONE_V, right->type, "success",
+            poss, pose, context));
+
+    value_p res;
+
     switch (left->type)
     {
     case INT_V:
         switch (right->type)
         {
         case INT_V:
-            int_add(left->value.ptr, right->value.ptr);
-            break;
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set1(INT_V, int_add(left->value.ptr, right->value.ptr)));
+            }
+
+            int_add_self(left->value.ptr, right->value.ptr);
+
+            return ires_success(left);
         case FLOAT_V:
-            left->type = FLOAT_V;
+            res = value_set1(FLOAT_V, float_add_int(right->value.ptr, left->value.ptr));
 
-            float_p conv = float_set_int(left->value.ptr);
+            value_free_type(left, int);
 
-            int_free(left->value.ptr);
-
-            left->value.ptr = conv;
-
-            float_add(left->value.ptr, right->value.ptr);
-            break;
+            return ires_success(res);
         case BOOL_V:
         case CHAR_V:
-            int_add_ul(left->value.ptr, right->value.chr);
-            break;
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set1(INT_V, int_add_ul(left->value.ptr, right->value.chr)));
+            }
+
+            int_add_ul_self(left->value.ptr, right->value.chr);
+
+            return ires_success(left);
         }
 
         break;
@@ -4585,15 +4599,36 @@ void operate_success(value_p left, const value_p right)
         switch (right->type)
         {
         case INT_V:
-            float_add_int(left->value.ptr, right->value.ptr);
-            break;
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set1(FLOAT_V, float_add_int(left->value.ptr, right->value.ptr)));
+            }
+
+            float_add_int_self(left->value.ptr, right->value.ptr);
+
+            return ires_success(left);
         case FLOAT_V:
-            float_add(left->value.ptr, right->value.ptr);
-            break;
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set1(FLOAT_V, float_add(left->value.ptr, right->value.ptr)));
+            }
+
+            float_add_self(left->value.ptr, right->value.ptr);
+
+            return ires_success(left);
         case BOOL_V:
         case CHAR_V:
-            float_add_ul(left->value.ptr, right->value.chr);
-            break;
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set1(FLOAT_V, float_add_ul(left->value.ptr, right->value.chr)));
+            }
+
+            float_add_ul_self(left->value.ptr, right->value.chr);
+
+            return ires_success(left);
         }
 
         break;
@@ -4639,12 +4674,22 @@ void operate_success(value_p left, const value_p right)
             break;
         case BOOL_V:
         case CHAR_V:
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set2(CHAR_V, left->value.chr + right->value.chr));
+            }
+
             left->value.chr += right->value.chr;
-            break;
+
+            return ires_success(left);
         }
 
         break;
     }
+
+    return ires_fail(illegal_operation(left->type, right->type, "success",
+        poss, pose, context));
 }
 
 char operate_success_type_change(const value_p left, const value_p right)
@@ -4685,33 +4730,27 @@ unsigned long long operate_size(const value_p operand)
     switch (operand->type)
     {
     case STR_V:
-        return ((str_p)operand->value.ptr)->size;
+        return str_size(operand->value.ptr);
     case LIST_V:
-        return ((list_p)operand->value.ptr)->size;
+        return list_size(operand->value.ptr);
     case TUPLE_V:
-        return ((tuple_p)operand->value.ptr)->size;
+        return tuple_size(operand->value.ptr);
     }
 
     return 0;
 }
 
-value_t operate_index(const value_p operand, unsigned long long index)
+value_p operate_index(const value_p operand, unsigned long long index)
 {
-    value_t res;
-
     switch (operand->type)
     {
     case STR_V:
-        res.type = CHAR_V;
-        res.value.chr = ((str_p)operand->value.ptr)->str[index];
-
-        return res;
+        return value_set2(CHAR_V, str_str(operand->value.ptr)[index]);
     case LIST_V:
-        return *((list_p)operand->value.ptr)->elements[index];
+        return list_elements(operand->value.ptr)[index];
     case TUPLE_V:
-        return *((tuple_p)operand->value.ptr)->elements[index];
+        return tuple_elements(operand->value.ptr)[index];
     }
 
-    return res;
+    return NULL;
 }
-*/

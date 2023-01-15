@@ -481,7 +481,7 @@ list_p list_reverse(const list_p array)
 
     if (!array->size)
         return res;
-    
+
     if (array->size == 1)
     {
         res->elements = malloc(sizeof(value_p));

@@ -165,8 +165,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_var_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_FIXED_ASSIGN_N:
         return interpret_var_fixed_assign(node->value.ptr, &node->poss, &node->pose, context, properties);
-    //case VAR_REASSIGN_N:
-        //return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case VAR_REASSIGN_N:
+        return interpret_var_reassign(node->value.ptr, &node->poss, &node->pose, context, properties);
     case VAR_ACCESS_N:
         return interpret_var_access(node->value.ptr, &node->poss, &node->pose, context, properties);
 /*
@@ -176,8 +176,10 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_func_call(node->value.ptr, &node->poss, &node->pose, context, properties);
     case STRUCT_DEF_N:
         return interpret_struct_def(node->value.ptr, &node->poss, &node->pose, context, properties);
+*/
     case DOLLAR_FUNC_CALL_N:
         return interpret_dollar_func_call(node->value.ptr, &node->poss, &node->pose, context, properties);
+/*
     case IF_N:
         return interpret_if(node->value.ptr, &node->poss, &node->pose, context, properties);
     case SWITCH_N:
@@ -1096,17 +1098,17 @@ ires_t interpret_var_fixed_assign(var_fixed_assign_np node, pos_p poss, pos_p po
     if (!IPROP_NOT_FREE(properties))
         free(node);
 
-    ires.response &= IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
+    ires.response = response & IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
     return ires;
 }
 
-/*
 ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
     ires_t ires;
     ires.response = 0;
 
-    value_t var = ires_merge(&ires, interpret_node(&node->var, context, IPROP_COVER(properties, 1, node->operator == ASSIGN_T, 0)));
+    value_p ptr = ires_merge(&ires, interpret_node(&node->var, context,
+        properties | IPROP_SET(1, node->operator == ASSIGN_T, 0, 0, 0)));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -1117,26 +1119,32 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
         return ires;
     }
 
-    value_t copy;
-    char* ptr = NULL;
+    char ptype;
+    if (IRES_CHAR_PTR(ires.response))
+        ptype = CHAR_V;
+    else if (IRES_VAL_PTR(ires.response))
+        ptype = NONE_V;
+    else
+        ptype = ((var_p)ptr)->type;
+
+    value_p left = NULL;
     if (node->operator != ASSIGN_T)
     {
-        copy.should_free = 0;
-
         if (IRES_CHAR_PTR(ires.response))
+            left = value_set2(CHAR_V, *(char*)ptr);
+        else if (IRES_VAL_PTR(ires.response))
         {
-            ptr = var.value.ptr;
-
-            copy.type = CHAR_V;
-            copy.value.chr = *(char*)var.value.ptr;
-
-            var.value.ptr = &copy;
+            left = *(value_p*)ptr;
+            value_copy(left);
         }
         else
-            copy = value_copy(var.value.ptr);
+        {
+            left = ((var_p)ptr)->value;
+            value_copy(left);
+        }
     }
 
-    ires.value = ires_merge(&ires, interpret_node(&node->value, context, IPROP_COVER(properties, 0, 0, 1)));
+    ires.value = ires_merge(&ires, interpret_node(&node->value, context, properties & IPROP_MASK));
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -1149,73 +1157,42 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     switch (node->operator)
     {
     case ASSIGN_T:
-        if (var.type != NULL_V && var.type != ires.value.type)
-        {
-            value_delete(&ires.value);
-
-            if (!IPROP_NOT_FREE(properties))
-                free(node);
-
-            return ires_fail(assign_type_specified_variable(ires.value.type, var.type, poss, pose, context));
-        }
-
-        ires.value.should_free = 0;
-
-        if (IRES_CHAR_PTR(ires.response))
-        {
-            *(char*)var.value.ptr = ires.value.value.chr;
-
-            if (IPROP_PTR(properties))
-                ires.value.value.ptr = var.value.ptr;
-        }
-        else
-        {
-            value_delete(var.value.ptr);
-            *(value_p)var.value.ptr = ires.value;
-
-            if (IPROP_PTR(properties))
-            {
-                ires.value.type = var.type;
-                ires.value.value.ptr = var.value.ptr;
-            }
-        }
-
-        break;
+        goto ret;
     case PLUS_EQ_T:
-        ires = operate_add(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_add(left, ires.value, poss, pose, context);
         break;
     case MINUS_EQ_T:
-        ires = operate_subtract(var.value.ptr, &ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
+        ires = operate_subtract(left, ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
         break;
     case MULTIPLY_EQ_T:
-        ires = operate_multiply(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_multiply(left, ires.value, poss, pose, context);
         break;
     case DIVIDE_EQ_T:
-        ires = operate_divide(var.value.ptr, &ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
+        ires = operate_divide(left, ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
         break;
     case MODULO_EQ_T:
-        ires = operate_modulo(var.value.ptr, &ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
+        ires = operate_modulo(left, ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
         break;
     case QUOTIENT_EQ_T:
-        ires = operate_quotient(var.value.ptr, &ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
+        ires = operate_quotient(left, ires.value, poss, pose, context, &node->value.poss, &node->value.pose);
         break;
     case POWER_EQ_T:
-        ires = operate_power(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_power(left, ires.value, poss, pose, context);
         break;
     case B_AND_EQ_T:
-        ires = operate_b_and(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_b_and(left, ires.value, poss, pose, context);
         break;
     case B_OR_EQ_T:
-        ires = operate_b_or(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_b_or(left, ires.value, poss, pose, context);
         break;
     case B_XOR_EQ_T:
-        ires = operate_b_xor(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_b_xor(left, ires.value, poss, pose, context);
         break;
     case LSHIFT_EQ_T:
-        ires = operate_lshift(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_lshift(left, ires.value, poss, pose, context);
         break;
     case RSHIFT_EQ_T:
-        ires = operate_rshift(var.value.ptr, &ires.value, poss, pose, context);
+        ires = operate_rshift(left, ires.value, poss, pose, context);
         break;
     }
 
@@ -1223,54 +1200,71 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     {
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
 
-    if (node->operator != ASSIGN_T)
+ret:
+    if (ptype && ires.value && ptype != ires.value->type)
     {
-        if (var.type != NULL_V && var.type != ires.value.type)
-        {
-            value_delete(var.value.ptr);
-            *(value_p)var.value.ptr = copy;
+        char vtype = ires.value->type;
 
-            if (!IPROP_NOT_FREE(properties))
-                free(node);
+        value_free(left);
+        value_free(ires.value);
 
-            return ires_fail(assign_type_specified_variable(ires.value.type, var.type, poss, pose, context));
-        }
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
 
-        ires.value.should_free = 0;
-
-        if (IRES_CHAR_PTR(response))
-        {
-            *ptr = ires.value.value.chr;
-
-            if (IPROP_PTR(properties))
-                ires.value.value.ptr = ptr;
-        }
-        else
-        {
-            *(value_p)var.value.ptr = ires.value;
-
-            value_delete(&copy);
-
-            if (IPROP_PTR(properties))
-            {
-                ires.value.type = var.type;
-                ires.value.value.ptr = var.value.ptr;
-            }
-            else if (IPROP_SHOULD_COPY(properties))
-                ires.value = value_copy(&ires.value);
-        }
+        return ires_fail(assign_type_specified_variable(vtype, ptype, poss, pose, context));
     }
+
+    if (IRES_CHAR_PTR(response))
+    {
+        *(char*)ptr = ires.value->value.chr;
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        if (IPROP_PTR(properties))
+        {
+            value_free_shell(ires.value);
+            ires.value = (value_p)ptr;
+        }
+
+        ires.response = response & IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
+        return ires;
+    }
+    if (IRES_VAL_PTR(response))
+    {
+        value_free(*(value_p*)ptr);
+        *(value_p*)ptr = ires.value;
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        if (IPROP_PTR(properties))
+            ires.value = (value_p)ptr;
+        else
+            value_copy(ires.value);
+
+        ires.response = response & IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
+        return ires;
+    }
+
+    value_free(((var_p)ptr)->value);
+    ((var_p)ptr)->value = ires.value;
 
     if (!IPROP_NOT_FREE(properties))
         free(node);
 
-    ires.response &= IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties));
+    if (IPROP_PTR(properties))
+        ires.value = (value_p)ptr;
+    else
+        value_copy(ires.value);
+
+    ires.response = response & IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
     return ires;
 }
-*/
 
 ires_t interpret_var_access(char* node, pos_p poss, pos_p pose, context_p context, char properties)
 {
@@ -1906,6 +1900,7 @@ ires_t interpret_struct_def(struct_def_np node, pos_p poss, pos_p pose, context_
 
     return ires;
 }
+*/
 
 ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
@@ -1920,18 +1915,14 @@ ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p po
     ires_t ires;
     ires.response = 0;
     
-    value_p args = malloc(node->size * sizeof(value_t));
+    value_p* args = malloc(node->size * sizeof(value_p));
 
     unsigned long long i;
     for (i = 0; i < node->size; i++)
     {
-        value_t arg = ires_merge(&ires, interpret_node(&node->args[i], context, IPROP_COVER(properties, 0, 0, 0)));
+        value_p arg = ires_merge(&ires, interpret_node(&node->args[i], context, properties & IPROP_MASK));
         if (IRES_HAS_ERROR(ires.response))
         {
-            while (i)
-                value_free(args + --i);
-            free(args);
-
             if (!IPROP_NOT_FREE(properties))
             {
                 i++;
@@ -1943,6 +1934,10 @@ ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p po
                 free(node->name);
                 free(node);
             }
+
+            while (i)
+                value_free(args[--i]);
+            free(args);
 
             return ires;
         }
@@ -1960,19 +1955,8 @@ ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p po
     }
 
     while (i)
-        value_free(args + --i);
+        value_free(args[--i]);
     free(args);
-
-    if (IRES_HAS_ERROR(ires.response))
-    {
-        if (!IPROP_NOT_FREE(properties))
-        {
-            free(node->args);
-            free(node->name);
-            free(node);
-        }
-        return ires;
-    }
 
     if (!IPROP_NOT_FREE(properties))
     {
@@ -1984,6 +1968,7 @@ ires_t interpret_dollar_func_call(dollar_func_call_np node, pos_p poss, pos_p po
     return ires;
 }
 
+/*
 ires_t interpret_if(if_np node, pos_p poss, pos_p pose, context_p context, char properties)
 {
     if (IPROP_PTR(properties))

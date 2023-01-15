@@ -23,6 +23,12 @@ typedef struct __value__* value_p;
             (v)->ref++; \
     }
 
+#define value_ref_free(v) \
+    {                     \
+        if (v)            \
+            (v)->ref--;   \
+    }
+
 #define value_free_type(v, vt)         \
     {                                  \
         if ((v)->ref)                  \

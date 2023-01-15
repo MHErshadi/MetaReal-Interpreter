@@ -182,6 +182,7 @@
                                                            \
         return ires_success(o);                            \
     }
+
 ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
     char ltype;
@@ -1553,7 +1554,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
-            base_operation(FLOAT_V, float_int_quotient, left, right, float);
+            base_operation(INT_V, float_int_quotient, left, right, float);
         case BOOL_V:
             if (!right->value.chr)
             {
@@ -3783,7 +3784,7 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            res = value_set2(CHAR_V, str_str(left)[index]);
+            res = value_set2(CHAR_V, str_str(left->value.ptr)[index]);
 
             value_free_type(left, str);
 
@@ -3798,7 +3799,7 @@ ires_t operate_subscript(value_p left, value_p right, context_p context, pos_p l
                 return ires_fail(out_of_range(rposs, rpose, context));
             }
 
-            res = value_set2(CHAR_V, str_str(left)[right->value.chr]);
+            res = value_set2(CHAR_V, str_str(left->value.ptr)[right->value.chr]);
 
             value_free_type(left, str);
             value_free_shell(right);
@@ -3984,7 +3985,7 @@ ires_t operate_subscript_ptr(value_p* ptr, value_p right, context_p context, pos
                 *ptr = left;
             }
 
-            ires.value = (value_p)(str_str(left) + index);
+            ires.value = (value_p)(str_str(left->value.ptr) + index);
             ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 0, 1);
 
             return ires;
@@ -4005,7 +4006,7 @@ ires_t operate_subscript_ptr(value_p* ptr, value_p right, context_p context, pos
                 *ptr = left;
             }
 
-            ires.value = (value_p)(str_str(left) + right->value.chr);
+            ires.value = (value_p)(str_str(left->value.ptr) + right->value.chr);
             ires.response = IRES_RESPONSE_SET(0, 0, 0, 0, 0, 1);
 
             return ires;

@@ -4636,24 +4636,39 @@ ires_t operate_success(value_p left, const value_p right, pos_p poss, pos_p pose
         switch (right->type)
         {
         case INT_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
+            res = value_set1(INT_V, int_add_ul(right->value.ptr, left->value.chr));
 
-            int_add(left->value.ptr, right->value.ptr);
+            value_free_shell(left);
+
+            return ires_success(res);
             break;
         case FLOAT_V:
-            left->type = FLOAT_V;
-            left->value.ptr = float_set_ul(left->value.chr);
+            res = value_set1(FLOAT_V, float_add_ul(right->value.ptr, left->value.chr));
 
-            float_add(left->value.ptr, right->value.ptr);
-            break;
+            value_free_shell(left);
+
+            return ires_success(res);
         case BOOL_V:
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set2(BOOL_V, left->value.chr ^ right->value.chr));
+            }
+
             left->value.chr ^= right->value.chr;
-            break;
+
+            return ires_success(left);
         case CHAR_V:
+            if (left->ref)
+            {
+                left->ref--;
+                return ires_success(value_set2(CHAR_V, left->value.chr + right->value.chr));
+            }
+
             left->type = CHAR_V;
             left->value.chr += right->value.chr;
-            break;
+
+            return ires_success(left);
         }
 
         break;
@@ -4661,17 +4676,18 @@ ires_t operate_success(value_p left, const value_p right, pos_p poss, pos_p pose
         switch (right->type)
         {
         case INT_V:
-            left->type = INT_V;
-            left->value.ptr = int_set_ull(left->value.chr);
+            res = value_set1(INT_V, int_add_ul(right->value.ptr, left->value.chr));
 
-            int_add(left->value.ptr, right->value.ptr);
+            value_free_shell(left);
+
+            return ires_success(res);
             break;
         case FLOAT_V:
-            left->type = FLOAT_V;
-            left->value.ptr = float_set_ul(left->value.chr);
+            res = value_set1(FLOAT_V, float_add_ul(right->value.ptr, left->value.chr));
 
-            float_add(left->value.ptr, right->value.ptr);
-            break;
+            value_free_shell(left);
+
+            return ires_success(res);
         case BOOL_V:
         case CHAR_V:
             if (left->ref)

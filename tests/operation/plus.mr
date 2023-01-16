@@ -1,0 +1,427 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+v = 1 + 2
+if (v is int) && v == 3
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 12 + -3.4
+if (v is float) && v == 8.6
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 89 + 5i
+if (v is complex) && v == (5i+89)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+v = 1729 + true
+if (v is int) && v == 1730
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = 37 + 'A'
+if (v is int) && v == 102
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = 17 + "29"
+if (v is str) && v == "1729"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 <float> type *#
+
+v = 9.5 + -3
+if (v is float) && v == 6.5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = 36.6 + 45.7
+if (v is float) && v == 82.3
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test9 *#
+
+v = 88.8 + 1i
+if (v is complex) && v == (1i+88.8)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test10 *#
+
+v = 6.78 + false
+if (v is float) && v == 6.78
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test11 *#
+
+v = 0.25 + 'z'
+if (v is float) && v == 122.25
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test12 *#
+
+v = 3.1415 + " = pi"
+if (v is str) && v == "3.1415 = pi"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test13 <complex> type *#
+
+v = 2.3i + 2
+if (v is complex) && v == (2+2.3i)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test14 *#
+
+v = 10i + 10.1
+if (v is complex) && v == (10.1+10i)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test15 *#
+
+v = (0i+1024) + (1i)
+if (v is complex) && v == (1i+1024)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test16 *#
+
+v = 0i + true
+if (v is complex) && v == (0i+1)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test17 *#
+
+v = 0.2i + '''
+if (v is complex) && v == (39+0.2i)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test18 *#
+
+v = 3.1415i + " = im_pi!"
+if (v is str) && v == "3.1415i = im_pi!"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test19 <bool> type *#
+
+v = true + 8
+if (v is int) && v == 9
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test20 *#
+
+v = false + 2.7
+if (v is float) && v == 2.7
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test21 *#
+
+v = true + 17.18i
+if (v is complex) && v == (17.18i+1)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test22 *#
+
+v = true + true
+if (v is bool) && v == false
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test23 *#
+
+v = false + '!'
+if (v is char) && v == '!'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test24 *#
+
+v = false + " is not true!"
+if (v is str) && v == "false is not true!"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test25 <char> type *#
+
+v = '\0' + 70
+if (v is int) && v == 70
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test26 *#
+
+v = '?' + 0.63
+if (v is float) && v == 63.63
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test27 *#
+
+v = 'O' + 5i
+if (v is complex) && v == (5i+79)
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test28 *#
+
+v = 'P' + false
+if (v is char) && v == 'P'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test29 *#
+
+v = '"' + 'B'
+if (v is char) && v == 'd'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test30 *#
+
+v = 'H' + "ello world"
+if (v is str) && v == "Hello world"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test31 <str> type *#
+
+v = "favorite prime: " + 499
+if (v is str) && v == "favorite prime: 499"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test32 *#
+
+v = "-e is: " + -2.718281828
+if (v is str) && v == "-e is: -2.718281828"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test33 *#
+
+v = "first zero " + (0.5 + 14.1347i)
+if (v is str) && v == "first zero (0.5+14.1347i)"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test34 *#
+
+v = "true is " + true
+if (v is str) && v == "true is true"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test35 *#
+
+v = "Hello worl" + 'd'
+if (v is str) && v == "Hello world"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test36 *#
+
+v = "Bye" + " world!"
+if (v is str) && v == "Bye world!"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test37 <list> type *#
+
+v = [] + -6 + 1.618033 + (2+2i) + true + 'm' + "ok!" + int
+if (v is list) && v == [-6, 1.618033, 2+2i, true, 'm', "ok!", int]
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test 38 *#
+
+v = [1,2,3] + [4,5,6] + (7,8,9) + [[1,2,3]] + ((1,2,3),)
+if (v is list) && v == [1, 2, 3, 4, 5, 6, 7, 8, 9, [1,2,3], (1,2,3)]
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 38:
+    "PASSED"
+else:
+    "       FAILED"

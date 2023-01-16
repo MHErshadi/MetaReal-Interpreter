@@ -42,8 +42,8 @@ const char* types[TYPES_COUNT] =
 {
     "object",
     "int", "float", "complex",
-    "char",
     "bool",
+    "char",
     "str",
     "list", "tuple", "dict", "set"
 };

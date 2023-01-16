@@ -1582,7 +1582,11 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
             ires = object_call(node);
             break;
         }
-        //ill defined
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires;
     }
 
     func_p func_v = func->value.ptr;

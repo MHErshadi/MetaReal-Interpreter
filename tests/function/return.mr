@@ -1,6 +1,8 @@
 a = []
 c = 0
 
+#* Test1 *#
+
 func f()
 {
     func g(x, y):
@@ -16,6 +18,8 @@ if f()(5.5, 3) == 16.5
 }
 else:
     a += "FAILED"
+
+#* Test2 *#
 
 func f(x)
 {
@@ -33,6 +37,8 @@ if f(3)(4) == 12
 else:
     a += "FAILED"
 
+#* Test3 *#
+
 b = f(6)
 
 if b(5) == 30
@@ -42,6 +48,8 @@ if b(5) == 30
 }
 else:
     a += "FAILED"
+
+#* Result *#
 
 if c == 3:
     "PASSED"

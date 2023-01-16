@@ -22,29 +22,10 @@ func_p func_set(unsigned char type, unsigned long long min_size, unsigned long l
     return func;
 }
 
-func_p func_copy(const func_p func)
-{
-    func_p copy = malloc(sizeof(func_t));
-
-    copy->type = func->type;
-
-    copy->min_size = func->min_size;
-    copy->max_size = func->max_size;
-
-    copy->size = func->size;
-
-    //copy->context = context_copy(&func->context);
-
-    copy->body.nodes = node_p_copy(func->body.nodes, func->body.size);
-    copy->body.size = func->body.size;
-
-    return copy;
-}
-
 void func_free(func_p func)
 {
     free(func->context.name);
-    //table_delete(&func->context.table);
+    table_delete(&func->context.table);
 
     arg_value_free(func->args, func->size);
 
@@ -96,6 +77,6 @@ void func_table_free_args(table_p table, unsigned long long arg_size)
     for (i = 0; i < arg_size; i++)
     {
         value_free(table->vars[i].value);
-        //table->vars[i].value = NULL;
+        table->vars[i].value = NULL;
     }
 }

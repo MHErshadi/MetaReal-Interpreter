@@ -1,6 +1,8 @@
 a = []
 c = 0
 
+#* Test1 *#
+
 func f(x, y):
     "" + x + y
 
@@ -16,6 +18,8 @@ else:
 
 var int b = 40
 
+#* Test2 *#
+
 try
 {
     b = f
@@ -26,6 +30,8 @@ except "Can not assign <func> to a type-specified variable (type is <int>)"
     a += "PASSED"
     c++
 }
+
+#* Test3 *#
 
 var const b = 40
 
@@ -39,6 +45,8 @@ except "'b' is a constant variable"
     a += "PASSED"
     c++
 }
+
+#* Result *#
 
 if c == 3:
     "PASSED"

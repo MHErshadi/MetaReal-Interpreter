@@ -18,9 +18,7 @@ make: $(OUT)
 
 remake: clean $(OUT)
 
-all: $(OUT) test
-
-rall: clean $(OUT) test
+all: clean $(OUT) test
 
 test: $(TRES)
 

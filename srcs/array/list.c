@@ -123,6 +123,8 @@ list_p list_concat(const list_p array1, const list_p array2)
             return res;
         }
 
+        res->elements = malloc(array2->size * sizeof(value_p));
+
         unsigned long long i;
         for (i = 0; i < array2->size; i++)
         {
@@ -137,6 +139,8 @@ list_p list_concat(const list_p array1, const list_p array2)
 
     if (!array2->size)
     {
+        res->elements = malloc(array1->size * sizeof(value_p));
+
         unsigned long long i;
         for (i = 0; i < array1->size; i++)
         {
@@ -208,6 +212,8 @@ list_p list_concat_tuple(const list_p array1, const tuple_p array2)
             return res;
         }
 
+        res->elements = malloc(array2->size * sizeof(value_p));
+
         unsigned long long i;
         for (i = 0; i < array2->size; i++)
         {
@@ -222,6 +228,8 @@ list_p list_concat_tuple(const list_p array1, const tuple_p array2)
 
     if (!array2->size)
     {
+        res->elements = malloc(array1->size * sizeof(value_p));
+
         unsigned long long i;
         for (i = 0; i < array1->size; i++)
         {
@@ -259,9 +267,9 @@ char list_concat_tuple_self(list_p array1, tuple_p array2)
     list_p res = malloc(sizeof(list_t));
 
     if (!array2->size)
-        return 1;
+        return 0;
 
-    if (!array2->size)
+    if (!array1->size)
     {
         array1->elements = array2->elements;
         array1->size = array2->size;

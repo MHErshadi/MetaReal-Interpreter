@@ -488,9 +488,35 @@ ires_t operate_add(value_p left, value_p right, pos_p poss, pos_p pose, context_
         switch (right->type)
         {
         case LIST_V:
-            base_operation(LIST_V, list_concat, left, right, list);
+            if (left->ref)
+            {
+                res = value_set1(LIST_V, list_concat(left->value.ptr, right->value.ptr));
+
+                left->ref--;
+                value_free_type(right, tuple);
+
+                return ires_success(res);
+            }
+
+            if (!list_concat_self(left->value.ptr, right->value.ptr))
+                value_free_type(right, tuple);
+
+            return ires_success(left);
         case TUPLE_V:
-            base_operation(TUPLE_V, list_concat_tuple, left, right, tuple);
+            if (left->ref)
+            {
+                res = value_set1(LIST_V, list_concat_tuple(left->value.ptr, right->value.ptr));
+
+                left->ref--;
+                value_free_type(right, tuple);
+
+                return ires_success(res);
+            }
+
+            if (!list_concat_tuple_self(left->value.ptr, right->value.ptr))
+                value_free_type(right, tuple);
+
+            return ires_success(left);
         }
 
         if (left->ref)
@@ -729,7 +755,7 @@ ires_t operate_subtract(value_p left, value_p right, pos_p poss, pos_p pose, con
 
             if (left->ref)
             {
-                res = value_set1(STR_V, list_remove(left->value.ptr, right->value.chr));
+                res = value_set1(LIST_V, list_remove(left->value.ptr, right->value.chr));
 
                 left->ref--;
                 value_free_shell(right);
@@ -2549,7 +2575,7 @@ ires_t operate_equal(value_p left, value_p right)
 
             return ires_success(res);
         case COMPLEX_V:
-            res = value_set2(COMPLEX_V, complex_equal(left->value.ptr, right->value.ptr));
+            res = value_set2(BOOL_V, complex_equal(left->value.ptr, right->value.ptr));
 
             value_free_type(left, complex);
             value_free_type(right, complex);
@@ -4439,6 +4465,8 @@ char operate_equal_compare(const value_p left, const value_p right)
         }
 
         break;
+    case TYPE_V:
+        return left->type == TYPE_V && left->value.chr == right->value.chr;
     case FUNC_V:
     case STRUCT_V:
         return left->value.ptr == right->value.ptr;

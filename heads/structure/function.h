@@ -41,8 +41,6 @@ func_p func_set(unsigned char type, unsigned long long min_size, unsigned long l
     arg_value_p args, unsigned long long size,
     context_p context, body_p body);
 
-func_p func_copy(const func_p func);
-
 void func_free(func_p func);
 
 /* */

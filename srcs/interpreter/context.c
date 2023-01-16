@@ -31,23 +31,6 @@ context_t context_set2(char* name, table_p table, const char* fname)
     return context;
 }
 
-context_t context_copy(const context_p context)
-{
-    context_t copy;
-
-    copy.name = malloc(strlen(context->name) + 1);
-    strcpy(copy.name, context->name);
-
-    copy.parent = context->parent;
-    copy.parent_pos = context->parent_pos;
-
-    copy.table = table_copy(&context->table);
-
-    copy.fname = context->fname;
-
-    return copy;
-}
-
 context_t context_copy_debug(const context_p context)
 {
     context_t copy;
@@ -122,32 +105,6 @@ table_t table_set(unsigned long long alloc)
     table.size = 0;
 
     return table;
-}
-
-table_t table_copy(const table_p table)
-{
-    table_t copy;
-
-    copy.vars = malloc(table->alloc * sizeof(var_t));
-
-    unsigned long long i;
-    for (i = 0; i < table->size; i++)
-    {
-        copy.vars[i].properties = table->vars[i].properties;
-
-        copy.vars[i].name = malloc(strlen(table->vars[i].name) + 1);
-        strcpy(copy.vars[i].name, table->vars[i].name);
-
-        copy.vars[i].type = table->vars[i].type;
-
-        copy.vars[i].value = table->vars[i].value;
-        value_copy(table->vars[i].value);
-    }
-
-    copy.alloc = table->alloc;
-    copy.size = table->size;
-
-    return copy;
 }
 
 void table_delete(table_p table)

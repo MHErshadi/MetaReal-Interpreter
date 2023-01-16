@@ -75,7 +75,7 @@ enum _value_types_
 
     FUNC_V,
 
-    STRCUT_V
+    STRUCT_V
 };
 
 static const char* value_labels[15] =

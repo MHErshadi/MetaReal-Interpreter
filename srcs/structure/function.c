@@ -59,7 +59,7 @@ void arg_value_free(arg_value_p args, unsigned long long size)
         return;
 
     while (size)
-        value_free(&args[--size].value);
+        value_free(args[--size].value);
     free(args);
 }
 

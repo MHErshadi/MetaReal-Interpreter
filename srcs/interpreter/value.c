@@ -67,15 +67,12 @@ void value_free(value_p value)
     case TUPLE_V:
         tuple_free(value->value.ptr);
         break;
-    /*
     case FUNC_V:
         func_free(value->value.ptr);
         break;
-    case STRCUT_V:
+    case STRUCT_V:
         context_free(value->value.ptr);
-        free(value->value.ptr);
         break;
-    */
     }
 
     free(value);
@@ -149,14 +146,12 @@ void value_label(value_p value, const char* end)
     case TYPE_V:
         fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
         return;
-    /*
     case FUNC_V:
-        context_print(setting.output, "function", &((func_p)value->value.ptr)->context, end);
+        context_print(setting.output, "function", &func_context(value->value.ptr), end);
         return;
-    case STRCUT_V:
+    case STRUCT_V:
         context_print(setting.output, "struct", value->value.ptr, end);
         return;
-    */
     }
 }
 
@@ -187,12 +182,10 @@ char value_is_true(value_p value)
         return tuple_size(value->value.ptr) != 0;
     case TYPE_V:
         return value->value.chr >= OBJECT_V;
-    /*
     case FUNC_V:
-        return ((func_p)value->value.ptr)->context.name != NULL;
-    case STRCUT_V:
-        return ((context_p)value->value.ptr)->name != NULL;
-    */
+        return func_name(value->value.ptr) != NULL;
+    case STRUCT_V:
+        return context_name(value->value.ptr) != NULL;
     }
 
     return 0;

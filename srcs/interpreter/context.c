@@ -73,6 +73,8 @@ void context_free(context_p context)
 {
     free(context->name);
     table_delete(&context->table);
+
+    free(context);
 }
 
 void context_free_debug(context_p context)

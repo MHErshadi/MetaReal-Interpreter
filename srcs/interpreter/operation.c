@@ -2716,14 +2716,20 @@ ires_t operate_equal(value_p left, value_p right)
         value_free(right);
 
         return ires_success(res);
-    //case FUNC_V:
-    //case STRCUT_V:
-    //    left->type = BOOL_V;
-    //    left->value.chr = left->value.ptr == right->value.ptr;
+    case FUNC_V:
+        res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
 
-    //    value_free(right);
+        value_free_type(right, func);
+        value_free(right);
 
-    //    return ires_success(left);
+        return ires_success(res);
+    case STRUCT_V:
+        res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
+
+        value_free_type(right, context);
+        value_free(right);
+
+        return ires_success(res);
     default:
         value_free(left);
         break;
@@ -3020,14 +3026,20 @@ ires_t operate_nequal(value_p left, value_p right)
         value_free(right);
 
         return ires_success(res);
-    //case FUNC_V:
-    //case STRCUT_V:
-    //    left->type = BOOL_V;
-    //    left->value.chr = left->value.ptr == right->value.ptr;
+    case FUNC_V:
+        res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
 
-    //    value_free(right);
+        value_free_type(right, func);
+        value_free(right);
 
-    //    return ires_success(left);
+        return ires_success(res);
+    case STRUCT_V:
+        res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
+
+        value_free_type(right, context);
+        value_free(right);
+
+        return ires_success(res);
     default:
         value_free(left);
         break;
@@ -4126,31 +4138,18 @@ ires_t operate_positive(value_p operand)
         value_free_type(operand, tuple);
 
         return ires_success(res);
-    /*
     case FUNC_V:
-        size = (unsigned long)((func_p)operand->value.ptr)->context.name;
+        size = (unsigned long)func_name(operand->value.ptr);
 
-        if (operand->should_free)
-            func_free(operand->value.ptr);
+        value_free_type(operand, func);
 
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(size);
+        return ires_success(value_set1(INT_V, int_set_ull(size)));
+    case STRUCT_V:
+        size = (unsigned long)context_name(operand->value.ptr);
 
-        return ires_success(operand);
-    case STRCUT_V:
-        size = (unsigned long)((context_p)operand->value.ptr)->name;
+        value_free_type(operand, context);
 
-        if (operand->should_free)
-        {
-            context_free(operand->value.ptr);
-            free(operand->value.ptr);
-        }
-
-        operand->type = INT_V;
-        operand->value.ptr = int_set_ull(size);
-
-        return ires_success(operand);
-    */
+        return ires_success(value_set1(INT_V, int_set_ull(size)));
     }
 
     return ires_success(operand);
@@ -4440,9 +4439,9 @@ char operate_equal_compare(const value_p left, const value_p right)
         }
 
         break;
-    //case FUNC_V:
-    //case STRCUT_V:
-    //    return left->value.ptr == right->value.ptr;
+    case FUNC_V:
+    case STRUCT_V:
+        return left->value.ptr == right->value.ptr;
     }
 
     return 0;

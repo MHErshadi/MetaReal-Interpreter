@@ -10,7 +10,7 @@
 
 struct __arg_value_t__
 {
-    value_t value;
+    value_p value;
     unsigned long long index;
 };
 typedef struct __arg_value_t__ arg_value_t;
@@ -31,6 +31,11 @@ struct __func_t__
 };
 typedef struct __func_t__ func_t;
 typedef struct __func_t__* func_p;
+
+#define func_context(f) (((func_p)f)->context)
+#define func_name(f) (((func_p)f)->context.name)
+
+/* */
 
 func_p func_set(unsigned char type, unsigned long long min_size, unsigned long long max_size,
     arg_value_p args, unsigned long long size,

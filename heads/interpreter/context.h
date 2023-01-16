@@ -47,6 +47,10 @@ struct __context__
 typedef struct __context__ context_t;
 typedef struct __context__* context_p;
 
+#define context_name(c) (((context_p)c)->name)
+
+/* */
+
 context_t context_set1(char* name, context_p parent, pos_p parent_pos, table_p table, const char* fname);
 context_t context_set2(char* name, table_p table, const char* fname);
 

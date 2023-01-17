@@ -1644,7 +1644,7 @@ ires_t operate_quotient(value_p left, value_p right, pos_p poss, pos_p pose, con
                 return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
-            res = value_set1(INT_V, float_get_int(left->value.ptr));
+            res = value_set1(INT_V, float_quotient_ul(left->value.ptr, 1));
 
             value_free_type(left, float);
             value_free_shell(right);

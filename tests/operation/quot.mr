@@ -1,0 +1,313 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+v = 20 // 3
+if (v is int) && v == 6
+{
+    try
+    {
+        100 // 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 8 // 1.3
+if (v is int) && v == 6
+{
+    try
+    {
+        8 // 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 19 // true
+if (v is int) && v == 19
+{
+    try
+    {
+        19 // false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+v = 1729 // ','
+if (v is int) && v == 39
+{
+    try
+    {
+        0 // '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test5 <float> type *#
+
+v = 89.45 // 5
+if (v is int) && v == 17
+{
+    try
+    {
+        89.45 // 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = 7.6 // 0.6
+if (v is int) && v == 12
+{
+    try
+    {
+        7.6 // 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test7 *#
+
+v = 16.7 // true
+if (v is int) && v == 16
+{
+    try
+    {
+        16.7 // false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = 40.2 // '='
+if (v is int) && v == 0
+{
+    try
+    {
+        1.1 // '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test9 <bool> type *#
+
+v = true // 1
+if (v is int) && v == 1
+{
+    try
+    {
+        true // 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test10 *#
+
+v = true // 0.3
+if (v is int) && v == 3
+{
+    try
+    {
+        false // 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test11 *#
+
+v = false // true
+if (v is bool) && v == false
+{
+    try
+    {
+        true // false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test12 *#
+
+v = true // '?'
+if (v is char) && v == '\0'
+{
+    try
+    {
+        false // '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test13 <char> type *#
+
+v = '5' // 5
+if (v is int) && v == 10
+{
+    try
+    {
+        '5' // 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test14 *#
+
+v = '[' // 0.22
+if (v is int) && v == 413
+{
+    try
+    {
+        '[' // 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test15 *#
+
+v = '#' // true
+if (v is char) && v == '#'
+{
+    try
+    {
+        '#' // false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test16 *#
+
+v = '<' // '\a'
+if (v is char) && v == '\b'
+{
+    try
+    {
+        '<' // '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 16:
+    "PASSED"
+else:
+    "       FAILED"

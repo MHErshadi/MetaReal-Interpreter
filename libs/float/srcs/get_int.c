@@ -14,7 +14,7 @@ int_p float_get_int(const float_p src)
     int_p dst = malloc(sizeof(int_t));
 
     mpz_init(dst->value);
-    mpfr_get_z(dst->value, src->value, MPFR_RNDN);
+    mpfr_get_z(dst->value, src->value, MPFR_RNDD);
 
     return dst;
 }

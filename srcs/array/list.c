@@ -40,7 +40,9 @@ void list_free(list_p array)
     while (array->size)
         value_free(array->elements[--array->size]);
 
-    free(array->elements);
+    if (array->size)
+        free(array->elements);
+
     free(array);
 }
 

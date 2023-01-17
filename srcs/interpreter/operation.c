@@ -841,7 +841,7 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
             base_operation(COMPLEX_V, complex_multiply, left, right, complex);
         case BOOL_V:
         case CHAR_V:
-            base_operation_ul(COMPLEX_V, float_multiply, left, right);
+            base_operation_ul(COMPLEX_V, complex_multiply, left, right);
         }
 
         value_free_type(left, complex);
@@ -1138,7 +1138,7 @@ ires_t operate_divide(value_p left, value_p right, pos_p poss, pos_p pose, conte
                 return ires_fail(division_by_zero(rposs, rpose, context));
             }
 
-            base_operation_rev(COMPLEX_V, complex_float_divide, right, left, complex);
+            base_operation_rev(COMPLEX_V, complex_float_divide, right, left, float);
         case BOOL_V:
             if (!right->value.chr)
             {

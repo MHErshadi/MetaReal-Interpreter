@@ -1,0 +1,484 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+v = 4 / 5
+if (v is float) && v == 0.8
+{
+    try
+    {
+        10 / 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 7 / 0.5
+if (v is float) && v == 14
+{
+    try
+    {
+        5 / 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 6 / 1i
+if (v is complex) && v == -6i
+{
+    try
+    {
+        5 / (0 + 0i)
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+v = 78 / true
+if (v is int) && v == 78
+{
+    try
+    {
+        78 / false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = 10 / '\b'
+if (v is float) && v == 1.25
+{
+    try
+    {
+        90 / '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test6 <float> type *#
+
+v = 1.6 / 4
+if (v is float) && v == 0.4
+{
+    try
+    {
+        6.8 / 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test7 *#
+
+v = 0.2 / 1.6
+if (v is float) && v == 0.125
+{
+    try
+    {
+        0.2 / 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = 8.9 / (8.9 + 8.9i)
+if (v is complex) && v == (0.5 - 0.5i)
+{
+    try
+    {
+        0.0 / 0i
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test9 *#
+
+v = 78.8 / true
+if (v is float) && v == 78.8
+{
+    try
+    {
+        12.3 / false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test10 *#
+
+v = 13.13 / '\r'
+if (v is float) && v == 1.01
+{
+    try
+    {
+        4.3 / '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test11 <complex> type *#
+
+v = (100i + 50.5) / 5
+if (v is complex) && v == (20i + 10.1)
+{
+    try
+    {
+        5i / 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test12 *#
+
+v = (2i + 7) / 0.25
+if (v is complex) && v == (8i + 28)
+{
+    try
+    {
+        (2i + 9) / 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test13 *#
+
+v = (2i + 6) / (2i + 4)
+if (v is complex) && v == (1.4 - 0.2i)
+{
+    try
+    {
+        0.5i / 0.0i
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test14 *#
+
+v = (5i + 6) / true
+if (v is complex) && v == (6 + 5i)
+{
+    try
+    {
+        (7 + 6.1i) / false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test15 *#
+
+v = (70.7i + 3.5) / '#'
+if (v is complex) && v == (0.1 + 2.02i)
+{
+    try
+    {
+        (11 + 1.3i) / '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test16 <bool> type *#
+
+v = true / 5
+if (v is float) && v == 0.2
+{
+    try
+    {
+        false / 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test17 *#
+
+v = true / -0.5
+if (v is float) && v == -2
+{
+    try
+    {
+        true / 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test18 *#
+
+v = false / (5 - 5i)
+if (v is complex) && v == 0
+{
+    try
+    {
+        false / 0.0i
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test19 *#
+
+v = true / true
+if (v is bool) && v == true
+{
+    try
+    {
+        true / false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test20 *#
+
+v = true / '\b'
+if (v is float) && v == 0.125
+{
+    try
+    {
+        true / '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test21 <char> type *#
+
+v = '`' / 32
+if (v is float) && v == 3
+{
+    try
+    {
+        '`' / 0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test22 *#
+
+v = 'l' / 2.5
+if (v is float) && v == 43.2
+{
+    try
+    {
+        'l' / 0.0
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test23 *#
+
+v = 'u' / (2 - 2i)
+if (v is complex) && v == (29.25 + 29.25i)
+{
+    try
+    {
+        'u' / (0i + 0.0)
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test24 *#
+
+v = 'o' / true
+if (v is char) && v == 'o'
+{
+    try
+    {
+        'o' / false
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Test25 *#
+
+v = '`' / '2'
+if (v is float) && v == 1.92
+{
+    try
+    {
+        '!' / '\0'
+        a += "FAILED"
+    }
+    except "Division by zero"
+    {
+        a += "PASSED"
+        c++
+    }
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 25:
+    "PASSED"
+else:
+    "       FAILED"

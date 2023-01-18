@@ -2540,7 +2540,7 @@ ires_t operate_equal(value_p left, value_p right)
 
             return ires_success(res);
         case COMPLEX_V:
-            res = value_set2(COMPLEX_V, complex_equal_int(right->value.ptr, left->value.ptr));
+            res = value_set2(BOOL_V, complex_equal_float(right->value.ptr, left->value.ptr));
 
             value_free_type(left, float);
             value_free_type(right, complex);
@@ -2746,14 +2746,14 @@ ires_t operate_equal(value_p left, value_p right)
     case FUNC_V:
         res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
 
-        value_free_type(right, func);
+        value_free_type(left, func);
         value_free(right);
 
         return ires_success(res);
     case STRUCT_V:
         res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
 
-        value_free_type(right, context);
+        value_free_type(left, context);
         value_free(right);
 
         return ires_success(res);
@@ -2850,7 +2850,7 @@ ires_t operate_nequal(value_p left, value_p right)
 
             return ires_success(res);
         case COMPLEX_V:
-            res = value_set2(COMPLEX_V, complex_nequal_int(right->value.ptr, left->value.ptr));
+            res = value_set2(BOOL_V, complex_nequal_float(right->value.ptr, left->value.ptr));
 
             value_free_type(left, float);
             value_free_type(right, complex);
@@ -2886,7 +2886,7 @@ ires_t operate_nequal(value_p left, value_p right)
 
             return ires_success(res);
         case COMPLEX_V:
-            res = value_set2(COMPLEX_V, complex_nequal(left->value.ptr, right->value.ptr));
+            res = value_set2(BOOL_V, complex_nequal(left->value.ptr, right->value.ptr));
 
             value_free_type(left, complex);
             value_free_type(right, complex);
@@ -3056,14 +3056,14 @@ ires_t operate_nequal(value_p left, value_p right)
     case FUNC_V:
         res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
 
-        value_free_type(right, func);
+        value_free_type(left, func);
         value_free(right);
 
         return ires_success(res);
     case STRUCT_V:
         res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
 
-        value_free_type(right, context);
+        value_free_type(left, context);
         value_free(right);
 
         return ires_success(res);

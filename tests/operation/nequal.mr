@@ -1,0 +1,470 @@
+a = []
+c = 0
+
+#* Test1 <none> type *#
+
+v = none != none
+w = none != false
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 <object> type *#
+
+o = object()
+
+v = o != o
+w = o != object()
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 <int> type *#
+
+v = 12 != 12
+w = 3 != -3
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+v = 5 != 5.0
+w = -4 != -3.9999
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = 7 != (7 + 0i)
+w = 4 != 4i
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = 1 != true
+w = 0 != true
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 *#
+
+v = 36 != '$'
+w = 9 != '9'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test8 <float> type *#
+
+v = -10.0 != -10
+w = 6.4 != 6
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test9 *#
+
+v = 6.7 != 6.7
+w = 3.14 != 3.1
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test10 *#
+
+v = 2.3 != (2.3 + 0i)
+w = 9.8 != (9.8 + 9.8i)
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test11 *#
+
+v = 1.0 != true
+w = 0.1 != false
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test12 *#
+
+v = 83.0 != 'S'
+w = 6.0 != '{'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test13 <complex> type *#
+
+v = (1.0 + 0i) != 1
+w = 4i != 4
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test14 *#
+
+v = (5.6 + 0i) != 5.6
+w = 2.11i != 0.0
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test15 *#
+
+v = (8.9 + 4.5i) != (4.5i + 8.9)
+w = (2.2 + 3.3i) != (3.3 + 2.2i)
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test16 *#
+
+v = 0i != false
+w = 1i != true
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test17 *#
+
+v = 0i != '\0'
+w = 93i != ']'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test18 <bool> type *#
+
+v = false != 0
+w = true != 100
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test19 *#
+
+v = true != 1.0
+w = true != 1.3
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test20 *#
+
+v = false != 0i
+w = true != -1i
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test21 *#
+
+v = false != false
+w = true != false
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test22 *#
+
+v = false != '\0'
+w = true != 't'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test23 <char> type *#
+
+v = 'y' != 121
+w = '^' != 93
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test24 *#
+
+v = '#' != 35.0
+w = 'p' != 112.1
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test25 *#
+
+v = '\\' != (92 + 0i)
+w = '\\' != 92i
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test26 *#
+
+v = '\0' != false
+w = '6' != true
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test27 *#
+
+v = 'o' != 'o'
+w = '\\' != '/'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test28 *#
+
+v = 'R' != "R"
+w = 'M' != "MM"
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test29 <str> type *#
+
+v = "w" != 'w'
+w = "" != '0'
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test30 *#
+
+v = "Hello World" != "Hello World"
+w = "Hello World" != "hello world"
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test31 <list> type *#
+
+v = [1, 2, 3, 0, 10] != [1, 2.0, (3 + 0i), false, '\n']
+w = [1, 2, 3] != [3, 2, 1]
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test32 *#
+
+v = [1, 2, 3, 0, 10] != (1, 2.0, (3 + 0i), false, '\n')
+w = [1, 2, 3] != (3, 2, 1)
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test33 <tuple> type *#
+
+v = (1, 2, 3, 0, 10) != [1, 2.0, (3 + 0i), false, '\n']
+w = (1, 2, 3) != [3, 2, 1]
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test34 *#
+
+v = (1, 2, 3, 0, 10) != (1, 2.0, (3 + 0i), false, '\n')
+w = (1, 2, 3) != (3, 2, 1)
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test35 <type> *#
+
+v = int != int
+w = int != float
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test36 <func> type *#
+
+i = func (x): x
+j = func (x): x
+
+v = i != i
+w = i != j
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test37 <struct> type *#
+
+i = struct
+{
+    var int x
+    var int y
+}
+
+j = struct
+{
+    var int x
+    var int y
+}
+
+v = i != i
+w = i != j
+if ((v, w) are bool) && !v && w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c != 37:
+    "PASSED"
+else:
+    "       FAILED"

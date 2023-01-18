@@ -111,11 +111,12 @@ void table_delete(table_p table)
 {
     while (table->size)
     {
-        value_free(table->vars[table->size].value);
-        free(table->vars[--table->size].name);
+        value_free(table->vars[--table->size].value);
+        free(table->vars[table->size].name);
     }
 
-    free(table->vars);
+    if (table->alloc)
+        free(table->vars);
 }
 
 void table_free(table_p table)

@@ -1,0 +1,108 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+v = 81 >> 6
+if (v is int) && v == 1
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 897 >> false
+if (v is int) && v == 897
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 1097 >> '\a'
+if (v is int) && v == 8
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 <bool> type *#
+
+v = true >> 0
+if (v is int) && v == 1
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = false >> false
+if (v is bool) && v == false
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = true >> '0'
+if (v is char) && v == '\0'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 <char> type *#
+
+v = 'U' >> 2
+if (v is int) && v == 21
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = '@' >> true
+if (v is char) && v == ' '
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test9 *#
+
+v = '(' >> ')'
+if (v is char) && v == '\0'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 9:
+    "PASSED"
+else:
+    "       FAILED"

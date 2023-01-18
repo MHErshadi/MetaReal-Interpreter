@@ -1982,6 +1982,7 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
                 return ires_success(value_set2(CHAR_V, res_chr));
             }
 
+            left->type = CHAR_V;
             left->value.chr = res_chr;
 
             return ires_success(left);

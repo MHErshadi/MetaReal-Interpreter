@@ -78,6 +78,8 @@ lres_t lex(const char* code, char terminator)
 
         if (*code == '#')
         {
+            pos.index++;
+
             code = skip_comment(++code, terminator, &pos);
             continue;
         }

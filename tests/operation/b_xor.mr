@@ -1,0 +1,108 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+v = 43 ^ 15
+if (v is int) && v == 36
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 20 ^ true
+if (v is int) && v == 21
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 110 ^ 'n'
+if (v is int) && v == 0
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 <bool> type *#
+
+v = true ^ 13
+if (v is int) && v == 12
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = false ^ true
+if (v is bool) && v == true
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = false ^ '&'
+if (v is char) && v == '&'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 <char> type *#
+
+v = '@' ^ 192
+if (v is int) && v == 128
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = 't' ^ true
+if (v is char) && v == 'u'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test9 *#
+
+v = 'r' ^ 'x'
+if (v is char) && v == '\n'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 9:
+    "PASSED"
+else:
+    "       FAILED"

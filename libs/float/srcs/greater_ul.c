@@ -10,5 +10,5 @@
 
 char float_greater_ul(const float_p num1, unsigned long num2)
 {
-    return mpfr_cmp_ui(num1->value, num2) > 1;
+    return mpfr_cmp_ui(num1->value, num2) > 0;
 }

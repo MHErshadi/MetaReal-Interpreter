@@ -10,5 +10,5 @@
 
 char float_greater_int(const float_p num1, const int_p num2)
 {
-    return mpfr_cmp_z(num1->value, num2->value) > 1;
+    return mpfr_cmp_z(num1->value, num2->value) > 0;
 }

@@ -181,7 +181,7 @@ char value_is_true(value_p value)
     case TUPLE_V:
         return tuple_size(value->value.ptr) != 0;
     case TYPE_V:
-        return value->value.chr >= OBJECT_V;
+        return value->value.chr != NONE_V;
     case FUNC_V:
         return func_name(value->value.ptr) != NULL;
     case STRUCT_V:

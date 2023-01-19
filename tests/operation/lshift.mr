@@ -4,7 +4,7 @@ c = 0
 #* Test1 <int> type *#
 
 v = 3 << 4
-if (v is int) && v == 48
+if v is int && v == 48
 {
     a += "PASSED"
     c++
@@ -15,7 +15,7 @@ else:
 #* Test2 *#
 
 v = 78 << true
-if (v is int) && v == 156
+if v is int && v == 156
 {
     a += "PASSED"
     c++
@@ -26,7 +26,7 @@ else:
 #* Test3 *#
 
 v = 3 << '\b'
-if (v is int) && v == 768
+if v is int && v == 768
 {
     a += "PASSED"
     c++
@@ -37,7 +37,7 @@ else:
 #* Test4 <bool> type *#
 
 v = true << 10
-if (v is int) && v == 1024
+if v is int && v == 1024
 {
     a += "PASSED"
     c++
@@ -48,7 +48,7 @@ else:
 #* Test5 *#
 
 v = true << true
-if (v is bool) && v == false
+if v is bool && v == false
 {
     a += "PASSED"
     c++
@@ -59,7 +59,7 @@ else:
 #* Test6 *#
 
 v = false << 'i'
-if (v is char) && v == '\0'
+if v is char && v == '\0'
 {
     a += "PASSED"
     c++
@@ -70,7 +70,7 @@ else:
 #* Test7 <char> type *#
 
 v = 'Z' << 0
-if (v is int) && v == 90
+if v is int && v == 90
 {
     a += "PASSED"
     c++
@@ -81,7 +81,7 @@ else:
 #* Test8 *#
 
 v = '1' << true
-if (v is char) && v == 'b'
+if v is char && v == 'b'
 {
     a += "PASSED"
     c++
@@ -92,7 +92,7 @@ else:
 #* Test9 *#
 
 v = '*' << '\0'
-if (v is char) && v == '*'
+if v is char && v == '*'
 {
     a += "PASSED"
     c++

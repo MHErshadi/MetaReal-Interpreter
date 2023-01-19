@@ -4,7 +4,7 @@ c = 0
 #* Test1 <int> type *#
 
 v = 10 % 3
-if (v is int) && v == 1
+if v is int && v == 1
 {
     try
     {
@@ -23,7 +23,7 @@ else:
 #* Test2 *#
 
 v = 6 % 2.5
-if (v is float) && v == 1
+if v is float && v == 1
 {
     try
     {
@@ -42,7 +42,7 @@ else:
 #* Test3 *#
 
 v = 17 % true
-if (v is int) && v == 0
+if v is int && v == 0
 {
     try
     {
@@ -61,7 +61,7 @@ else:
 #* Test4 *#
 
 v = 128 % 'r'
-if (v is int) && v == 14
+if v is int && v == 14
 {
     try
     {
@@ -80,7 +80,7 @@ else:
 #* Test5 <float> type *#
 
 v = 5.25 % 1
-if (v is float) && v == 0.25
+if v is float && v == 0.25
 {
     try
     {
@@ -99,7 +99,7 @@ else:
 #* Test6 *#
 
 v = 5.6 % 2.55
-if (v is float) && v == 0.5
+if v is float && v == 0.5
 {
     try
     {
@@ -118,7 +118,7 @@ else:
 #* Test7 *#
 
 v = 7.125 % true
-if (v is float) && v == 0.125
+if v is float && v == 0.125
 {
     try
     {
@@ -137,7 +137,7 @@ else:
 #* Test8 *#
 
 v = 13.13 % '|'
-if (v is float) && v == 13.13
+if v is float && v == 13.13
 {
     try
     {
@@ -156,7 +156,7 @@ else:
 #* Test9 <bool> type *#
 
 v = true % 1
-if (v is int) && v == 0
+if v is int && v == 0
 {
     try
     {
@@ -175,7 +175,7 @@ else:
 #* Test10 *#
 
 v = true % -3.7
-if (v is float) && v == 1
+if v is float && v == 1
 {
     try
     {
@@ -194,7 +194,7 @@ else:
 #* Test11 *#
 
 v = false % true
-if (v is bool) && v == false
+if v is bool && v == false
 {
     try
     {
@@ -213,7 +213,7 @@ else:
 #* Test12 *#
 
 v = true % '.'
-if (v is char) && v == ('\0' + true)
+if v is char && v == ('\0' + true)
 {
     try
     {
@@ -232,7 +232,7 @@ else:
 #* Test13 <char> type *#
 
 v = '@' % 5
-if (v is int) && v == 4
+if v is int && v == 4
 {
     try
     {
@@ -251,7 +251,7 @@ else:
 #* Test14 *#
 
 v = ')' % 1.5
-if (v is float) && v == 0.5
+if v is float && v == 0.5
 {
     try
     {
@@ -270,7 +270,7 @@ else:
 #* Test15 *#
 
 v = 'e' % true
-if (v is char) && v == '\0'
+if v is char && v == '\0'
 {
     try
     {
@@ -289,7 +289,7 @@ else:
 #* Test16 *#
 
 v = 'q' % 'g'
-if (v is char) && v == '\n'
+if v is char && v == '\n'
 {
     try
     {

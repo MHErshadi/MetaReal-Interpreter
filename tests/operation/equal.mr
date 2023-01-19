@@ -5,7 +5,7 @@ c = 0
 
 v = none == none
 w = none == false
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -19,7 +19,7 @@ o = object()
 
 v = o == o
 w = o == object()
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -31,7 +31,7 @@ else:
 
 v = 12 == 12
 w = 3 == -3
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -43,7 +43,7 @@ else:
 
 v = 5 == 5.0
 w = -4 == -3.9999
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -55,7 +55,7 @@ else:
 
 v = 7 == (7 + 0i)
 w = 4 == 4i
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -67,7 +67,7 @@ else:
 
 v = 1 == true
 w = 0 == true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -79,7 +79,7 @@ else:
 
 v = 36 == '$'
 w = 9 == '9'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -91,7 +91,7 @@ else:
 
 v = -10.0 == -10
 w = 6.4 == 6
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -103,7 +103,7 @@ else:
 
 v = 6.7 == 6.7
 w = 3.14 == 3.1
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -115,7 +115,7 @@ else:
 
 v = 2.3 == (2.3 + 0i)
 w = 9.8 == (9.8 + 9.8i)
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -127,7 +127,7 @@ else:
 
 v = 1.0 == true
 w = 0.1 == false
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -139,7 +139,7 @@ else:
 
 v = 83.0 == 'S'
 w = 6.0 == '{'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -151,7 +151,7 @@ else:
 
 v = (1.0 + 0i) == 1
 w = 4i == 4
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -163,7 +163,7 @@ else:
 
 v = (5.6 + 0i) == 5.6
 w = 2.11i == 0.0
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -175,7 +175,7 @@ else:
 
 v = (8.9 + 4.5i) == (4.5i + 8.9)
 w = (2.2 + 3.3i) == (3.3 + 2.2i)
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -187,7 +187,7 @@ else:
 
 v = 0i == false
 w = 1i == true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -199,7 +199,7 @@ else:
 
 v = 0i == '\0'
 w = 93i == ']'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -211,7 +211,7 @@ else:
 
 v = false == 0
 w = true == 100
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -223,7 +223,7 @@ else:
 
 v = true == 1.0
 w = true == 1.3
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -235,7 +235,7 @@ else:
 
 v = false == 0i
 w = true == -1i
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -247,7 +247,7 @@ else:
 
 v = false == false
 w = true == false
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -259,7 +259,7 @@ else:
 
 v = false == '\0'
 w = true == 't'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -271,7 +271,7 @@ else:
 
 v = 'y' == 121
 w = '^' == 93
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -283,7 +283,7 @@ else:
 
 v = '#' == 35.0
 w = 'p' == 112.1
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -295,7 +295,7 @@ else:
 
 v = '\\' == (92 + 0i)
 w = '\\' == 92i
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -307,7 +307,7 @@ else:
 
 v = '\0' == false
 w = '6' == true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -319,7 +319,7 @@ else:
 
 v = 'o' == 'o'
 w = '\\' == '/'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -331,7 +331,7 @@ else:
 
 v = 'R' == "R"
 w = 'M' == "MM"
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -343,7 +343,7 @@ else:
 
 v = "w" == 'w'
 w = "" == '0'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -355,7 +355,7 @@ else:
 
 v = "Hello World" == "Hello World"
 w = "Hello World" == "hello world"
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -367,7 +367,7 @@ else:
 
 v = [1, 2, 3, 0, 10] == [1, 2.0, (3 + 0i), false, '\n']
 w = [1, 2, 3] == [3, 2, 1]
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -379,7 +379,7 @@ else:
 
 v = [1, 2, 3, 0, 10] == (1, 2.0, (3 + 0i), false, '\n')
 w = [1, 2, 3] == (3, 2, 1)
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -391,7 +391,7 @@ else:
 
 v = (1, 2, 3, 0, 10) == [1, 2.0, (3 + 0i), false, '\n']
 w = (1, 2, 3) == [3, 2, 1]
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -403,7 +403,7 @@ else:
 
 v = (1, 2, 3, 0, 10) == (1, 2.0, (3 + 0i), false, '\n')
 w = (1, 2, 3) == (3, 2, 1)
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -415,7 +415,7 @@ else:
 
 v = int == int
 w = int == float
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -430,7 +430,7 @@ j = func (x): x
 
 v = i == i
 w = i == j
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -454,7 +454,7 @@ j = struct
 
 v = i == i
 w = i == j
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++

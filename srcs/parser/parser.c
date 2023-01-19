@@ -15,11 +15,11 @@ token_p statement(pres_p res, token_p tokens);    // return continue break
 token_p tuple(pres_p res, token_p tokens);        // tuple
 token_p assign(pres_p res, token_p tokens);       // = += -= *= /= %= //= **= &= |= ^= <<= >>=
 token_p ternary(pres_p res, token_p tokens);      // ?:
-token_p typeof(pres_p pres, token_p tokens);      // is are
-token_p contain(pres_p pres, token_p tokens);     // in
 token_p or(pres_p pres, token_p tokens);          // || or
 token_p xor(pres_p pres, token_p tokens);         // ^^ xor
 token_p and(pres_p pres, token_p tokens);         // && and
+token_p typeof(pres_p pres, token_p tokens);      // is are
+token_p contain(pres_p pres, token_p tokens);     // in
 token_p compare1(pres_p pres, token_p tokens);    // == !=
 token_p compare2(pres_p pres, token_p tokens);    // < > <= >=
 token_p b_or(pres_p pres, token_p tokens);        // |
@@ -321,7 +321,7 @@ token_p assign(pres_p pres, token_p tokens)
 
 token_p ternary(pres_p pres, token_p tokens)
 {
-    tokens = typeof(pres, tokens);
+    tokens = or(pres, tokens);
     if (pres->has_error)
         return tokens;
 
@@ -388,66 +388,6 @@ token_p ternary(pres_p pres, token_p tokens)
     return tokens;
 }
 
-token_p typeof(pres_p pres, token_p tokens)
-{
-    tokens = contain(pres, tokens);
-    if (pres->has_error)
-        return tokens;
-
-    node_t left = *pres->nodes;
-
-    unsigned char operator;
-    while (tokens->type == IS_TK || tokens->type == ARE_TK)
-    {
-        operator = tokens++->type;
-
-        advance_newline(tokens);
-
-        tokens = contain(pres, tokens);
-        if (pres->has_error)
-        {
-            node_free(&left);
-            return tokens;
-        }
-
-        left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
-        left.type = BINARY_OPERATION_N;
-        left.pose = pres->nodes->pose;
-    }
-
-    *pres->nodes = left;
-    return tokens;
-}
-
-token_p contain(pres_p pres, token_p tokens)
-{
-    tokens = or(pres, tokens);
-    if (pres->has_error)
-        return tokens;
-
-    node_t left = *pres->nodes;
-
-    while (tokens->type == IN_TK)
-    {
-        tokens++;
-        advance_newline(tokens);
-
-        tokens = or(pres, tokens);
-        if (pres->has_error)
-        {
-            node_free(&left);
-            return tokens;
-        }
-
-        left.value.ptr = binary_operation_n_set(IN_TK, &left, pres->nodes);
-        left.type = BINARY_OPERATION_N;
-        left.pose = pres->nodes->pose;
-    }
-
-    *pres->nodes = left;
-    return tokens;
-}
-
 token_p or(pres_p pres, token_p tokens)
 {
     tokens = xor(pres, tokens);
@@ -508,13 +448,73 @@ token_p xor(pres_p pres, token_p tokens)
 
 token_p and(pres_p pres, token_p tokens)
 {
-    tokens = compare1(pres, tokens);
+    tokens = typeof(pres, tokens);
     if (pres->has_error)
         return tokens;
 
     node_t left = *pres->nodes;
 
     while (tokens->type == AND_T || tokens->type == AND_TK)
+    {
+        tokens++;
+        advance_newline(tokens);
+
+        tokens = typeof(pres, tokens);
+        if (pres->has_error)
+        {
+            node_free(&left);
+            return tokens;
+        }
+
+        left.value.ptr = binary_operation_n_set(AND_T, &left, pres->nodes);
+        left.type = BINARY_OPERATION_N;
+        left.pose = pres->nodes->pose;
+    }
+
+    *pres->nodes = left;
+    return tokens;
+}
+
+token_p typeof(pres_p pres, token_p tokens)
+{
+    tokens = contain(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    node_t left = *pres->nodes;
+
+    unsigned char operator;
+    while (tokens->type == IS_TK || tokens->type == ARE_TK)
+    {
+        operator = tokens++->type;
+
+        advance_newline(tokens);
+
+        tokens = contain(pres, tokens);
+        if (pres->has_error)
+        {
+            node_free(&left);
+            return tokens;
+        }
+
+        left.value.ptr = binary_operation_n_set(operator, &left, pres->nodes);
+        left.type = BINARY_OPERATION_N;
+        left.pose = pres->nodes->pose;
+    }
+
+    *pres->nodes = left;
+    return tokens;
+}
+
+token_p contain(pres_p pres, token_p tokens)
+{
+    tokens = compare1(pres, tokens);
+    if (pres->has_error)
+        return tokens;
+
+    node_t left = *pres->nodes;
+
+    while (tokens->type == IN_TK)
     {
         tokens++;
         advance_newline(tokens);
@@ -526,7 +526,7 @@ token_p and(pres_p pres, token_p tokens)
             return tokens;
         }
 
-        left.value.ptr = binary_operation_n_set(AND_T, &left, pres->nodes);
+        left.value.ptr = binary_operation_n_set(IN_TK, &left, pres->nodes);
         left.type = BINARY_OPERATION_N;
         left.pose = pres->nodes->pose;
     }

@@ -4,7 +4,7 @@ c = 0
 #* Test1 <int> type *#
 
 v = 10 - 100
-if (v is int) && v == -90
+if v is int && v == -90
 {
     a += "PASSED"
     c++
@@ -15,7 +15,7 @@ else:
 #* Test2 *#
 
 v = 15 - 3.14
-if (v is float) && v == 11.86
+if v is float && v == 11.86
 {
     a += "PASSED"
     c++
@@ -26,7 +26,7 @@ else:
 #* Test3 *#
 
 v = 56 - 58i
-if (v is complex) && v == (-58i + 56)
+if v is complex && v == (-58i + 56)
 {
     a += "PASSED"
     c++
@@ -37,7 +37,7 @@ else:
 #* Test4 *#
 
 v = 1 - true
-if (v is int) && v == 0
+if v is int && v == 0
 {
     a += "PASSED"
     c++
@@ -48,7 +48,7 @@ else:
 #* Test5 *#
 
 v = 81 - 'P'
-if (v is int) && v == 1
+if v is int && v == 1
 {
     a += "PASSED"
     c++
@@ -59,7 +59,7 @@ else:
 #* Test6 <float> type *#
 
 v = 10.125 - 10
-if (v is float) && v == 0.125
+if v is float && v == 0.125
 {
     a += "PASSED"
     c++
@@ -70,7 +70,7 @@ else:
 #* Test7 *#
 
 v = 4.4 - 2.2
-if (v is float) && v == 2.2
+if v is float && v == 2.2
 {
     a += "PASSED"
     c++
@@ -81,7 +81,7 @@ else:
 #* Test8 *#
 
 v = -1.6 - 6.1i
-if (v is complex) && v == (-6.1i - 1.6)
+if v is complex && v == (-6.1i - 1.6)
 {
     a += "PASSED"
     c++
@@ -92,7 +92,7 @@ else:
 #* Test9 *#
 
 v = 3.14 - false
-if (v is float) && v == 3.14
+if v is float && v == 3.14
 {
     a += "PASSED"
     c++
@@ -103,7 +103,7 @@ else:
 #* Test10 *#
 
 v = 0.0625 - '0'
-if (v is float) && v == -47.9375
+if v is float && v == -47.9375
 {
     a += "PASSED"
     c++
@@ -114,7 +114,7 @@ else:
 #* Test11 <complex> type *#
 
 v = 0.77i - 0
-if (v is complex) && v == 0.77i
+if v is complex && v == 0.77i
 {
     a += "PASSED"
     c++
@@ -125,7 +125,7 @@ else:
 #* Test12 *#
 
 v = 0i - -9.9
-if (v is complex) && v == (9.9 + 0i)
+if v is complex && v == (9.9 + 0i)
 {
     a += "PASSED"
     c++
@@ -136,7 +136,7 @@ else:
 #* Test13 *#
 
 v = (6i + 9) - (1i - 10.5)
-if (v is complex) && v == (5i + 19.5)
+if v is complex && v == (5i + 19.5)
 {
     a += "PASSED"
     c++
@@ -147,7 +147,7 @@ else:
 #* Test14 *#
 
 v = 8i - true
-if (v is complex) && v == (8i - 1)
+if v is complex && v == (8i - 1)
 {
     a += "PASSED"
     c++
@@ -158,7 +158,7 @@ else:
 #* Test15 *#
 
 v = (95.95i + 95) - '_'
-if (v is complex) && v == 95.95i
+if v is complex && v == 95.95i
 {
     a += "PASSED"
     c++
@@ -169,7 +169,7 @@ else:
 #* Test16 <bool> type *#
 
 v = true - 7
-if (v is int) && v == -6
+if v is int && v == -6
 {
     a += "PASSED"
     c++
@@ -180,7 +180,7 @@ else:
 #* Test17 *#
 
 v = false - -0.0204
-if (v is float) && v == 0.0204
+if v is float && v == 0.0204
 {
     a += "PASSED"
     c++
@@ -191,7 +191,7 @@ else:
 #* Test18 *#
 
 v = true - 19.2i
-if (v is complex) && v == (-19.2i + 1)
+if v is complex && v == (-19.2i + 1)
 {
     a += "PASSED"
     c++
@@ -202,7 +202,7 @@ else:
 #* Test19 *#
 
 v = false - true
-if (v is bool) && v == true
+if v is bool && v == true
 {
     a += "PASSED"
     c++
@@ -213,7 +213,7 @@ else:
 #* Test20 *#
 
 v = false - '\0'
-if (v is char) && v == '\0'
+if v is char && v == '\0'
 {
     a += "PASSED"
     c++
@@ -224,7 +224,7 @@ else:
 #* Test21 <char> type *#
 
 v = 'I' - 9
-if (v is int) && v == 64
+if v is int && v == 64
 {
     a += "PASSED"
     c++
@@ -235,7 +235,7 @@ else:
 #* Test22 *#
 
 v = 'A' - 0.6
-if (v is float) && v == 64.4
+if v is float && v == 64.4
 {
     a += "PASSED"
     c++
@@ -246,7 +246,7 @@ else:
 #* Test23 *#
 
 v = ':' - 99i
-if (v is complex) && v == (-99i + 58)
+if v is complex && v == (-99i + 58)
 {
     a += "PASSED"
     c++
@@ -257,7 +257,7 @@ else:
 #* Test24 *#
 
 v = 'y' - true
-if (v is char) && v == 'x'
+if v is char && v == 'x'
 {
     a += "PASSED"
     c++
@@ -268,7 +268,7 @@ else:
 #* Test25 *#
 
 v = '&' - '\0'
-if (v is char) && v == '&'
+if v is char && v == '&'
 {
     a += "PASSED"
     c++
@@ -279,7 +279,7 @@ else:
 #* Test26 <str> type *#
 
 v = "code" - 3
-if (v is str) && v == "cod"
+if v is str && v == "cod"
 {
     a += "PASSED"
     c++
@@ -290,7 +290,7 @@ else:
 #* Test27 *#
 
 v = "farm" - -1 
-if (v is str) && v == "far"
+if v is str && v == "far"
 {
     a += "PASSED"
     c++
@@ -314,7 +314,7 @@ except "Index out of range"
 #* Test29 *#
 
 v = "pink" - false
-if (v is str) && v == "ink"
+if v is str && v == "ink"
 {
     a += "PASSED"
     c++
@@ -325,7 +325,7 @@ else:
 #* Test30 *#
 
 v = "Account Banned" - '\a'
-if (v is str) && v == "AccountBanned"
+if v is str && v == "AccountBanned"
 {
     a += "PASSED"
     c++
@@ -336,7 +336,7 @@ else:
 #* Test31 <list> type *#
 
 v = [1, 2, 2, 3, 4] - 1
-if (v is list) && v == [1, 2, 3, 4]
+if v is list && v == [1, 2, 3, 4]
 {
     a += "PASSED"
     c++
@@ -347,7 +347,7 @@ else:
 #* Test32 *#
 
 v = [0.1, 0.2, 0.3, 0.3] - -2 
-if (v is list) && v == [0.1, 0.2, 0.3]
+if v is list && v == [0.1, 0.2, 0.3]
 {
     a += "PASSED"
     c++
@@ -371,7 +371,7 @@ except "Index out of range"
 #* Test34 *#
 
 v = [true, false, true, true] - true
-if (v is list) && v == [true, true, true]
+if v is list && v == [true, true, true]
 {
     a += "PASSED"
     c++
@@ -382,7 +382,7 @@ else:
 #* Test35 *#
 
 v = [1, 1, 1, 1, 1, 1, 1, 1, none] - '\b'
-if (v is list) && v == [1, 1, 1, 1, 1, 1, 1, 1]
+if v is list && v == [1, 1, 1, 1, 1, 1, 1, 1]
 {
     a += "PASSED"
     c++

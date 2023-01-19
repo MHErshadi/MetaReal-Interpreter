@@ -1,0 +1,35 @@
+a = []
+c = 0
+
+#* Test1 *#
+
+v = true xor false
+w = true ^^ true
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+func f(x): x
+
+v = object() xor 0 xor 1.0 xor 2i xor false xor 'p' xor [] xor (1, 2, 3) xor int xor f
+w = none ^^ 0 ^^ 0.0 ^^ 0i ^^ false ^^ '\0' ^^ []
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 2:
+    "PASSED"
+else:
+    "       FAILED"

@@ -1,0 +1,50 @@
+a = []
+c = 0
+
+#* Test1 *#
+
+v = true or false
+w = false || false
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = object() or 12 or 1.5 or 6i or true or 'p' or [1, 2, 3] or (1, 2, 3) or int
+w = none || 0 || 0.0 || 0i || false || '\0' || []
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = true or not_defined
+try
+{
+    w = false || not_defined
+    a += "FAILED"
+}
+except "'not_defined' is not defined":
+    if v is bool && v
+    {
+        a += "PASSED"
+        c++
+    }
+    else:
+        a += "FAILED"
+
+#* Result *#
+
+if c == 3:
+    "PASSED"
+else:
+    "       FAILED"

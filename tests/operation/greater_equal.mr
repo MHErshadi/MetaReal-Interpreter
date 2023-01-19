@@ -5,7 +5,7 @@ c = 0
 
 v = 13 >= 13
 w = -4 >= -3
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -17,7 +17,7 @@ else:
 
 v = 7 >= 6.5
 w = 9 >= 9.01
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -29,7 +29,7 @@ else:
 
 v = 1 >= false
 w = -2 >= true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -41,7 +41,7 @@ else:
 
 v = 1000 >= '%'
 w = 10 >= '8'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -53,7 +53,7 @@ else:
 
 v = -9.5 >= -10
 w = 82.99 >= 83
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -65,7 +65,7 @@ else:
 
 v = 9.3 >= 2.9
 w = -12.3 >= 3.1
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -77,7 +77,7 @@ else:
 
 v = 1.0 >= true
 w = 0.1 >= true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -89,7 +89,7 @@ else:
 
 v = 74.0 >= 'J'
 w = 74.9 >= 'K'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -101,7 +101,7 @@ else:
 
 v = false >= -1
 w = false >= 1
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -113,7 +113,7 @@ else:
 
 v = true >= 0.67
 w = false >= 0.01 
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -125,7 +125,7 @@ else:
 
 v = true >= false
 w = false >= true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -137,7 +137,7 @@ else:
 
 v = true >= '\0'
 w = true >= '\\'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -149,7 +149,7 @@ else:
 
 v = 'x' >= 120
 w = '!' >= 34
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -161,7 +161,7 @@ else:
 
 v = 'L' >= 75.56
 w = 'e' >= 101.1
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -173,7 +173,7 @@ else:
 
 v = '\t' >= true
 w = '\0' >= true
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++
@@ -185,7 +185,7 @@ else:
 
 v = 'a' >= 'A'
 w = 'a' >= 'b'
-if ((v, w) are bool) && v && !w
+if (v, w) are bool && v && !w
 {
     a += "PASSED"
     c++

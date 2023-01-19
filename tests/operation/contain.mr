@@ -1,0 +1,129 @@
+a = []
+c = 0
+
+#* Test1 <str> type *#
+
+v = none in "has none"
+w = none in "does not have n-o-n-e"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = 27 in "2746"
+w = 27 in "2476"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+v = 1.3 in "1.300"
+w = 1.3 in "1.003"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+v = (1 + 2i) in "(1+2i)"
+w = (1 + 2i) in "(1 + 2i), 1+2i"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+v = false in "true or false"
+w = true in "only false"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+v = 'c' in "character"
+w = 'w' in "character"
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 <list> type *#
+
+v = none in [true, 1, none]
+w = none in [0, 0.0, 0i, false, '\0', []]
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test8 *#
+
+v = 61 in ["OK", 1, '='] && [1, 2, 3] in [[1, 2], [2, 3], [1, 3], (1, 2, 3)]
+w = 61 in [610, 61.0001, 61i, true, '>', "61", [61], (61,)] || [1, 2, 3] in [[3, 2, 1], [1, 3, 2]]
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test9 <tuple> type *#
+
+v = none in (true, 1, none)
+w = none in (0, 0.0, 0i, false, '\0', [])
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test10 *#
+
+v = 61 in ("OK", 1, '=') && (1, 2, 3) in ((1, 2), (2, 3), (1, 3), [1, 2, 3])
+w = 61 in (610, 61.0001, 61i, true, '>', "61", [61], (61,)) || (1, 2, 3) in ((3, 2, 1), (1, 3, 2))
+if (v, w) are bool && v && !w
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 10:
+    "PASSED"
+else:
+    "       FAILED"

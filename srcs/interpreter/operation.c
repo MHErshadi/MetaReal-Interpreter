@@ -3719,7 +3719,12 @@ ires_t operate_is(value_p left, value_p right)
     value_p res;
 
     if (left->type == TYPE_V)
-        res = value_set2(BOOL_V, right->type == left->value.chr);
+    {
+        if (right->type == TYPE_V)
+            res = value_set2(BOOL_V, left->value.chr == right->value.chr);
+        else
+            res = value_set2(BOOL_V, left->value.chr == right->type);
+    }
     else if (right->type == TYPE_V)
         res = value_set2(BOOL_V, left->type == right->value.chr);
     else

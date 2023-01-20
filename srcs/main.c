@@ -14,7 +14,7 @@
 #include <info.h>
 #include <def.h>
 
-#include <time.h>
+//#include <time.h>
 
 void run_code(const char* code, unsigned long long size, context_p context);
 
@@ -192,7 +192,7 @@ void run_code(const char* code, unsigned long long size, context_p context)
         return;
     }
 
-    clock_t s = clock();
+    //clock_t s = clock();
 
     ires_t ires = interpret(pres.nodes, context);
     if (IRES_HAS_ERROR(ires.response))
@@ -201,7 +201,7 @@ void run_code(const char* code, unsigned long long size, context_p context)
         return;
     }
 
-    printf("time: %ld milliseconds\n", clock() - s);
+    //printf("time: %ld milliseconds\n", clock() - s);
 
     value_label(ires.value, "\n");
     value_free(ires.value);

@@ -1,0 +1,79 @@
+a = []
+c = 0
+
+#* Test1 <int> type *#
+
+if -12 is int && -12 == 1 - 13
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 <float> type *#
+
+if -2.3 is float && -2.3 == -2 - 0.3
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 <complex> type *#
+
+if -(1 + 2i) is complex && -(1 + 2i) == -1 - 2i
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 <bool> type *#
+
+if -true is bool && -true == false
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 <char> type *#
+
+if -'\0' is char && -'\0' == '\0'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 <str> type *#
+
+if -"devil" is str && -"devil" == "lived"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test7 <list> type *#
+
+if -[1, 2.0, "OK"] is list && -[1, 2.0, "OK"] == ["OK", 2.0, 1]
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 7:
+    "PASSED"
+else:
+    "       FAILED"

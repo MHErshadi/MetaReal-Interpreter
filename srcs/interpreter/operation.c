@@ -4207,7 +4207,7 @@ ires_t operate_negate(value_p operand, pos_p poss, pos_p pose, context_p context
     case BOOL_V:
         base_unary_operation_char(BOOL_V, !, operand);
     case CHAR_V:
-        base_unary_operation_char(BOOL_V, -, operand);
+        base_unary_operation_char(CHAR_V, -, operand);
     case STR_V:
         base_unary_operation(COMPLEX_V, str_reverse, operand);
     case LIST_V:
@@ -4234,8 +4234,9 @@ ires_t operate_b_not(value_p operand, pos_p poss, pos_p pose, context_p context)
     case INT_V:
         base_unary_operation(INT_V, int_not, operand);
     case BOOL_V:
+        base_unary_operation_char(BOOL_V, !, operand);
     case CHAR_V:
-        base_unary_operation_char(operand->type, ~, operand);
+        base_unary_operation_char(CHAR_V, ~, operand);
     }
 
     char otype = operand->type;

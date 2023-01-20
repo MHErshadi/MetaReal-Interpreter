@@ -1,0 +1,42 @@
+a = []
+c = 0
+
+cs = []
+for i = '\0' to 255: cs += i
+
+#* Test1 <int> type *#
+
+if ~43 is int && ~43 == -44
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 <bool> type *#
+
+if ~true is bool && ~true == false
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 <char> type *#
+
+if ~'1' is char && ~'1' == cs[206]
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 3:
+    "PASSED"
+else:
+    "       FAILED"

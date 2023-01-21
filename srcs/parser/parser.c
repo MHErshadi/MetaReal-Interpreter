@@ -854,77 +854,80 @@ token_p post(pres_p pres, token_p tokens)
         return tokens;
 
 check:
-    if (tokens->type == LSQUARE_T)
+    if ((tokens - 1)->type != NEWLINE_T)
     {
-        tokens++;
-        advance_newline(tokens);
-
-        node_t value = *pres->nodes;
-
-        tokens = tuple(pres, tokens);
-        if (pres->has_error)
+        if (tokens->type == LSQUARE_T)
         {
-            node_free(&value);
-            return tokens;
+            tokens++;
+            advance_newline(tokens);
+
+            node_t value = *pres->nodes;
+
+            tokens = tuple(pres, tokens);
+            if (pres->has_error)
+            {
+                node_free(&value);
+                return tokens;
+            }
+
+            if (tokens->type != RSQUARE_T)
+            {
+                node_free(pres->nodes);
+                node_free(&value);
+
+                invalid_syntax_t error = invalid_syntax_set("Expected ']'", &tokens->poss, &tokens->pose);
+                pres_fail(pres, &error);
+                return tokens;
+            }
+
+            tokens++;
+            advance_newline(tokens);
+
+            subscript_np node = subscript_n_set(&value, pres->nodes);
+            *pres->nodes = node_set1(SUBSCRIPT_N, node, &value.poss, &pres->nodes->pose);
+            goto check;
         }
 
-        if (tokens->type != RSQUARE_T)
+        if (tokens->type == DOT_T)
         {
-            node_free(pres->nodes);
-            node_free(&value);
+            tokens++;
+            advance_newline(tokens);
 
-            invalid_syntax_t error = invalid_syntax_set("Expected ']'", &tokens->poss, &tokens->pose);
-            pres_fail(pres, &error);
-            return tokens;
+            node_t value = *pres->nodes;
+
+            tokens = core(pres, tokens);
+            if (pres->has_error)
+            {
+                node_free(&value);
+                return tokens;
+            }
+
+            access_np node = access_n_set(&value, pres->nodes);
+            *pres->nodes = node_set1(ACCESS_N, node, &value.poss, &pres->nodes->pose);
+            goto check;
         }
 
-        tokens++;
-        advance_newline(tokens);
-
-        subscript_np node = subscript_n_set(&value, pres->nodes);
-        *pres->nodes = node_set1(SUBSCRIPT_N, node, &value.poss, &pres->nodes->pose);
-        goto check;
-    }
-
-    if (tokens->type == DOT_T)
-    {
-        tokens++;
-        advance_newline(tokens);
-
-        node_t value = *pres->nodes;
-
-        tokens = core(pres, tokens);
-        if (pres->has_error)
+        if (tokens->type == INCREMENT_T || tokens->type == DECREMENT_T)
         {
-            node_free(&value);
-            return tokens;
+            unsigned char operator = tokens->type;
+
+            pos_p pose = &tokens++->pose;
+
+            advance_newline(tokens);
+
+            var_fixed_assign_np node = var_fixed_assign_n_set(1, operator, pres->nodes);
+            *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, &pres->nodes->poss, pose);
+            goto check;
         }
 
-        access_np node = access_n_set(&value, pres->nodes);
-        *pres->nodes = node_set1(ACCESS_N, node, &value.poss, &pres->nodes->pose);
-        goto check;
-    }
+        if (tokens->type == LPAREN_T)
+        {
+            tokens = func_call_parse(pres, tokens);
+            if (pres->has_error)
+                return tokens;
 
-    if (tokens->type == INCREMENT_T || tokens->type == DECREMENT_T)
-    {
-        unsigned char operator = tokens->type;
-
-        pos_p pose = &tokens++->pose;
-
-        advance_newline(tokens);
-
-        var_fixed_assign_np node = var_fixed_assign_n_set(1, operator, pres->nodes);
-        *pres->nodes = node_set1(VAR_FIXED_ASSIGN_N, node, &pres->nodes->poss, pose);
-        goto check;
-    }
-
-    if (tokens->type == LPAREN_T)
-    {
-        tokens = func_call_parse(pres, tokens);
-        if (pres->has_error)
-            return tokens;
-
-        goto check;
+            goto check;
+        }
     }
 
     return tokens;

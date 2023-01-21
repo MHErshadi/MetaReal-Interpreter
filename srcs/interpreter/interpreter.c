@@ -714,16 +714,21 @@ ires_t interpret_ternary_condition(ternary_condition_np node, pos_p poss, pos_p 
         if (!IPROP_NOT_FREE(properties))
             node_free(&node->right);
 
-        ires.value = ires_merge(&ires, interpret_node(&node->left, context, properties));
-        if (IRES_HAS_ERROR(ires.response))
+        if (node->left.type != NULL_N)
         {
-            value_free(condition);
+            ires.value = ires_merge(&ires, interpret_node(&node->left, context, properties));
+            if (IRES_HAS_ERROR(ires.response))
+            {
+                value_free(condition);
 
-            if (!IPROP_NOT_FREE(properties))
-                free(node);
+                if (!IPROP_NOT_FREE(properties))
+                    free(node);
 
-            return ires;
+                return ires;
+            }
         }
+        else
+            ires.value = NULL;
     }
     else
     {

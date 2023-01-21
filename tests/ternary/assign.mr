@@ -1,0 +1,53 @@
+a = []
+c = 0
+
+#* Test1 *#
+
+v = w = 0
+(true ? v : w) = 67.4
+(false ? v : w) = "Hello World"
+
+if v == 67.4 && w == "Hello World"
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+v = w = 0
+(true ? v : w)++
+(false ? v : w)--
+
+if v == 1 && w == -1
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+struct s1 { x = 0 }
+struct s2 { x = 0 }
+
+(true ? s1 : s2).x = 5
+(false ? s1 : s2).x = 7
+
+if s1.x == 5 && s2.x == 7
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 3:
+    "PASSED"
+else:
+    "       FAILED"

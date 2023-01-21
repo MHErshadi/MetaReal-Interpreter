@@ -63,10 +63,10 @@ enum _token_types_
 
     /* */
 
-    ASSIGN_T,      // =
-
     INCREMENT_T,   // ++
     DECREMENT_T,   // --
+
+    ASSIGN_T,      // =
 
     PLUS_EQ_T,     // +=
     MINUS_EQ_T,    // -=

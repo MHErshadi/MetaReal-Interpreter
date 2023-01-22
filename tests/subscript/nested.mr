@@ -1,0 +1,69 @@
+a = []
+c = 0
+
+#* Test1 <list> type *#
+
+if [1, 2, [3, 4, 5], 6][2][-1] == 5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+if [1, 2, (3, 4, 5), 6][2][-1] == 5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 *#
+
+if [1, 2, (3, [4, 5, 6], 7), 8][2][-2][2] == 6
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 <tuple> type *#
+
+if (1, 2, (3, 4, 5), 6)[2][-1] == 5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test5 *#
+
+if (1, 2, [3, 4, 5], 6)[2][-1] == 5
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test6 *#
+
+if (1, 2, [3, (4, 5, 6), 7], 8)[2][-2][2] == 6
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 6:
+    "PASSED"
+else:
+    "       FAILED"

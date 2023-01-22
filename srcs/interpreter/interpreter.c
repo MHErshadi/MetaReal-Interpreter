@@ -1612,6 +1612,9 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
         return ires_fail(error);
     }
 
+    if (!func_v->running)
+        func_table_free_args(&func_v->context.table, func_v->max_size);
+
     unsigned long long i;
     for (i = 0; i < node->size; i++)
     {
@@ -1761,7 +1764,10 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
             value_copy(func_v->args[i].value);
         }
 
+    func_v->running = 1;
     ires.value = ires_merge(&ires, interpret_body(&func_v->body, &func_v->context, IPROP_SET(0, 0, 1, 1, 0)));
+    func_v->running = 0;
+
     if (IRES_HAS_ERROR(ires.response))
     {
         if (func->ref)

@@ -1,0 +1,75 @@
+a = []
+c = 0
+
+#* Test1 <func> type *#
+
+func g(x): x
+func h(o): o
+
+g(7.6)
+h(g)
+
+if h.o.x == 7.6
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test2 *#
+
+struct s
+{
+    x = 3
+    y = -3
+}
+
+h(s)
+
+if h.o.x == 3 && h.o.y == -3
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test3 <struct> type *#
+
+struct s1
+{
+    struct s2
+    {
+        a = 'A'
+        b = 'B'
+    }
+}
+
+if s1.s2.a == 'A' && s1.s2.b == 'B'
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Test4 *#
+
+s.x = g
+s.y = h
+
+if s.x.x == 7.6 && s.y.o == s
+{
+    a += "PASSED"
+    c++
+}
+else:
+    a += "FAILED"
+
+#* Result *#
+
+if c == 4:
+    "PASSED"
+else:
+    "       FAILED"

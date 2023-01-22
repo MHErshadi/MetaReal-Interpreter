@@ -18,6 +18,7 @@ func_p func_set(unsigned char type, unsigned long long min_size, unsigned long l
     func->size = size;
     func->context = *context;
     func->body = *body;
+    func->running = 0;
 
     return func;
 }

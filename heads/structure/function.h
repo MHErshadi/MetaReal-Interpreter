@@ -28,6 +28,8 @@ struct __func_t__
 
     context_t context;
     body_t body;
+
+    unsigned char running;
 };
 typedef struct __func_t__ func_t;
 typedef struct __func_t__* func_p;

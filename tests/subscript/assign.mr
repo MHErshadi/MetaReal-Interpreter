@@ -6,7 +6,7 @@ c = 0
 s = "whimper"
 s[3] = 's'
 
-if s == "whisper"
+if s === "whisper"
 {
     a += "PASSED"
     c++
@@ -19,7 +19,7 @@ else:
 s = "waited"
 s[2] += '\n'
 
-if s == "wasted"
+if s === "wasted"
 {
     a += "PASSED"
     c++
@@ -32,7 +32,7 @@ else:
 s = "new line: \t"
 s[-1]++
 
-if s == "new line: \n"
+if s === "new line: \n"
 {
     a += "PASSED"
     c++
@@ -45,7 +45,7 @@ else:
 s = [1, 2, 2, 4]
 s[-2] = 3
 
-if s == [1, 2, 3, 4]
+if s === [1, 2, 3, 4]
 {
     a += "PASSED"
     c++
@@ -58,7 +58,7 @@ else:
 s = [1, 2, [3, 4], 6]
 s[2] += 5
 
-if s == [1, 2, [3, 4, 5], 6]
+if s === [1, 2, [3, 4, 5], 6]
 {
     a += "PASSED"
     c++
@@ -71,7 +71,7 @@ else:
 s = [2, 4, 4, 5]
 s[1]--
 
-if s == [2, 3, 4, 5]
+if s === [2, 3, 4, 5]
 {
     a += "PASSED"
     c++
@@ -81,7 +81,7 @@ else:
 
 #* Result *#
 
-if c == 6:
+if c === 6:
     "PASSED"
 else:
     "       FAILED"

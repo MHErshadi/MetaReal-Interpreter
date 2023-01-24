@@ -9,7 +9,7 @@ func h(o): o
 g(7.6)
 h(g)
 
-if h.o.x == 7.6
+if h.o.x === 7.6
 {
     a += "PASSED"
     c++
@@ -27,7 +27,7 @@ struct s
 
 h(s)
 
-if h.o.x == 3 && h.o.y == -3
+if h.o.x === 3 && h.o.y === -3
 {
     a += "PASSED"
     c++
@@ -46,7 +46,7 @@ struct s1
     }
 }
 
-if s1.s2.a == 'A' && s1.s2.b == 'B'
+if s1.s2.a === 'A' && s1.s2.b === 'B'
 {
     a += "PASSED"
     c++
@@ -59,7 +59,7 @@ else:
 s.x = g
 s.y = h
 
-if s.x.x == 7.6 && s.y.o == s
+if s.x.x === 7.6 && s.y.o === s
 {
     a += "PASSED"
     c++
@@ -69,7 +69,7 @@ else:
 
 #* Result *#
 
-if c == 4:
+if c === 4:
     "PASSED"
 else:
     "       FAILED"

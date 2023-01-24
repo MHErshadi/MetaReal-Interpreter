@@ -544,7 +544,7 @@ token_p compare1(pres_p pres, token_p tokens)
     node_t left = *pres->nodes;
 
     unsigned char operator;
-    while (tokens->type == EQUAL_T || tokens->type == NEQUAL_T)
+    while (tokens->type >= EQUAL_T && tokens->type <= EX_NEQUAL_T)
     {
         operator = tokens++->type;
 

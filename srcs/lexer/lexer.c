@@ -806,8 +806,16 @@ const char* hand_equal(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
+        if (*++code == '=')
+        {
+            pos->index++;
+
+            *token = token_set2(EX_EQUAL_T, &poss, pos);
+            return ++code;
+        }
+
         *token = token_set2(EQUAL_T, &poss, pos);
-        return ++code;
+        return code;
     }
 
     *token = token_set2(ASSIGN_T, &poss, pos);
@@ -823,8 +831,16 @@ const char* hand_nequal(token_p token, const char* code, pos_p pos)
     {
         pos->index++;
 
+        if (*++code == '=')
+        {
+            pos->index++;
+
+            *token = token_set2(EX_NEQUAL_T, &poss, pos);
+            return ++code;
+        }
+
         *token = token_set2(NEQUAL_T, &poss, pos);
-        return ++code;
+        return code;
     }
 
     *token = token_set2(NOT_T, &poss, pos);

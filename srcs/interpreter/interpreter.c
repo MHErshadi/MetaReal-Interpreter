@@ -613,6 +613,12 @@ ires_t interpret_binary_operation(binary_operation_np node, pos_p poss, pos_p po
     case NEQUAL_T:
         ires = operate_nequal(left, right);
         break;
+    case EX_EQUAL_T:
+        ires = operate_ex_equal(left, right);
+        break;
+    case EX_NEQUAL_T:
+        ires = operate_ex_nequal(left, right);
+        break;
     case LESS_T:
         ires = operate_less(left, right, poss, pose, context);
         break;

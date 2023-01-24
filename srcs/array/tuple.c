@@ -36,12 +36,16 @@ tuple_p tuple_copy(const tuple_p src)
 
 void tuple_free(tuple_p array)
 {
+    if (!array->size)
+    {
+        free(array);
+        return;
+    }
+
     while (array->size)
         value_free(array->elements[--array->size]);
 
-    if (array->size)
-        free(array->elements);
-
+    free(array->elements);
     free(array);
 }
 

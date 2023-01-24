@@ -11,7 +11,7 @@ func f()
     g
 }
 
-if f()(5.5, 3) == 16.5
+if f()(5.5, 3) === 16.5
 {
     a += "PASSED"
     c++
@@ -29,7 +29,7 @@ func f(x)
     g
 }
 
-if f(3)(4) == 12
+if f(3)(4) === 12
 {
     a += "PASSED"
     c++
@@ -41,7 +41,7 @@ else:
 
 b = f(6)
 
-if b(5) == 30
+if b(5) === 30
 {
     a += "PASSED"
     c++
@@ -51,7 +51,7 @@ else:
 
 #* Result *#
 
-if c == 3:
+if c === 3:
     "PASSED"
 else:
     "       FAILED"

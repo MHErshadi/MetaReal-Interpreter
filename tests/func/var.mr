@@ -8,7 +8,7 @@ func f(x, y):
 
 b = f
 
-if b(1, 2) == "12"
+if b(1, 2) === "12"
 {
     a += "PASSED"
     c++
@@ -48,7 +48,7 @@ except "'b' is a constant variable"
 
 #* Result *#
 
-if c == 3:
+if c === 3:
     "PASSED"
 else:
     "       FAILED"

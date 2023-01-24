@@ -5,7 +5,7 @@ c = 0
 
 v = true ? 732 : "OK"
 w = false ? 732 : "OK"
-if v == 732 && w == "OK"
+if v === 732 && w === "OK"
 {
     a += "PASSED"
     c++
@@ -23,7 +23,7 @@ try
     a += "FAILED"
 }
 except "'v' is not defined":
-    if w == 'C'
+    if w === 'C'
     {
         a += "PASSED"
         c++
@@ -33,7 +33,7 @@ except "'v' is not defined":
 
 #* Result *#
 
-if c == 2:
+if c === 2:
     "PASSED"
 else:
     "       FAILED"

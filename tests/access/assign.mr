@@ -6,7 +6,7 @@ c = 0
 func f(x): x
 f.x = 30
 
-if f.x == 30
+if f.x === 30
 {
     a += "PASSED"
     c++
@@ -18,7 +18,7 @@ else:
 
 f.x = f.y = 3.2i
 
-if f.x == 3.2i && f.y == 3.2i
+if f.x === 3.2i && f.y === 3.2i
 {
     a += "PASSED"
     c++
@@ -37,7 +37,7 @@ struct s
 s.x = "Test"
 s.y = [1, 2]
 
-if s.x == "Test" && s.y == [1, 2]
+if s.x === "Test" && s.y === [1, 2]
 {
     a += "PASSED"
     c++
@@ -49,7 +49,7 @@ else:
 
 s.x = s.z = 'W'
 
-if s.x == 'W' && s.y == [1, 2] && s.z == 'W'
+if s.x === 'W' && s.y === [1, 2] && s.z === 'W'
 {
     a += "PASSED"
     c++
@@ -59,7 +59,7 @@ else:
 
 #* Result *#
 
-if c == 4:
+if c === 4:
     "PASSED"
 else:
     "       FAILED"

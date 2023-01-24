@@ -1,0 +1,34 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = none
+
+try
+{
+    a
+    r += "FAILED"
+}
+except "'a' is not defined"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test2 *#
+
+if none:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

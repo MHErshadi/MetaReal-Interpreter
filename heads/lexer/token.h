@@ -51,6 +51,9 @@ enum _token_types_
 
     EQUAL_T,       // ==
     NEQUAL_T,      // !=
+    EX_EQUAL_T,    // ===
+    EX_NEQUAL_T,   // !==
+
     LESS_T,        // <
     GREATER_T,     // >
     LESS_EQ_T,     // <=

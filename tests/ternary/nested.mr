@@ -7,7 +7,7 @@ v = true ? 20 : true ? "hello" : [1, 2, 3]
 w = false ? 20 : true ? "hello" : [1, 2, 3]
 z = false ? 20 : false ? "hello" : [1, 2, 3]
 
-if v == 20 && w == "hello" && z == [1, 2, 3]
+if v === 20 && w === "hello" && z === [1, 2, 3]
 {
     a += "PASSED"
     c++
@@ -22,7 +22,7 @@ w = true ? false ? 7 : 7.3 : true ? "test" : (1, 2)
 z = false ? true ? 7 : 7.3 : true ? "test" : (1, 2)
 t = false ? true ? 7 : 7.3 : false ? "test" : (1, 2)
 
-if v == 7 && w == 7.3 && z == "test" && t == (1, 2)
+if v === 7 && w === 7.3 && z === "test" && t === (1, 2)
 {
     a += "PASSED"
     c++
@@ -32,7 +32,7 @@ else:
 
 #* Result *#
 
-if c == 2:
+if c === 2:
     "PASSED"
 else:
     "       FAILED"

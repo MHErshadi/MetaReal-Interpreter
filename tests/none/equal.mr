@@ -1,0 +1,139 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if none == none
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if none == object():
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test3 *#
+
+if none == 0:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test4 *#
+
+if none == 0.0:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test5 *#
+
+if none == 0.0i:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test6 *#
+
+if none == false:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test7 *#
+
+if none == '\0':
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test8 *#
+
+if none == "":
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test9 *#
+
+if none == []:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test10 *#
+
+if none == (1, 2):
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test11 *#
+
+if none == str:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test12 *#
+
+if none == func() {}:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test13 *#
+
+if none == struct {}:
+    r += "FAILED"
+else
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 13:
+    "PASSED"
+else:
+    r

@@ -19,12 +19,12 @@ func pow(x, y):
 func op(x, y, f):
     f(x, y)
 
-if op(3, 4, add) == 7 &&
-    op(4, 8, sub) == -4 &&
-    op(3, 9, mul) == 27 &&
-    op(3, 4, div) == 0.75 &&
-    op(7, 4, mod) == 3 &&
-    op(5, 3, pow) == 125:
+if op(3, 4, add) === 7 &&
+    op(4, 8, sub) === -4 &&
+    op(3, 9, mul) === 27 &&
+    op(3, 4, div) === 0.75 &&
+    op(7, 4, mod) === 3 &&
+    op(5, 3, pow) === 125:
     "PASSED"
 else:
     "       FAILED"

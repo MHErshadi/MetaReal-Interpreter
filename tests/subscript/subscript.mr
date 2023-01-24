@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 <str> type *#
 
-if "Hello"[1] == 'e' && "Hello"[-1] == 'o'
+if "Hello"[1] === 'e' && "Hello"[-1] === 'o'
 {
     a += "PASSED"
     c++
@@ -32,7 +32,7 @@ except "Index out of range":
 
 #* Test3 <list> type *#
 
-if [1, 2.3, [1, '!']][2] == [1, '!'] && ["OK", "NO", "BAD"][-3] == "OK"
+if [1, 2.3, [1, '!']][2] === [1, '!'] && ["OK", "NO", "BAD"][-3] === "OK"
 {
     a += "PASSED"
     c++
@@ -61,7 +61,7 @@ except "Index out of range":
 
 #* Test5 <tuple> type *#
 
-if (1, 2.3, (1, '!'))[2] == (1, '!') && ("OK", "NO", "BAD")[-3] == "OK"
+if (1, 2.3, (1, '!'))[2] === (1, '!') && ("OK", "NO", "BAD")[-3] === "OK"
 {
     a += "PASSED"
     c++
@@ -90,7 +90,7 @@ except "Index out of range":
 
 #* Result *#
 
-if c == 6:
+if c === 6:
     "PASSED"
 else:
     "       FAILED"

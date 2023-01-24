@@ -3077,6 +3077,254 @@ ires_t operate_nequal(value_p left, value_p right)
     return ires_success(value_set2(BOOL_V, 1));
 }
 
+ires_t operate_ex_equal(value_p left, value_p right)
+{
+    if (!left)
+    {
+        if (!right)
+            return ires_success(value_set2(BOOL_V, 1));
+
+        value_free(right);
+        return ires_success(value_set2(BOOL_V, 0));
+    }
+
+    if (!right)
+    {
+        value_free(left);
+        return ires_success(value_set2(BOOL_V, 0));
+    }
+
+    if (left->type != right->type)
+    {
+        value_free(left);
+        value_free(right);
+
+        return ires_success(value_set2(BOOL_V, 0));
+    }
+
+    value_p res;
+    char res_chr;
+
+    switch (left->type)
+    {
+    case OBJECT_V:
+        res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case INT_V:
+        res = value_set2(BOOL_V, int_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, int);
+        value_free_type(right, int);
+
+        return ires_success(res);
+    case FLOAT_V:
+        res = value_set2(BOOL_V, float_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, float);
+        value_free_type(right, float);
+
+        return ires_success(res);
+    case COMPLEX_V:
+        res = value_set2(BOOL_V, complex_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, complex);
+        value_free_type(right, complex);
+
+        return ires_success(res);
+    case BOOL_V:
+        res = value_set2(BOOL_V, left->value.chr == right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case CHAR_V:
+        res = value_set2(BOOL_V, left->value.chr == right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case STR_V:
+        res = value_set2(BOOL_V, str_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, str);
+        value_free_type(right, str);
+
+        return ires_success(res);
+    case LIST_V:
+        res = value_set2(BOOL_V, list_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, list);
+        value_free_type(right, list);
+
+        return ires_success(res);
+    case TUPLE_V:
+        res = value_set2(BOOL_V, tuple_equal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, tuple);
+        value_free_type(right, tuple);
+
+        return ires_success(res);
+    case TYPE_V:
+        res = value_set2(BOOL_V, left->value.chr == right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case FUNC_V:
+        res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
+
+        value_free_type(left, func);
+        value_free_type(right, func);
+
+        return ires_success(res);
+    case STRUCT_V:
+        res = value_set2(BOOL_V, left->value.ptr == right->value.ptr);
+
+        value_free_type(left, context);
+        value_free_type(right, context);
+
+        return ires_success(res);
+    default:
+        value_free(left);
+        break;
+    }
+
+    value_free(right);
+
+    return ires_success(value_set2(BOOL_V, 0));
+}
+
+ires_t operate_ex_nequal(value_p left, value_p right)
+{
+    if (!left)
+    {
+        if (!right)
+            return ires_success(value_set2(BOOL_V, 0));
+
+        value_free(right);
+        return ires_success(value_set2(BOOL_V, 1));
+    }
+
+    if (!right)
+    {
+        value_free(left);
+        return ires_success(value_set2(BOOL_V, 1));
+    }
+
+    if (left->type != right->type)
+    {
+        value_free(left);
+        value_free(right);
+
+        return ires_success(value_set2(BOOL_V, 1));
+    }
+
+    value_p res;
+    char res_chr;
+
+    switch (left->type)
+    {
+    case OBJECT_V:
+        res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case INT_V:
+        res = value_set2(BOOL_V, int_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, int);
+        value_free_type(right, int);
+
+        return ires_success(res);
+    case FLOAT_V:
+        res = value_set2(BOOL_V, float_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, float);
+        value_free_type(right, float);
+
+        return ires_success(res);
+    case COMPLEX_V:
+        res = value_set2(BOOL_V, complex_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, complex);
+        value_free_type(right, complex);
+
+        return ires_success(res);
+    case BOOL_V:
+        res = value_set2(BOOL_V, left->value.chr != right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case CHAR_V:
+        res = value_set2(BOOL_V, left->value.chr != right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case STR_V:
+        res = value_set2(BOOL_V, str_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, str);
+        value_free_type(right, str);
+
+        return ires_success(res);
+    case LIST_V:
+        res = value_set2(BOOL_V, list_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, list);
+        value_free_type(right, list);
+
+        return ires_success(res);
+    case TUPLE_V:
+        res = value_set2(BOOL_V, tuple_nequal(left->value.ptr, right->value.ptr));
+
+        value_free_type(left, tuple);
+        value_free_type(right, tuple);
+
+        return ires_success(res);
+    case TYPE_V:
+        res = value_set2(BOOL_V, left->value.chr != right->value.chr);
+
+        value_free_shell(left);
+        value_free_shell(right);
+
+        return ires_success(res);
+    case FUNC_V:
+        res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
+
+        value_free_type(left, func);
+        value_free_type(right, func);
+
+        return ires_success(res);
+    case STRUCT_V:
+        res = value_set2(BOOL_V, left->value.ptr != right->value.ptr);
+
+        value_free_type(left, context);
+        value_free_type(right, context);
+
+        return ires_success(res);
+    default:
+        value_free(left);
+        break;
+    }
+
+    value_free(right);
+
+    return ires_success(value_set2(BOOL_V, 1));
+}
+
 ires_t operate_less(value_p left, value_p right, pos_p poss, pos_p pose, context_p context)
 {
     char ltype;

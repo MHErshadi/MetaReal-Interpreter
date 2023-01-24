@@ -50,6 +50,9 @@ char list_equal_tuple(const list_p array1, const tuple_p array2);
 char list_nequal(const list_p array1, const list_p array2);
 char list_nequal_tuple(const list_p array1, const tuple_p array2);
 
+char list_ex_equal(const list_p array1, const list_p array2);
+char list_ex_nequal(const list_p array1, const list_p array2);
+
 char list_contains(const list_p array, const value_p value);
 
 char list_are_type(const list_p array, unsigned char type);

@@ -96,6 +96,32 @@ char tuple_nequal(const tuple_p array1, const tuple_p array2)
     return 0;
 }
 
+char tuple_ex_equal(const tuple_p array1, const tuple_p array2)
+{
+    if (array1->size != array2->size)
+        return 0;
+
+    unsigned long long i;
+    for (i = 0; i < array1->size; i++)
+        if (!operate_ex_equal_compare(array1->elements[i], array2->elements[i]))
+            return 0;
+
+    return 1;
+}
+
+char tuple_ex_nequal(const tuple_p array1, const tuple_p array2)
+{
+    if (array1->size != array2->size)
+        return 1;
+
+    unsigned long long i;
+    for (i = 0; i < array1->size; i++)
+        if (!operate_ex_equal_compare(array1->elements[i], array2->elements[i]))
+            return 1;
+
+    return 0;
+}
+
 char tuple_contains(const tuple_p array, const value_p value)
 {
     if (!array->size)

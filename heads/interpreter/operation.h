@@ -58,6 +58,8 @@ ires_t operate_success(value_p left, const value_p right, pos_p poss, pos_p pose
 char operate_success_type_change(const value_p left, const value_p right);
 
 char operate_equal_compare(const value_p left, const value_p right);
+char operate_ex_equal_compare(const value_p left, const value_p right);
+
 char operate_less_compare(const value_p left, const value_p right);
 char operate_greater_compare(const value_p left, const value_p right);
 

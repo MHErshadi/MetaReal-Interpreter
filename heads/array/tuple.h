@@ -31,8 +31,10 @@ void tuple_print(FILE* stream, const tuple_p array, const char* end);
 /* */
 
 char tuple_equal(const tuple_p array1, const tuple_p array2);
-
 char tuple_nequal(const tuple_p array1, const tuple_p array2);
+
+char tuple_ex_equal(const tuple_p array1, const tuple_p array2);
+char tuple_ex_nequal(const tuple_p array1, const tuple_p array2);
 
 char tuple_contains(const tuple_p array, const value_p value);
 

@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if none === none
+if none !== none === false
 {
     r += "PASSED"
     c++
@@ -13,123 +13,123 @@ else:
 
 #* Test2 *#
 
-if none === object():
-    r += "FAILED"
-else
+if none !== object() === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test3 *#
 
-if none === 0:
-    r += "FAILED"
-else
+if none !== 0 === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test4 *#
 
-if none === 0.0:
-    r += "FAILED"
-else
+if none !== 0.0 === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test5 *#
 
-if none === 0.0i:
-    r += "FAILED"
-else
+if none !== 0.0i === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test6 *#
 
-if none === false:
-    r += "FAILED"
-else
+if none !== false === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test7 *#
 
-if none === '\0':
-    r += "FAILED"
-else
+if none !== '\0' === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test8 *#
 
-if none === "":
-    r += "FAILED"
-else
+if none !== "" === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test9 *#
 
-if none === []:
-    r += "FAILED"
-else
+if none !== [] === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test10 *#
 
-if none === (1, 2):
-    r += "FAILED"
-else
+if none !== (1, 2) === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test11 *#
 
-if none === str:
-    r += "FAILED"
-else
+if none !== str === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test12 *#
 
-if none === func() {}:
-    r += "FAILED"
-else
+if none !== func() {} === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Test13 *#
 
-if none === struct {}:
-    r += "FAILED"
-else
+if none !== struct {} === true
 {
     r += "PASSED"
     c++
 }
+else:
+    r += "FAILED"
 
 #* Result *#
 

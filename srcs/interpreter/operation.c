@@ -3157,14 +3157,14 @@ ires_t operate_ex_equal(value_p left, value_p right)
 
         return ires_success(res);
     case LIST_V:
-        res = value_set2(BOOL_V, list_equal(left->value.ptr, right->value.ptr));
+        res = value_set2(BOOL_V, list_ex_equal(left->value.ptr, right->value.ptr));
 
         value_free_type(left, list);
         value_free_type(right, list);
 
         return ires_success(res);
     case TUPLE_V:
-        res = value_set2(BOOL_V, tuple_equal(left->value.ptr, right->value.ptr));
+        res = value_set2(BOOL_V, tuple_ex_equal(left->value.ptr, right->value.ptr));
 
         value_free_type(left, tuple);
         value_free_type(right, tuple);
@@ -3281,14 +3281,14 @@ ires_t operate_ex_nequal(value_p left, value_p right)
 
         return ires_success(res);
     case LIST_V:
-        res = value_set2(BOOL_V, list_nequal(left->value.ptr, right->value.ptr));
+        res = value_set2(BOOL_V, list_ex_nequal(left->value.ptr, right->value.ptr));
 
         value_free_type(left, list);
         value_free_type(right, list);
 
         return ires_success(res);
     case TUPLE_V:
-        res = value_set2(BOOL_V, tuple_nequal(left->value.ptr, right->value.ptr));
+        res = value_set2(BOOL_V, tuple_ex_nequal(left->value.ptr, right->value.ptr));
 
         value_free_type(left, tuple);
         value_free_type(right, tuple);
@@ -4725,6 +4725,44 @@ char operate_equal_compare(const value_p left, const value_p right)
     case FUNC_V:
     case STRUCT_V:
         return left->value.ptr == right->value.ptr;
+    }
+
+    return 0;
+}
+
+char operate_ex_equal_compare(const value_p left, const value_p right)
+{
+    if (!left)
+        return !right;
+
+    if (!right)
+        return 0;
+
+    if (left->type != right->type)
+        return 0;
+
+    switch (left->type)
+    {
+    case OBJECT_V:
+    case FUNC_V:
+    case STRUCT_V:
+        return left->value.ptr == right->value.ptr;
+    case INT_V:
+        return int_equal(left->value.ptr, right->value.ptr);
+    case FLOAT_V:
+        return float_equal(left->value.ptr, right->value.ptr);
+    case COMPLEX_V:
+        return complex_equal(left->value.ptr, right->value.ptr);
+    case BOOL_V:
+    case CHAR_V:
+    case TYPE_V:
+        return left->value.chr == right->value.chr;
+    case STR_V:
+        return str_equal(left->value.ptr, right->value.ptr);
+    case LIST_V:
+        return list_ex_equal(left->value.ptr, right->value.ptr);
+    case TUPLE_V:
+        return tuple_ex_equal(left->value.ptr, right->value.ptr);
     }
 
     return 0;

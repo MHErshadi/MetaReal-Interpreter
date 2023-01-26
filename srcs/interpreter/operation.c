@@ -3851,6 +3851,16 @@ ires_t operate_contain(value_p left, value_p right, pos_p poss, pos_p pose, cont
     case STR_V:
         switch (left->type)
         {
+        case OBJECT_V:
+            str = malloc(7);
+            strcpy(str, "object");
+
+            res = value_set2(BOOL_V, str_contains_str(right->value.ptr, str));
+
+            value_free_type(right, str);
+            free(str);
+
+            return ires_success(res);
         case INT_V:
             str = int_get_str(left->value.ptr, 10);
 

@@ -3,11 +3,17 @@ c = 0
 
 #* Test1 *#
 
-if 6 ** 3  === 216
-{
-    r += "PASSED"
-    c++
-}
+if 6 ** 3  === 216:
+    try
+    {
+        8 ** (10 ** 30)
+        a += "FAILED"
+    }
+    except "Memory overflow"
+    {
+        r += "PASSED"
+        c++
+    }
 else:
     r += "FAILED"
 

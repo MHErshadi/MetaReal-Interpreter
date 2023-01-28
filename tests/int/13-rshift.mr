@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if 66 >> 2 === 16
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if 413 >> false === 413
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 10 ** 30 >> 'w' === 0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

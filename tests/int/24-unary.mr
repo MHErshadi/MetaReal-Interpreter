@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if (object() is object) === true
+if +6 === 6
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if (object() is object()) === true
+if -7 === 3 - 10
 {
     r += "PASSED"
     c++
@@ -23,7 +23,7 @@ else:
 
 #* Test3 *#
 
-if (object() is complex) === false
+if ~65 === -66
 {
     r += "PASSED"
     c++
@@ -33,7 +33,7 @@ else:
 
 #* Test4 *#
 
-if (object() is 1) === false
+if not 0 === true && !-2 === false
 {
     r += "PASSED"
     c++

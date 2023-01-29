@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if (none is none) === true
+if (none is none) === true && (none is "none") === false
 {
     r += "PASSED"
     c++
@@ -21,19 +21,9 @@ if (none is int) === false
 else:
     r += "FAILED"
 
-#* Test3 *#
-
-if (none is "none") === false
-{
-    r += "PASSED"
-    c++
-}
-else:
-    r += "FAILED"
-
 #* Result *#
 
-if c === 3:
+if c === 2:
     "PASSED"
 else:
     r

@@ -1,0 +1,73 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if 10 % 3 === 1:
+    try
+    {
+        0.0 % 0
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if 5 % 0.5 === 0.0:
+    try
+    {
+        0.0 % 0.0
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 1 % true === 0:
+    try
+    {
+        0.0 % false
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if 93 % 'Y' === 4:
+    try
+    {
+        0.0 % '\0'
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

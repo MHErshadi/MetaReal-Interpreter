@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (76.8 in "076.80") === true && (0.64 in ".64") === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (83.0 in [true, object(), 83]) === true && (20.4 in [20, false, "20.4", [20.4], (20.4,)]) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if (83.0 in (true, object(), 83)) === true && (20.4 in (20, false, "20.4", [20.4], (20.4,))) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c == 3:
+    "PASSED"
+else:
+    r

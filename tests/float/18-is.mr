@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (752.1 is 0.0) === true && (3.0 is 3) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (5.8 is float) === true && (14.0 is int) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

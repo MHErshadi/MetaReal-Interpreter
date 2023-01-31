@@ -1,0 +1,85 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if 6 ** 3  === 216:
+    try
+    {
+        8 ** (10 ** 30)
+        a += "FAILED"
+    }
+    except "Memory overflow"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if 2 ** -3 === 0.125
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 4 ** 3.5 === 128.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if (-25) ** 0.5 === 5.0i
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if 7 ** 0i === (1.0 + 0i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if 661 ** false === 1
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+if 2 ** '\t' === 512
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 7:
+    "PASSED"
+else:
+    r

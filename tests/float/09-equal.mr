@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if 45 == none === false
+if 0.0 == none === false
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if 7 == object() === false
+if 1.3 == object() === false
 {
     r += "PASSED"
     c++
@@ -23,7 +23,7 @@ else:
 
 #* Test3 *#
 
-if 67 == 67 === true && 8 == 9 === false
+if 571.0 == 571 === true && 9.001 == 9 === false
 {
     r += "PASSED"
     c++
@@ -33,7 +33,7 @@ else:
 
 #* Test4 *#
 
-if 91 == 91.0 === true && 12 == 12.3 === false
+if 8.34 == 8.34 === true && 6.12 == 61.2 === false
 {
     r += "PASSED"
     c++
@@ -43,7 +43,7 @@ else:
 
 #* Test5 *#
 
-if 33 == (33.0 + 0.0i) === true && 1 == 1i === false
+if 56.72 == (56.72 + 0.0i) === true && 0.31 == 0.31i === false
 {
     r += "PASSED"
     c++
@@ -53,7 +53,7 @@ else:
 
 #* Test6 *#
 
-if 0 == false === true && 2 == true === false
+if 1.0 == true === true && 4.5 == true === false
 {
     r += "PASSED"
     c++
@@ -63,7 +63,7 @@ else:
 
 #* Test7 *#
 
-if 55 == '7' === true && 3 == '3' === false
+if 61.0 == '=' === true && 73.73 == 'I' === false
 {
     r += "PASSED"
     c++
@@ -73,7 +73,7 @@ else:
 
 #* Test8 *#
 
-if 1729 == "1729" === false
+if 91.65 == "91.65" === false
 {
     r += "PASSED"
     c++
@@ -83,7 +83,7 @@ else:
 
 #* Test9 *#
 
-if 66 == [66] === false
+if 5.12 == [5.12] === false
 {
     r += "PASSED"
     c++
@@ -93,7 +93,7 @@ else:
 
 #* Test10 *#
 
-if 81 == (81,) === false
+if 859.2 == (859.2,) === false
 {
     r += "PASSED"
     c++
@@ -103,7 +103,7 @@ else:
 
 #* Test11 *#
 
-if 1 == object === false
+if 3.0 == float === false
 {
     r += "PASSED"
     c++
@@ -113,7 +113,7 @@ else:
 
 #* Test12 *#
 
-if 78 == func() {} === false
+if 91.65 == func() {} === false
 {
     r += "PASSED"
     c++
@@ -123,7 +123,7 @@ else:
 
 #* Test13 *#
 
-if 93 == struct {} === false
+if 2.718 == struct {} === false
 {
     r += "PASSED"
     c++

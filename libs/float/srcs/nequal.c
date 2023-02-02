@@ -10,5 +10,5 @@
 
 char float_nequal(const float_p num1, const float_p num2)
 {
-    return mpfr_equal_p(num1->value, num2->value);
+    return !mpfr_equal_p(num1->value, num2->value);
 }

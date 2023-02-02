@@ -3718,7 +3718,7 @@ ires_t operate_greater_eq(value_p left, value_p right, pos_p poss, pos_p pose, c
 
             return ires_success(res);
         case FLOAT_V:
-            res = value_set2(BOOL_V, float_greater(left->value.ptr, right->value.ptr));
+            res = value_set2(BOOL_V, float_greater_equal(left->value.ptr, right->value.ptr));
 
             value_free_type(left, float);
             value_free_type(right, float);

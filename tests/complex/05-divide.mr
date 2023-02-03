@@ -1,0 +1,89 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (3 + 6i) / 2 === (1.5 + 3i):
+    try
+    {
+        0.0i / 0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (7 + 21i) / 3.5 === (2 + 6i):
+    try
+    {
+        0.0i / 0.0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if (1 + 2i) / (1 + 1i) === (1.5 + 0.5i):
+    try
+    {
+        0.0i / 0.0i
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if (6.423 + 8.12i) / true === (6.423 + 8.12i):
+    try
+    {
+        0.0i / false
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if (48 + 40i) / ' ' === (1.5 + 1.25i):
+    try
+    {
+        0.0i / '\0'
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

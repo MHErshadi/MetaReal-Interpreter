@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if ((1 + 3i) is 6i) === true && (0i is 0.0) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (5.1i is complex) === true && ((1.4 + 0i) is float) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

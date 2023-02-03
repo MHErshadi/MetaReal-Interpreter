@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if ((9 + 12.5i) in "(9+12.5i)") === true && ((71 + 17i) in "(71 + 17i)") === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if ((61 + 2i) in ["True", (61 + 2i)]) === true && (2i in [2.1i, true, "2.1i", [2.1i], (2.1i,)]) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if ((61 + 2i) in ("True", (61 + 2i))) === true && (2i in (2.1i, true, "2.1i", [2.1i], (2.1i,))) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c == 3:
+    "PASSED"
+else:
+    r

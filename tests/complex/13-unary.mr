@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if +(1.9 + 4i) === 1.9 + 4i
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if -(5.8 - 2.1i) === -5.8 + 2.1i
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if not 0.0i === true && !7.9i === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

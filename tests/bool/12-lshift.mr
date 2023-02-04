@@ -3,10 +3,10 @@ c = 0
 
 #* Test1 *#
 
-if 3 << 4 === 48:
+if true << 5 === 32:
     try
     {
-        5 << 10 ** 30
+        true << 10 ** 30
         a += "FAILED"
     }
     except "Memory overflow"
@@ -19,7 +19,7 @@ else:
 
 #* Test2 *#
 
-if 25 << true === 50
+if false << true === false
 {
     r += "PASSED"
     c++
@@ -29,7 +29,7 @@ else:
 
 #* Test3 *#
 
-if 61 << '\a' === 7808
+if true << 'e' === ' '
 {
     r += "PASSED"
     c++

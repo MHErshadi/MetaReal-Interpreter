@@ -1,0 +1,49 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if 7 >= 0 === true && 1 >= 2 === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if 76 >= 76.0 === true && 92 >= 92.1 === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 2 >= true === true && 0 >= true === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if 256 >= '~' === true && 0 >= '0' === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

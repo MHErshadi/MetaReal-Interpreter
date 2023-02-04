@@ -1,0 +1,73 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if true // 1 === 1:
+    try
+    {
+        false // 0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if true // 0.23 === 4:
+    try
+    {
+        false // 0.0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if false // true === false:
+    try
+    {
+        false // false
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if true // '0' === '\0':
+    try
+    {
+        false // '\0'
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

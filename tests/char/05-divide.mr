@@ -1,0 +1,89 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if '.' / 10 === 4.6:
+    try
+    {
+        '\0' / 0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if '1' / 17.5 === 2.8:
+    try
+    {
+        '\0' / 0.0
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if ';' / (1 + 2.0i) === (11.8 - 23.6i):
+    try
+    {
+        '\0' / 0.0i
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if 't' / true === 't':
+    try
+    {
+        '\0' / false
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if '8' / '#' === 1.6:
+    try
+    {
+        '\0' / '\0'
+        r += "FAILED"
+    }
+    except "Division by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

@@ -2004,6 +2004,14 @@ ires_t operate_power(value_p left, value_p right, pos_p poss, pos_p pose, contex
                 return ires_success(res);
             }
 
+            if (!int_fits_ul(right->value.ptr))
+            {
+                value_free_shell(left);
+                value_free_type(right, int);
+
+                return ires_fail(mem_overflow(poss, pose, context));
+            }
+
             base_operation_ul_rev(INT_V, int_ul_power, right, left);
         case FLOAT_V:
             base_operation_ul_rev(FLOAT_V, float_ul_power, right, left);

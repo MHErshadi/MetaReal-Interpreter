@@ -1,0 +1,73 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if '\\' % 11 === 4:
+    try
+    {
+        '\0' % 0
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if '@' % 1.25 === 0.25:
+    try
+    {
+        '\0' % 0.0
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 'w' % true === '\0':
+    try
+    {
+        '\0' % false
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if 'x' % '+' === '"':
+    try
+    {
+        '\0' % '\0'
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

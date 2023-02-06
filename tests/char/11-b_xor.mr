@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if 'J' ^ 67 === 9
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if '9' ^ true === '8'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if 'n' ^ '\\' === '2'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

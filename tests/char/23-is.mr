@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if (60 is 40) === true && (3 is 3.0) === false
+if ('r' is 's') === true && ('W' is 87) === false
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if (20 is int) === true && (5 is object) === false
+if ('i' is char) === true && (',' is object) === false
 {
     r += "PASSED"
     c++

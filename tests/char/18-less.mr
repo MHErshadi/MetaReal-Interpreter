@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if 1728 < 1729 === true && 1729 < 1729 === false
+if 'd' < 101 === true && 'a' < 97 === false
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if 72 < 72.01 === true && 72 < 7.2 === false
+if '_' < 95.5 === true && 'G' < 70.1 === false
 {
     r += "PASSED"
     c++
@@ -23,7 +23,7 @@ else:
 
 #* Test3 *#
 
-if 0 < true === true && 1 < true === false
+if '\0' < true === true && '\0' < false === false
 {
     r += "PASSED"
     c++
@@ -33,7 +33,7 @@ else:
 
 #* Test4 *#
 
-if 9 < '9' === true && 9 < '\0' === false
+if '0' < '9' === true && 'z' < 'Z' === false
 {
     r += "PASSED"
     c++

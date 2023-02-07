@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if +6 === 6
+if +'O' === 79
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if -7 === 3 - 10
+if -'\0' === '\0'
 {
     r += "PASSED"
     c++
@@ -23,7 +23,7 @@ else:
 
 #* Test3 *#
 
-if ~65 === -66
+if ~'\0' === '\0' - true
 {
     r += "PASSED"
     c++
@@ -33,7 +33,7 @@ else:
 
 #* Test4 *#
 
-if not 0 === true && !-2 === false
+if not '\0' === true && !'0' === false
 {
     r += "PASSED"
     c++

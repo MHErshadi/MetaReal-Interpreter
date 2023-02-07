@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if (23 in "002300") === true && (27 in "2 7") === false
+if ('j' in "jail") === true && ('p' in "Prison") === false
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if (707 in ['!', none, 707.0]) === true && (71 in [71.5, true, '@', "71", [71], (71,)]) === false
+if ('y' in [int, [], "y"]) === true && ('9' in [9, true, '8', "99", ['9'], ('9',)]) === false
 {
     r += "PASSED"
     c++
@@ -23,7 +23,7 @@ else:
 
 #* Test3 *#
 
-if (611 in ([], "", (611 + 0i))) === true && (31 in (31.05, 'U', "31", [31], (31,))) === false
+if ('y' in (int, [], "y")) === true && ('9' in (9, true, '8', "99", ['9'], ('9',))) === false
 {
     r += "PASSED"
     c++

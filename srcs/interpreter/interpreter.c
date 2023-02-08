@@ -209,6 +209,9 @@ ires_t interpret_body(body_p body, context_p context, char properties)
     ires.response = 0;
     ires.value = NULL;
 
+    if (!body->size)
+        return ires;
+
     unsigned long long i = 0;
     while (i < body->size)
     {

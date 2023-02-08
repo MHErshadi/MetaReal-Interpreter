@@ -1,0 +1,143 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = object()
+
+if [] + a === [a]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if [1, 2] + 3 === [1, 2, 3]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if [0.1, 0.2] + 0.3 === [0.1, 0.2, 0.3]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if [1i, 2i] + (1 + 2i) === [1i, 2i, (1 + 2i)]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if [false, true] + true === [false, true, true]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if ['H', 'i'] + '!' === ['H', 'i', '!']
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+if ["test", "str"] + "bye" === ["test", "str", "bye"]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test8 *#
+
+if [[1, 2], []] + [1, 2, ["some text", 5]] === [[1, 2], [], 1, 2, ["some text", 5]]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test9 *#
+
+if [(1, 2), (3,)] + (1, 2, ("OK", 61), []) === [(1, 2), (3,), 1, 2, ("OK", 61), []]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test10 *#
+
+if [object, int] + list === [object, int, list]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test11 *#
+
+func f(x): x ** 2
+
+a = func() {}
+
+if [a] + f === [a, f]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test12 *#
+
+struct s
+{
+    x = 3
+    y = 6.2
+}
+
+a = struct {}
+
+if [a] + s === [a, s]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 12:
+    "PASSED"
+else:
+    r

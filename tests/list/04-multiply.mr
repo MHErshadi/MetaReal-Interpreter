@@ -1,0 +1,55 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if [1, 2, 3] * 3 === [1, 2, 3, 1, 2, 3, 1, 2, 3]:
+    try
+    {
+        [1] * 10 ** 30
+        r += "FAILED"
+    }
+    except "Memory overflow"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if [1, 10] * -4 === [10, 1, 10, 1, 10, 1, 10, 1]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if [1, 1, 2, 3, 5] * true === [1, 1, 2, 3, 5]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if [] * '~' === []
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

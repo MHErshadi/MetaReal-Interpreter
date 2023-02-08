@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if ([5, 98, 2] are 23) === true && ([3, 3.0, (3 + 0i)] are 3) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if ([true, true, false, true] are bool) === true && ([[2.3, 1.2], 2.0, 4.6] are float) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

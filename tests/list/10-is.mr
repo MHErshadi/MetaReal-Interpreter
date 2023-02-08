@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if ([] is [1, 2, 3]) === true && ([0.1, 'w'] is (0.1, 'w')) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (["test", 1, 2i] is list) === true && ([1, 5, 9] is tuple) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

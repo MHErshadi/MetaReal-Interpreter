@@ -1,0 +1,139 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if [] == none === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if [object()] == object() === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if [581] == 581 === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if [3.14] == 3.14 === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if [(5 + 2i)] == (5 + 2i) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if [true] == true === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+if ['q'] == 'q' === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test8 *#
+
+if ["Hello world"] == "Hello world" === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test9 *#
+
+if [1, 2, 3] == [1, 2, 3] === true && [1, 2, 3] == [3, 2, 1] === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test10 *#
+
+if [0.5, 0.25, 0.125] == (0.5, 0.25, 0.125) === true && [0.5, 0.25, 0.125] == (0.125, 0.25, 0.5) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test11 *#
+
+if [int, object, list] == list === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test12 *#
+
+if [] == func() {} === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test13 *#
+
+if [struct {}] == struct {} === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 13:
+    "PASSED"
+else:
+    r

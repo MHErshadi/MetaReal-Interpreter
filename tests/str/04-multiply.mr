@@ -1,0 +1,55 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if "Hush" * 2 === "HushHush":
+    try
+    {
+        "!" * 10 ** 30
+        r += "FAILED"
+    }
+    except "Memory overflow"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if "deviL" * -3 === "LivedLivedLived"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if "this message will be removed" * false === ""
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if "a" * '\a' === "aaaaaaa"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

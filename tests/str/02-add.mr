@@ -1,0 +1,69 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if "My favorite prime is " + 499 === "My favorite prime is 499"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if "e is " + 2.71828 === "e is 2.71828"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if "complex PI: " + (3.1415 + 3.1415i) === "complex PI: (3.1415+3.1415i)"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if "True is not " + false === "True is not false"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if "Hello worl" + 'd' === "Hello world"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if "Hello " + "World" === "Hello World"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 6:
+    "PASSED"
+else:
+    r

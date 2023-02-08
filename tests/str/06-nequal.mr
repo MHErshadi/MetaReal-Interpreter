@@ -1,0 +1,139 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if "none" != none === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if "object" != object() === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if "1940" != 1940 === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if "5.78" != 5.78 === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if "(3.6+7.8i)" != (3.6 + 7.8i) === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if "true" != true === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+if "L" != 'L' === false && "Z" != 'z' === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test8 *#
+
+if "test" != "test" === false && "slope" != "Slope" === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test9 *#
+
+if "good" != ["good"] === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test10 *#
+
+if "fun" != ("fun",) === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test11 *#
+
+if "jelly" != str === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test12 *#
+
+if "" != func() {} === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test13 *#
+
+if "empty" != struct {} === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 13:
+    "PASSED"
+else:
+    r

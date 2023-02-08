@@ -1,0 +1,73 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if "beast" - 3 === "beat":
+    try
+    {
+        "OK" - 100
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if "code" - -1 === "cod":
+    try
+    {
+        "OK" - -100
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if "good" - true === "god":
+    try
+    {
+        "" - true
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if "Hello World!" - '\t' === "Hello Word!":
+    try
+    {
+        "just not enough" - 'u'
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if ("" is "message") === true && ("y" is 'y') === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if ("text" is str) === true && ("list" is list) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

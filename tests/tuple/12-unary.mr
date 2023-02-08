@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if +(true, object(), 23) === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if not (1,) === false && ![0, false] === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

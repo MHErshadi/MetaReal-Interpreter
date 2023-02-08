@@ -1,0 +1,19 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (false, 0, none)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 1:
+    "PASSED"
+else:
+    r

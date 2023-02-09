@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (str is "some string") === true && (list is ([1], [2], [3])) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (char is char) === true && (bool is int) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

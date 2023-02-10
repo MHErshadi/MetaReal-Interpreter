@@ -1,4 +1,4 @@
-a = []
+r = []
 c = 0
 
 #* Test1 *#
@@ -9,11 +9,11 @@ v = w = 0
 
 if v === 67.4 && w === "Hello World"
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test2 *#
 
@@ -23,13 +23,26 @@ v = w = 0
 
 if v === 1 && w === -1
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test3 *#
+
+func f1(x): x ** 2
+func f2(x): x ** 3
+
+if (true ? f1 : f2)(3) === 9 && (false ? f1 : f2)(2) === 8
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
 
 struct s1 { x = 0 }
 struct s2 { x = 0 }
@@ -39,15 +52,15 @@ struct s2 { x = 0 }
 
 if s1.x === 5 && s2.x === 7
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Result *#
 
-if c === 3:
+if c === 4:
     "PASSED"
 else:
-    "       FAILED"
+    r

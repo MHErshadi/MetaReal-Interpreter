@@ -1,0 +1,34 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (true ? 20 : true ? "hello" : [1, 2, 3]) === 20 &&
+    (false ? 20 : true ? "hello" : [1, 2, 3]) === "hello" &&
+    (false ? 20 : false ? "hello" : [1, 2, 3]) === [1, 2, 3]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (true ? true ? 7 : 7.3 : true ? "test" : (1, 2)) === 7 &&
+    (true ? false ? 7 : 7.3 : true ? "test" : (1, 2)) === 7.3 &&
+    (false ? true ? 7 : 7.3 : true ? "test" : (1, 2)) === "test" &&
+    (false ? true ? 7 : 7.3 : false ? "test" : (1, 2)) === (1, 2)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

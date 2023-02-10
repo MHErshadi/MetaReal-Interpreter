@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (true ? 732 : "OK") === 732 && (false ? 732 : "OK") === "OK"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (true ? : 'C') === none && (false ? : 'C') === 'C'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

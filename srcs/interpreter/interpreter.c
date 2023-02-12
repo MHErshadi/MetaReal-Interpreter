@@ -1131,6 +1131,7 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
             node_free(&node->value);
             free(node);
         }
+
         return ires;
     }
 
@@ -1164,6 +1165,7 @@ ires_t interpret_var_reassign(var_reassign_np node, pos_p poss, pos_p pose, cont
     {
         if (!IPROP_NOT_FREE(properties))
             free(node);
+
         return ires;
     }
 
@@ -1243,12 +1245,13 @@ ret:
         if (IPROP_PTR(properties))
         {
             value_free_shell(ires.value);
-            ires.value = (value_p)ptr;
+            ires.value = ptr;
         }
 
         ires.response = response & IRES_RESPONSE_SET(0, 1, 1, 1, IPROP_PTR(properties), IPROP_PTR(properties));
         return ires;
     }
+
     if (IRES_VAL_PTR(response))
     {
         value_free(*(value_p*)ptr);
@@ -1258,7 +1261,7 @@ ret:
             free(node);
 
         if (IPROP_PTR(properties))
-            ires.value = (value_p)ptr;
+            ires.value = ptr;
         else
             value_copy(ires.value);
 
@@ -1273,7 +1276,7 @@ ret:
         free(node);
 
     if (IPROP_PTR(properties))
-        ires.value = (value_p)ptr;
+        ires.value = ptr;
     else
         value_copy(ires.value);
 
@@ -2433,8 +2436,7 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
     value_p value;
     value_p tmp;
 
-    char sign = operate_sign(step);
-    if (!sign)
+    if (!operate_sign(step))
         while (operate_less_compare(var->value, end))
         {
             value = ires_merge(&ires, interpret_body(&node->body, context,

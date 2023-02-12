@@ -1,0 +1,31 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+func f(x, y, z): [x, x * y, x * y * z]
+
+if (f in [1, "str", f]) === true && (func() {} in [none, false, "", func() {}]) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (f in (1, "str", f)) === true && (func() {} in (none, false, "", func() {})) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

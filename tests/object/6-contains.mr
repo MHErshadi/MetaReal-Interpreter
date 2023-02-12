@@ -35,7 +35,7 @@ else:
 
 #* Result *#
 
-if c == 3:
+if c === 3:
     "PASSED"
 else:
     r

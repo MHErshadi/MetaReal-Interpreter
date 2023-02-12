@@ -3,7 +3,7 @@ c = 0
 
 #* Test1 *#
 
-if ((1, 2, 3) in [1, 2, [1, 2, 3]]) === true && ((1, 2, 3) in [1, 2, 3, (3, 2, 1)]) === false
+if +func f() {} is int
 {
     r += "PASSED"
     c++
@@ -13,7 +13,7 @@ else:
 
 #* Test2 *#
 
-if ((1, 2, 3) in (1, 2, [1, 2, 3])) === true && ((1, 2, 3) in (1, 2, 3, (3, 2, 1))) === false
+if not func (x) {x} === true && !func f() {} === false
 {
     r += "PASSED"
     c++

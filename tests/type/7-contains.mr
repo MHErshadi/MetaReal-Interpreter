@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (int in [0, int, "test"]) === true && (complex in [7i, 4, "complex", [complex], (complex,)]) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (int in (0, int, "test")) === true && (complex in (7i, 4, "complex", [complex], (complex,))) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

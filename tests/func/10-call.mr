@@ -1,0 +1,119 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+func f(x, y):
+    x * y ** -x
+
+if f(2, 4) === 0.125:
+    try
+    {
+        f(1, 2, 3)
+        r += "FAILED"
+    }
+    except "Invalid argument count for function 'f' (argument count must be between 2 and 2 (inclusive), not 3)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+func g(x, y, z):
+    (x, x * y, x * y * z)
+
+if g(x: 2, z: 3, y: 5) === (2, 10, 30)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if g(x: 4, 7, z: 1) === (4, 28, 28)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+func h(x, y = 4, z = 1):
+    "" + x + y + z
+
+if h(5, 3, 7.5) === "537.5":
+    try
+    {
+        h()
+        r += "FAILED"
+    }
+    except "Invalid argument count for function 'h' (argument count must be between 1 and 3 (inclusive), not 0)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if h(12.1) === "12.141"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if h("PRIME: ", z: 99) === "PRIME: 499"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+func p(x, int y, float z = 2.3):
+    [x + 2, y + 1, z]
+
+if p("first prime: ", 36, 8.26) === ["first prime: 2", 37, 8.26]:
+    try
+    {
+        p("", "", 8.9)
+        r += "FAILED"
+    }
+    except "Type of variable and type of value do not match (<int> and <str>)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test8 *#
+
+if p(y: 3, x: [0, 1]) === [[0, 1, 2], 4, 2.3]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 8:
+    "PASSED"
+else:
+    r

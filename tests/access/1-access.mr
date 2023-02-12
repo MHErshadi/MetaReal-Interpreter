@@ -1,18 +1,18 @@
-a = []
+r = []
 c = 0
 
-#* Test1 <func> type *#
+#* Test1 *#
 
 func f(x): x
 f(56)
 
 if f.x === 56
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test2 *#
 
@@ -22,21 +22,21 @@ f(5, 6)
 
 if f.x === 5 && f.y === 6
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test3 *#
 
 if f.(x + y) === 11
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test4 *#
 
@@ -44,23 +44,23 @@ f.(z = 47)
 
 if f.z === 47
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
-#* Test5 <struct> type *#
+#* Test5 *#
 
 struct s {x = "Hello World"}
 
 if s.x === "Hello World"
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test6 *#
 
@@ -72,21 +72,21 @@ struct s
 
 if s.x === 3.4 && s.y === 5.7
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test7 *#
 
 if s.(x + y) === 9.1
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test8 *#
 
@@ -94,15 +94,15 @@ s.(z = 10.1)
 
 if s.z === 10.1
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Result *#
 
 if c === 8:
     "PASSED"
 else:
-    "       FAILED"
+    r

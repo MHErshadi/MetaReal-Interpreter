@@ -1,0 +1,128 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+func f(x)
+{
+    x += 1
+    x ** 3
+}
+
+if f(2) === 27
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+struct
+{
+    x = 2
+
+    func global g(x, y):
+        x * (y + x)
+}
+
+if g(2, 5) === 14
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+func const h(x):
+    [x, x ** 2, x ** 3]
+
+if h(2) === [2, 4, 8]:
+    try
+    {
+        h = 0
+        r += "FAILED"
+    }
+    except "'h' is a constant variable"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+func int p(x, y):
+    x ** y
+
+if p(4, 3) === 64:
+    try
+    {
+        p(6, -2)
+        r += "FAILED"
+    }
+    except "Return value must be int (not <float>)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+func s(x, float y):
+    x + " " + y
+
+if s(2.7182, 3.1415) === "2.7182 3.1415":
+    try
+    {
+        s("Taxicab number is", 1729)
+        r += "FAILED"
+    }
+    except "Type of variable and type of value do not match (<float> and <int>)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+func a(x, y = 3):
+    x + y
+
+if a(5) === 8
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+try
+{
+    func e(int x = ""):
+        x * 45 + (x & 23)
+
+    r += "FAILED"
+}
+except "Type of variable and type of value do not match (<int> and <str>)"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 7:
+    "PASSED"
+else:
+    r

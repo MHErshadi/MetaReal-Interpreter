@@ -23,7 +23,7 @@ else:
 
 #* Result *#
 
-if c == 2:
+if c === 2:
     "PASSED"
 else:
     r

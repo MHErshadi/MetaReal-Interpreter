@@ -1,4 +1,4 @@
-a = []
+r = []
 c = 0
 
 #* Test1 <func> type *#
@@ -8,11 +8,11 @@ f.x = 30
 
 if f.x === 30
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test2 *#
 
@@ -20,13 +20,13 @@ f.x = f.y = 3.2i
 
 if f.x === 3.2i && f.y === 3.2i
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
-#* Test3 <struct> type *#
+#* Test3 *#
 
 struct s
 {
@@ -39,11 +39,11 @@ s.y = [1, 2]
 
 if s.x === "Test" && s.y === [1, 2]
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Test4 *#
 
@@ -51,15 +51,15 @@ s.x = s.z = 'W'
 
 if s.x === 'W' && s.y === [1, 2] && s.z === 'W'
 {
-    a += "PASSED"
+    r += "PASSED"
     c++
 }
 else:
-    a += "FAILED"
+    r += "FAILED"
 
 #* Result *#
 
 if c === 4:
     "PASSED"
 else:
-    "       FAILED"
+    r

@@ -70,7 +70,7 @@ static const char* runtime_labels[ERROR_CODE_COUNT + 1] =
     "ConstError",
     "AccessError",
     "OutsideLoopError",
-    "OutsideFuncError"
+    "OutsideFuncError",
     "InvalidArgCountError",
     "BoundaryError",
     "InvalidDollarFunctionError",

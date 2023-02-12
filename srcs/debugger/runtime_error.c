@@ -116,8 +116,17 @@ runtime_t outside_loop(const char* name,
 runtime_t invalid_arg_number_function(const char* name, unsigned long long min, unsigned long long max, unsigned long long size,
     pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = malloc(99 + strlen(name) + number_length(min) + number_length(max) + number_length(size));
-    sprintf(detail, "Invalid argument count for function '%s' (argument count is must be between %llu and %llu (inclusive), not %llu)",
+    if (!name)
+    {
+        char* detail = malloc(107 + number_length(min) + number_length(max) + number_length(size));
+        sprintf(detail, "Invalid argument count for function '<anonymous>' (argument count must be between %llu and %llu (inclusive), not %llu)",
+            min, max, size);
+
+        return runtime_set(INVALID_ARG_COUNT_E, detail, poss, pose, context);
+    }
+
+    char* detail = malloc(96 + strlen(name) + number_length(min) + number_length(max) + number_length(size));
+    sprintf(detail, "Invalid argument count for function '%s' (argument count must be between %llu and %llu (inclusive), not %llu)",
         name, min, max, size);
 
     return runtime_set(INVALID_ARG_COUNT_E, detail, poss, pose, context);

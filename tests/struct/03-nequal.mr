@@ -1,0 +1,139 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if struct {none} != none === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if struct {object()} != object() === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+if struct {0} != 0 === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+if struct {0.0} != 0.0 === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+if struct {0.0i} != 0.0i === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+if struct {false} != false === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+if struct {'\0'} != '\0' === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test8 *#
+
+if struct {""} != "" === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test9 *#
+
+if struct {[]} != [] === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test10 *#
+
+if struct s {} != (s,) === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test11 *#
+
+if struct {str} != str === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test12 *#
+
+if struct {} != func() {} === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test13 *#
+
+if struct s {x = (1, 2); y = (-2, 1)} != s === false && struct {} != struct {} === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 13:
+    "PASSED"
+else:
+    r

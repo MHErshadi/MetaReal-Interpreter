@@ -1,0 +1,69 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+struct s
+{
+    s1 = "str 1"
+    s2 = "str 2"
+}
+
+if s.s1 === "str 1" && s.s2 === "str 2"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+struct
+{
+    dummy = false
+
+    struct global v3
+    {
+        x = 0
+        y = -3.76
+        z = (2 - 5.1i)
+    }
+}
+
+if v3.x === 0 && v3.y === -3.76 && v3.z === (2 - 5.1i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+struct const o
+{
+    c1 = true
+    c2 = c1
+}
+
+if o.c1 === true && o.c2 === true:
+    try
+    {
+        o = 0
+        r += "FAILED"
+    }
+    except "'o' is a constant variable"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

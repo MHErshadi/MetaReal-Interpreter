@@ -1,0 +1,35 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+struct s
+{
+    x = []
+    y = 3.6
+}
+
+if (s in [1, none, s, true]) === true && (struct {} in [none, func() {}, struct {}]) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if (s in (1, none, s, true)) === true && (struct {} in (none, func() {}, struct {})) === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

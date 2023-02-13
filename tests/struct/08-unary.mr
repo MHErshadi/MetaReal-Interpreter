@@ -1,0 +1,29 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if +struct s {} is int
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+if not struct {x = [1, 2, 3]} === true && !struct s {} === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

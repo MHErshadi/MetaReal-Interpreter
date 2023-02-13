@@ -11,7 +11,6 @@ SRCS = $(shell find $(SDIR) -name "*.c")
 OBJS = $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(SRCS))
 LIBS = $(shell find $(LDIR) -name "*.a")
 TSTS = $(shell find $(TDIR) -name "*.mr")
-TRES = $(patsubst $(TDIR)/%.mr, $(TDIR)/%.x, $(TSTS))
 OUT = metareal.exe
 
 make: $(OUT)
@@ -20,7 +19,8 @@ remake: clean $(OUT)
 
 all: clean $(OUT) test
 
-test: $(TRES)
+test: $(OUT)
+	@for test in $(TSTS) ; do echo $$test ; metareal $$test ; done
 
 $(OUT): $(OBJS)
 	$(CC) -o $(OUT) $(OBJS) $(LIBS) -lgmp -lmpfr -lmpc

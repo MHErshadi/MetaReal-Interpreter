@@ -1,0 +1,48 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if (18, true, none, "empty")[2] === none && (3, 1.7, 'C')[-2] === 1.7
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+try
+{
+    (1, 2, 3, 4, 5, 6, 7, 8, 100)[100]
+    r += "FAILED"
+}
+except "Index out of range":
+    try
+    {
+        (-100, -200, -300, -1000)[-100]
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+
+#* Test3 *#
+
+if (1, 2, [3, 4])[-1][1] === 4 && (1, 2, (3, 4), 5)[-2][0] === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

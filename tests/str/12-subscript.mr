@@ -1,0 +1,77 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+if "Hello"[1] === 'e' && "Hello"[-1] === 'o'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+try
+{
+    "not enough"[100]
+    r += "FAILED"
+}
+except "Index out of range":
+    try
+    {
+        "not enough again"[-100]
+        r += "FAILED"
+    }
+    except "Index out of range"
+    {
+        r += "PASSED"
+        c++
+    }
+
+#* Test3 *#
+
+s = "whimper"
+s[3] = 's'
+
+if s === "whisper"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Tets4 *#
+
+s = "waited"
+s[-4] += '\n'
+
+if s === "wasted"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+s = "new line: \t"
+s[-1]++
+
+if s === "new line: \n"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

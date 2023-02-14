@@ -3,9 +3,9 @@ c = 0
 
 #* Test1 *#
 
-a = if true: 51.82 elif true: "crust" else: ['a', 'b', 'c']
+a = switch 34 {case 34.0: "OK" case false: (1 + 5i) default: 'f'}
 
-if a === 51.82
+if a === "OK"
 {
     r += "PASSED"
     c++
@@ -15,9 +15,9 @@ else:
 
 #* Test2 *#
 
-a = if false: 51.82 elif true: "crust" else: ['a', 'b', 'c']
+a = switch '\0' {case 34.0: "OK" case false: (1 + 5i) default: 'f'}
 
-if a === "crust"
+if a === (1 + 5i)
 {
     r += "PASSED"
     c++
@@ -27,9 +27,9 @@ else:
 
 #* Test3 *#
 
-a = if false: 51.82 elif false: "crust" else: ['a', 'b', 'c']
+a = switch "dummy" {case 34.0: "OK" case false: (1 + 5i) default: 'f'}
 
-if a === ['a', 'b', 'c']
+if a === 'f'
 {
     r += "PASSED"
     c++
@@ -39,7 +39,7 @@ else:
 
 #* Test4 *#
 
-a = if false: 45
+a = switch 67 {case 2: 0 case [67]: object()}
 
 try
 {

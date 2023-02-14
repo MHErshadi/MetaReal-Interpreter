@@ -1,0 +1,97 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+switch (1, 2, 3)
+{
+case 6:
+    r += "FAILED"
+case tuple:
+    r += "FAILED"
+case [1, 2, 3]:
+    switch "#"
+    {
+    case "##":
+        r += "FAILED"
+    case '#':
+        r += "PASSED"
+        c++
+    default:
+        r += "FAILED"
+    }
+default:
+    r += "FAILED"
+}
+
+#* Test2 *#
+
+switch 34
+{
+case 34.1:
+    r += "FAILED"
+default:
+    switch int
+    {
+    case 2:
+        r += "FAILED"
+    case float:
+        r += "FAILED"
+    case int:
+        r += "PASSED"
+        c++
+    default:
+        r += "FAILED"
+    }
+}
+
+#* Test3 *#
+
+switch (1, 2, 3)
+{
+case 6:
+    r += "FAILED"
+case tuple:
+    r += "FAILED"
+case [1, 2, 3]:
+    switch object()
+    {
+    case "##":
+        r += "FAILED"
+    case '#':
+        r += "FAILED"
+    default:
+        r += "PASSED"
+        c++
+    }
+default:
+    r += "FAILED"
+}
+
+#* Test4 *#
+
+switch 34
+{
+case 34.1:
+    r += "FAILED"
+default:
+    switch none
+    {
+    case 2:
+        r += "FAILED"
+    case float:
+        r += "FAILED"
+    case int:
+        r += "FAILED"
+    default:
+        r += "PASSED"
+        c++
+    }
+}
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

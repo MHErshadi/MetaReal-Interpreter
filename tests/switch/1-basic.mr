@@ -1,0 +1,55 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+switch 'c'
+{
+case 12:
+    r += "FAILED"
+case 30.91:
+    r += "FAILED"
+case true:
+    r += "FAILED"
+case 'c':
+    r += "PASSED"
+    c++
+default:
+    r += "FAILED"
+}
+
+#* Test2 *#
+
+switch "string"
+{
+case 1:
+    r += "FAILED"
+case 3.4:
+    r += "FAILED"
+case ['s', 't', 'r', 'i', 'n', 'g']:
+    r += "FAILED"
+default:
+    r += "PASSED"
+    c++
+}
+
+#* Test3 *#
+
+cc = c
+
+switch none
+{
+default:
+    r += "PASSED"
+    c++
+}
+
+if cc === c:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

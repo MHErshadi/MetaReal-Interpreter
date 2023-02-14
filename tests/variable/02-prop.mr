@@ -122,9 +122,24 @@ except "Can not assign <char> to a type-specified variable (type is <str>)"
     c++
 }
 
+#* Test9 *#
+
+var int n = 12
+
+try
+{
+    n /= 3
+    r += "FAILED"
+}
+except "Can not assign <float> to a type-specified variable (type is <int>)"
+{
+    r += "PASSED"
+    c++
+}
+
 #* Result *#
 
-if c === 8:
+if c === 9:
     "PASSED"
 else:
     r

@@ -970,14 +970,14 @@ ires_t operate_multiply(value_p left, value_p right, pos_p poss, pos_p pose, con
                     list_p rev = list_reverse(left->value.ptr);
 
                     list_repeat_self(rev, count);
-                    res = value_set1(STR_V, rev);
+                    res = value_set1(LIST_V, rev);
 
                     return ires_success(res);
                 }
 
                 value_free_type(right, int);
 
-                res = value_set1(STR_V, list_repeat(left->value.ptr, count));
+                res = value_set1(LIST_V, list_repeat(left->value.ptr, count));
 
                 return ires_success(res);
             }

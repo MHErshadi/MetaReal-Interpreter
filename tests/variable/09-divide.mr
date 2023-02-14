@@ -1,0 +1,74 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 18
+a /= 12
+
+if a === 1.5
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 3.5
+a /= 2.5
+
+if a === 1.4
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = (1 + 2i)
+a /= (2 + 1i)
+
+if a === (0.8 + 0.6i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = true
+a /= 2.5
+
+if a === 0.4
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = 'n'
+a /= ' '
+
+if a === 3.4375
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

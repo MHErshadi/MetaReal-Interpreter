@@ -1,0 +1,61 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 10
+a %= 4.5
+
+if a === 1.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 14.75
+a %= 4.5
+
+if a === 1.25
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = true
+a %= 0.5
+
+if a === 0.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = 'w'
+a %= 33
+
+if a === 20
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

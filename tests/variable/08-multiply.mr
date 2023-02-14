@@ -1,0 +1,100 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 6
+a *= 1.5
+
+if a === 9.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 3.25
+a *= 4.5
+
+if a === 14.625
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = (1 + 2i)
+a *= (2 - 3i)
+
+if a === (8 + 1i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = false
+a *= true
+
+if a === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = 's'
+a *= '-'
+
+if a === '7'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+a = "mur"
+a *= 2
+
+if a === "murmur"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+a = [1, 2.4]
+a *= 4
+
+if a === [1, 2.4, 1, 2.4, 1, 2.4, 1, 2.4]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 7:
+    "PASSED"
+else:
+    r

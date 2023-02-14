@@ -1,0 +1,74 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 3
+a **= 4
+
+if a === 81
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 1.44
+a **= 0.5
+
+if a === 1.2
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = (2.5 + 3.5i)
+a **= 3
+
+if a === (-76.25 + 22.75i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = false
+a **= 0.0
+
+if a === 1.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = '''
+a **= 2
+
+if a === 1521
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

@@ -1,0 +1,48 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 72
+a |= 35
+
+if a === 107
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = false
+a |= false
+
+if a === false
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = 'S'
+a |= '^'
+
+if a === '_'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 3:
+    "PASSED"
+else:
+    r

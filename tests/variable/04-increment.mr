@@ -1,0 +1,74 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = 23
+b = 10
+
+if a++ === 23 && a === 24 && ++b === 11
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 5.3
+b = 19.4
+
+if a++ === 5.3 && a === 6.3 && ++b === 20.4
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = (4 + 9i)
+b = (3.2 + 0.5i)
+
+if a++ === (4 + 9i) && a === (5 + 9i) && ++b === (4.2 + 0.5i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = true
+b = false
+
+if a++ === true && a === false && ++b === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = 'x'
+b = '6'
+
+if a++ === 'x' && a === 'y' && ++b === '7'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

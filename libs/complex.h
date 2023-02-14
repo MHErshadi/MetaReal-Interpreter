@@ -9,7 +9,7 @@
 
 #include <float.h>
 
-#include <C:/MinGW/include/mpc.h>
+#include <mpc.h>
 
 struct _complex__
 {

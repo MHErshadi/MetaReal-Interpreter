@@ -8,7 +8,7 @@
 #define __M_INT__
 
 #include <stdio.h>
-#include <C:/MinGW/include/gmp.h>
+#include <gmp.h>
 
 struct __int__
 {

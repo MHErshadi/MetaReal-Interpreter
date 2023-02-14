@@ -1,0 +1,130 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+var a = 45
+
+if a === 45
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+struct
+{
+    k = true
+
+    var global l = [k, [1, 2, 3]]
+}
+
+if l === [true, [1, 2, 3]]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+var const v = [4, 2.3, 0.8i]
+
+if v === [4, 2.3, 0.8i]:
+    try
+    {
+        v = none
+        r += "FAILED"
+    }
+    except "'v' is a constant variable"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+var const g
+g = 7.8
+
+if g === 7.8
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+func f(x):
+    var static p = x ** x
+
+f(4)
+
+if f.p === 256
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test6 *#
+
+var int i = 1729
+
+if i === 1729:
+    try
+    {
+        i = true
+        r += "FAILED"
+    }
+    except "Can not assign <bool> to a type-specified variable (type is <int>)"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test7 *#
+
+try
+{
+    var float f = 48
+    r += "FAILED"
+}
+except "Type of variable and type of value do not match (<float> and <int>)"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test8 *#
+
+var str s
+
+try
+{
+    s = 's'
+    r += "FAILED"
+}
+except "Can not assign <char> to a type-specified variable (type is <str>)"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 8:
+    "PASSED"
+else:
+    r

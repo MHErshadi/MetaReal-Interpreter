@@ -1,0 +1,58 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+var p = 4
+p = "poem"
+
+if p === "poem"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = (1, 2, 3)
+
+if a === (1, 2, 3)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+x = y = z = 1.75i
+
+if x === 1.75i && y === 1.75i && z === 1.75i
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+i = var j = 'g'
+
+if i === 'g' && j === 'g'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

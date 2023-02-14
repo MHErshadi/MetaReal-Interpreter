@@ -1,0 +1,63 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+var a = none
+
+try
+{
+    a
+    r += "FAILED"
+}
+except "'a' is not defined"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test2 *#
+
+var q
+
+try
+{
+    q
+    r += "FAILED"
+}
+except "'q' is not defined"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test3 *#
+
+var a = "first variable"
+
+if a === "first variable"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+var a = var b = var d = 4.87
+
+if a === 4.87 && b === 4.87 && d === 4.87
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

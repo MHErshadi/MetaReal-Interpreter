@@ -9,7 +9,7 @@
 
 #include <int.h>
 
-#include <C:/MinGW/include/mpfr.h>
+#include <mpfr.h>
 
 struct __float__
 {

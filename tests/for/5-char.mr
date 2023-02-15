@@ -1,0 +1,79 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for i = 'a' to 'e':
+    a += i
+
+if a === ['a', 'b', 'c', 'd'] && i === 'e'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+for i = 'a' to 'z' step 5:
+    a += i
+
+if a === ['a', 102, 107, 112, 117] && i === 122
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = []
+for i = '0' to '9' step 1.25:
+    a += i
+
+if a === ['0', 49.25, 50.5, 51.75, 53.0, 54.25, 55.5, 56.75] && i === 58.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = []
+for i = 'A' to 70 step true:
+    a += i
+
+if a === ['A', 'B', 'C', 'D', 'E'] && i === 'F'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = []
+for i = 'a' to 121.5 step '\t':
+    a += i
+
+if a === ['a', 'j', 's'] && i === '|'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

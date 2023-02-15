@@ -1,0 +1,40 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for i = 1 to 5:
+    for j = i to 5:
+        a += j
+
+if a === [1, 2, 3, 4, 2, 3, 4, 3, 4, 4] && i === 5 && j === 5
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+for i = 3 to 6:
+    for j = to 10 step i:
+        a += j
+
+if a === [0, 3, 6, 9, 0, 4, 8, 0, 5] && i === 6 && j === 10
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r
+

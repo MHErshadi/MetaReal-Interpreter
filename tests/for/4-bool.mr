@@ -1,0 +1,79 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for i = false to true:
+    a += i
+
+if a === [false] && i === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+for i = true to '\a' step 3:
+    a += i
+
+if a === [true, 4] && i === 7
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = []
+for i = false to true step 0.25:
+    a += i
+
+if a === [false, 0.25, 0.5, 0.75] && i === 1.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = []
+for i = false to true step true:
+    a += i
+
+if a === [false] && i === true
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test5 *#
+
+a = []
+for i = true to 99.9 step '!':
+    a += i
+
+if a === [true, '"', 'C'] && i === 'd'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

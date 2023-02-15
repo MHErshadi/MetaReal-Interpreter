@@ -1,0 +1,81 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for i = 1 to 6
+{
+    if i === 3:
+        continue
+
+    a += i
+}
+
+if a === [1, 2, 4, 5] && i === 6
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+for i = 1 to 100
+{
+    continue
+    a += i
+}
+
+if a === [] && i === 100
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = []
+for i = 1 to -10 step -1
+{
+    if i === -3:
+        break
+
+    a += i
+}
+
+if a === [1, 0, -1, -2] && i === -3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = []
+for i = 1 to 20
+{
+    break
+    a += i
+}
+
+if a === [] && i === 1
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

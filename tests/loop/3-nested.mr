@@ -1,0 +1,39 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for (i = 3; i < 5; i++):
+    for (j = 4; j < 6; j++):
+        a += i * j
+
+if a === [12, 15, 16, 20] && i === 5 && j === 6
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+for (i = 4; i < 8;):
+    for (j = 0; j < 3; i++, j++):
+        a += [(i, j)]
+
+if a === [(4, 0), (5, 1), (6, 2), (7, 0), (8, 1), (9, 2)] && i === 10 && j === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

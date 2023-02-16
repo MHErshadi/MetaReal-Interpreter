@@ -28,9 +28,6 @@ $(OUT): $(OBJS)
 $(ODIR)/%.o: $(SDIR)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $< -I $(HDIR) -I $(LDIR)
 
-$(TDIR)/%.x: $(TDIR)/%.mr
-	metareal $<
-
 clean:
 	@rm -f $(shell find $(ODIR) -name "*.o")
 	@rm -f $(OUT)

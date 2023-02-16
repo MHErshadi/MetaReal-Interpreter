@@ -1,0 +1,43 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+for i in []:
+    a += i
+
+if a === []:
+    try
+    {
+        i
+        r += "FAILED"
+    }
+    except "'i' is not defined"
+    {
+        r += "PASSED"
+        c++
+    }
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = 1
+for i in [1, 2, 3]:
+    a *= i
+
+if a === 6 && i === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

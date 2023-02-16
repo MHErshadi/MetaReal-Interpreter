@@ -2674,6 +2674,8 @@ ires_t interpret_foreach(foreach_np node, pos_p poss, pos_p pose, context_p cont
     for (i = 0; i < size; i++)
     {
         value = operate_index(iterable, i);
+        value_copy(value);
+
         res = table_var_set(&context->table, 0, node->iterator, 0, value);
         if (res == -1)
         {

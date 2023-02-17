@@ -1,0 +1,43 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = "" + (0.3i - 0.2i - 0.1i)
+
+$complex_prec_bit: 1024
+
+b = "" + (0.3i - 0.2i - 0.1i)
+
+if a === "6.776263578034403e-21i" && b === "6.953355807835004e-310i"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+$complex_prec_bit: 64
+
+#* Test2 *#
+
+a = (1 + 1i) / 32
+
+$complex_prec_bit: 1024
+
+b = (1 + 1i) / 32
+
+if a === (0.03125 + 0.03125i) && b === (0.03125 + 0.03125i)
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

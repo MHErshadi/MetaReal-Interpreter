@@ -1,0 +1,35 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+try
+{
+    $dummy
+    r += "FAILED"
+}
+except "Invalid dollar-function with name 'dummy'"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test2 *#
+
+try
+{
+    $param_get: "float_prec_bit", "dummy"
+    r += "FAILED"
+}
+except "Invalid argument count for dollar-function 'param_get' (argument count is 1, not 2)"
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

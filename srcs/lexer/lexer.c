@@ -304,7 +304,7 @@ const char* gen_identifier(token_p token, const char* code, pos_p pos)
     } while ((*code >= 'a' && *code <= 'z') || (*code >= 'A' && *code <= 'Z') || (*code >= '0' && *code <= '9') || *code == '_');
 
     if (size == alloc)
-        identifier = realloc(identifier, alloc++);
+        identifier = realloc(identifier, ++alloc);
     identifier[size++] = '\0';
 
     unsigned char type = identifier_type(identifier);

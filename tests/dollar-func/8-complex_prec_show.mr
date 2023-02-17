@@ -1,0 +1,43 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = "" + 1i / 3
+
+$complex_prec_show: 8
+
+b = "" + 1i / 3
+
+if a === "0.3333333333333333i" && b === "0.33333333i"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+$complex_prec_show: 16
+
+#* Test2 *#
+
+a = "" + 1i / 1024
+
+$complex_prec_show: 1
+
+b = "" + 1i / 1024
+
+if a === "0.0009765625i" && b === "0.001i"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

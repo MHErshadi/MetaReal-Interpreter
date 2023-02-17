@@ -1,0 +1,43 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = "" + (0.3 - 0.2 - 0.1)
+
+$float_prec_bit: 1024
+
+b = "" + (0.3 - 0.2 - 0.1)
+
+if a === "6.776263578034403e-21" && b === "6.953355807835004e-310"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+$float_prec_bit: 64
+
+#* Test2 *#
+
+a = 1 / 32
+
+$float_prec_bit: 1024
+
+b = 1 / 32
+
+if a === 0.03125 && b === 0.03125
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

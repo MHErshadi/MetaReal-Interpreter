@@ -1,0 +1,38 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+while +a < 3:
+    a += +a
+
+if a === [0, 1, 2]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+i = 0.25
+while i < 5:
+    a += i *= 2
+
+if a === [0.5, 1.0, 2.0, 4.0, 8.0] && i === 8.0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

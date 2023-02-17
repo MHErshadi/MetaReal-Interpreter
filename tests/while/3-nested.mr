@@ -1,0 +1,54 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+i = 0
+while i < 10
+{
+    j = 0
+
+    while j < 10
+    {
+        a += i * j
+        i += 2
+        j += 3
+    }
+}
+
+if a === [0, 6, 24, 54, 0, 30, 72, 126] && i === 16 && j === 12
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+i = 0
+while i < 10
+{
+    while i < 3:
+        a += (i += 2) ** 2
+
+    a += ','
+    a += (i += 3) ** 2
+}
+
+if a === [4, 16, ',', 49, ',', 100] && i === 10
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

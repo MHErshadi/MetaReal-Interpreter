@@ -1,0 +1,87 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+i = 0
+do
+{
+    i += 2
+
+    if i === 4:
+        continue
+
+    a += i * 3
+} while i <= 6
+
+if a === [6, 18, 24] && i === 8
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+i = 0
+do
+{
+    continue
+    a += i
+} while i++ < 35
+
+if a === [] && i === 36
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = []
+i = 0
+do
+{
+    if i > 9:
+        break
+
+    a += i
+    i += 3
+} while i < 20
+
+if a === [0, 3, 6, 9] && i === 12
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = []
+do
+{
+    break
+    a += 1
+} while true
+
+if a === []
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

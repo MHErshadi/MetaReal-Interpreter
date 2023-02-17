@@ -1,0 +1,54 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+i = 0
+do
+{
+    j = 0
+    do: a += i ** j while ++j < 3
+} while i++ < 3
+
+if a === [1, 0, 0, 1, 1, 1, 1, 2, 4, 1, 3, 9] && i === 4 && j === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+i = 0
+do
+{
+    j = 0
+
+    do
+    {
+        i++
+        j++
+        a += i << j
+    } while j < 3
+
+    a += "END"
+    i++
+} while i < 8
+
+if a === [2, 8, 24, "END", 10, 24, 56, "END"] && i === 8 && j === 3
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

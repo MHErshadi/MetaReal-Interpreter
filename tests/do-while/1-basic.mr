@@ -1,0 +1,41 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = []
+i = 0
+do: a += i while i != 0
+
+if a === [0] && i === 0
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = []
+i = 1
+do
+{
+    a += i
+    i *= 2
+} while i <= 8
+
+if a === [1, 2, 4, 8] && i === 16
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 2:
+    "PASSED"
+else:
+    r

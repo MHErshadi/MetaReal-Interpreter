@@ -1,0 +1,72 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+a = try: 3.14 except 4: "some text" except "OutRangeError": [1, 2, 3] finally: 'r'
+
+if a === 3.14
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test2 *#
+
+a = try
+{
+    1 / 0
+    3.14
+}
+except 4: "some text" except "OutRangeError": [1, 2, 3] finally: 'r'
+
+if a === "some text"
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test3 *#
+
+a = try
+{
+    "not too big"[1000]
+    3.14
+}
+except 4: "some text" except "OutRangeError": [1, 2, 3] finally: 'r'
+
+if a === [1, 2, 3]
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Test4 *#
+
+a = try
+{
+    "different error" / "what?"
+    3.14
+}
+except 4: "some text" except "OutRangeError": [1, 2, 3] finally: 'r'
+
+if a === 'r'
+{
+    r += "PASSED"
+    c++
+}
+else:
+    r += "FAILED"
+
+#* Result *#
+
+if c === 4:
+    "PASSED"
+else:
+    r

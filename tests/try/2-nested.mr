@@ -1,0 +1,104 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+try
+{
+    try
+    {
+        1 % 0
+        r += "FAILED"
+    }
+    except "Modulo by zero"
+    {
+        r += "PASSED"
+        c++
+    }
+}
+except "Modulo by zero":
+    r += "FAILED"
+finally:
+    r += "FAILED"
+
+#* Test2 *#
+
+try
+{
+    try
+    {
+        1 % 0
+        r += "FAILED"
+    }
+    except "Division by zero":
+        r += "FAILED"
+}
+except "Modulo by zero"
+{
+    r += "PASSED"
+    c++
+}
+finally:
+    r += "FAILED"
+
+#* Test3 *#
+
+try
+{
+    try
+    {
+        1 % 0
+        r += "FAILED"
+    }
+    except "Division by zero":
+        r += "FAILED"
+}
+except "Division by zero":
+    r += "FAILED"
+finally
+{
+    r += "PASSED"
+    c++
+}
+
+#* Test4 *#
+
+try
+{
+    n
+    r += "FAILED"
+}
+except "'n' is not defined":
+    try
+    {
+        r += "PASSED"
+        c++
+    }
+    finally:
+        r += "FAILED"
+
+#* Test5 *#
+
+try
+{
+    n
+    r += "FAILED"
+}
+except "'n' is not defined":
+    try
+    {
+        n
+        r += "FAILED"
+    }
+    finally
+    {
+        r += "PASSED"
+        c++
+    }
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

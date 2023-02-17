@@ -1,0 +1,102 @@
+r = []
+c = 0
+
+#* Test1 *#
+
+try
+{
+    "nothing special"
+    r += "PASSED"
+    c++
+}
+except 4:
+    r += "FAILED"
+except "MemOverflowError":
+    r += "FAILED"
+except "'n' is not defined":
+    r += "FAILED"
+finally:
+    r += "FAILED"
+
+#* Test2 *#
+
+try
+{
+    1 / 0.0
+    r += "FAILED"
+}
+except 4
+{
+    r += "PASSED"
+    c++
+}
+except "MemOverflowError":
+    r += "FAILED"
+except "'n' is not defined":
+    r += "FAILED"
+finally:
+    r += "FAILED"
+
+#* Test3 *#
+
+try
+{
+    2 ** 10 ** 30
+    r += "FAILED"
+}
+except 4:
+    r += "FAILED"
+except "MemOverflowError"
+{
+    r += "PASSED"
+    c++
+}
+except "'n' is not defined":
+    r += "FAILED"
+finally:
+    r += "FAILED"
+
+#* Test4 *#
+
+try
+{
+    n
+    r += "FAILED"
+}
+except 4:
+    r += "FAILED"
+except "MemOverflowError":
+    r += "FAILED"
+except "'n' is not defined"
+{
+    r += "PASSED"
+    c++
+}
+finally:
+    r += "FAILED"
+
+#* Test5 *#
+
+try
+{
+    none + none
+    r += "FAILED"
+}
+except 4:
+    r += "FAILED"
+except "MemOverflowError":
+    r += "FAILED"
+except "'n' is not defined":
+    r += "FAILED"
+finally
+{
+    r += "PASSED"
+    c++
+}
+
+#* Result *#
+
+if c === 5:
+    "PASSED"
+else:
+    r

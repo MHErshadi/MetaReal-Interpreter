@@ -32,7 +32,7 @@ int main(int argc, char** argv)
         char* code_copy = code;
         unsigned long long size;
 
-        table_t table = table_set(TABLE_SIZE);
+        table_t table = table_set_def();
         context_t context = context_set2(ROOT_CONTEXT, &table, CMD_FILE_NAME);
 
         while (1)

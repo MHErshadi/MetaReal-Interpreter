@@ -65,6 +65,8 @@
 #define FUNC_CONTEXT_SIZE 16
 #define STRUCT_CONTEXT_SIZE 16
 
+#define BI_FUNC_ARG_SIZE 4
+
 /* */
 
 union __union_value__

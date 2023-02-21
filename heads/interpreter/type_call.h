@@ -7,6 +7,6 @@
 
 #include "interpreter.h"
 
-ires_t object_call(void* ptr);
+ires_t handle_type_call(unsigned char id, value_p* args);
 
 #endif /* __M_TYPE_CALL__ */

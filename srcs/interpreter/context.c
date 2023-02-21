@@ -3,6 +3,8 @@
 /*/
 
 #include <interpreter/context.h>
+#include <int.h>
+#include <struct/bi_func.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -107,12 +109,42 @@ table_t table_set(unsigned long long alloc)
     return table;
 }
 
+table_t table_set_def()
+{
+    table_t table;
+
+    table.vars = malloc(TABLE_SIZE * sizeof(var_t));
+    table.alloc = TABLE_SIZE;
+    table.size = 4;
+
+    *table.vars = (var_t){
+        DEF_VAR, "null",
+        INT_V, value_set1(INT_V, int_set_ull(0))
+    };
+    table.vars[1] = (var_t){
+        DEF_VAR, "print",
+        BI_FUNC_V, value_set2(BI_FUNC_V, PRINT_BI)
+    };
+    table.vars[2] = (var_t){
+        DEF_VAR, "input",
+        BI_FUNC_V, value_set2(BI_FUNC_V, INPUT_BI)
+    };
+    table.vars[3] = (var_t){
+        DEF_VAR, "typeof",
+        BI_FUNC_V, value_set2(BI_FUNC_V, TYPEOF_BI)
+    };
+
+    return table;
+}
+
 void table_delete(table_p table)
 {
     while (table->size)
     {
         value_free(table->vars[--table->size].value);
-        free(table->vars[table->size].name);
+
+        if (!VAR_DEFAULT(table->vars[table->size].properties))
+            free(table->vars[table->size].name);
     }
 
     if (table->alloc)

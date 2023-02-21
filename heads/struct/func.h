@@ -28,14 +28,14 @@ struct __func_t__
 
     context_t context;
     body_t body;
-
-    unsigned char running;
 };
 typedef struct __func_t__ func_t;
 typedef struct __func_t__* func_p;
 
 #define func_context(f) (((func_p)f)->context)
 #define func_name(f) (((func_p)f)->context.name)
+#define func_min_size(f) (((func_p)f)->min_size)
+#define func_max_size(f) (((func_p)f)->max_size)
 
 /* */
 

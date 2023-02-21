@@ -5,9 +5,10 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <structure/function.h>
-#include <setting.h>
+#include <struct/func.h>
+#include <struct/bi_func.h>
 #include <stdlib.h>
+#include <setting.h>
 
 value_p value_set1(unsigned char type, void* ptr)
 {
@@ -48,6 +49,7 @@ void value_free(value_p value)
     case BOOL_V:
     case CHAR_V:
     case TYPE_V:
+    case BI_FUNC_V:
         break;
     case INT_V:
         int_free(value->value.ptr);
@@ -149,6 +151,9 @@ void value_label(value_p value, const char* end)
     case FUNC_V:
         context_print(setting.output, "function", &func_context(value->value.ptr), end);
         return;
+    case BI_FUNC_V:
+        fprintf(setting.output, "<built-in function %s>%s", bi_func_names[value->value.chr], end);
+        return;
     case STRUCT_V:
         context_print(setting.output, "struct", value->value.ptr, end);
         return;
@@ -163,6 +168,7 @@ char value_is_true(value_p value)
     switch (value->type)
     {
     case OBJECT_V:
+    case BI_FUNC_V:
         return 1;
     case INT_V:
         return int_sign(value->value.ptr) != 0;

@@ -9,9 +9,12 @@
 #include <debugger/pos.h>
 #include <stdio.h>
 
+#define DEF_VAR 0b11101
+
 #define VAR_PUBLIC(x) (x & 1)
 #define VAR_CONST(x)  (x >> 2 & 1)
 #define VAR_STATIC(x) (x >> 3 & 1)
+#define VAR_DEFAULT(x) (x >> 4 & 1)
 
 struct __var__
 {
@@ -67,6 +70,8 @@ var_p context_ptr_get(context_p context, const char* name, char* flag);
 /* */
 
 table_t table_set(unsigned long long alloc);
+
+table_t table_set_def();
 
 void table_delete(table_p table);
 void table_free(table_p table);

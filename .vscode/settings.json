@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "context.h": "c",
+        "interpreter.h": "c"
+    }
+}

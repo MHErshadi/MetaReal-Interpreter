@@ -18,18 +18,21 @@ typedef struct __value__ value_t;
 typedef struct __value__* value_p;
 
 #define value_copy(v)   \
+    do                  \
     {                   \
         if (v)          \
             (v)->ref++; \
-    }
+    } while (0)
 
 #define value_ref_free(v) \
+    do                    \
     {                     \
         if (v)            \
             (v)->ref--;   \
-    }
+    } while (0)
 
 #define value_free_type(v, vt)         \
+    do                                 \
     {                                  \
         if ((v)->ref)                  \
             (v)->ref--;                \
@@ -38,15 +41,16 @@ typedef struct __value__* value_p;
             vt##_free((v)->value.ptr); \
             free(v);                   \
         }                              \
-    }
+    } while (0)
 
 #define value_free_shell(v) \
+    do                      \
     {                       \
         if ((v)->ref)       \
             (v)->ref--;     \
         else                \
             free(v);        \
-    }
+    } while (0)
 
 enum _value_types_
 {
@@ -74,11 +78,12 @@ enum _value_types_
     /* */
 
     FUNC_V,
+    BI_FUNC_V,
 
     STRUCT_V
 };
 
-static const char* value_labels[15] =
+static const char* value_labels[16] =
 {
     "none",
     "object",
@@ -90,10 +95,11 @@ static const char* value_labels[15] =
     "type",
 
     "func",
+    "built-in func",
     "struct"
 };
 
-static const int value_label_lens[15] =
+static const int value_label_lens[16] =
 {
     4,
     6,
@@ -105,6 +111,7 @@ static const int value_label_lens[15] =
     4,
 
     4,
+    13,
     6
 };
 

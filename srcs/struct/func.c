@@ -2,7 +2,7 @@
  * MetaReal version 1.0.0
 /*/
 
-#include <structure/function.h>
+#include <struct/func.h>
 #include <stdlib.h>
 
 func_p func_set(unsigned char type, unsigned long long min_size, unsigned long long max_size,
@@ -18,7 +18,6 @@ func_p func_set(unsigned char type, unsigned long long min_size, unsigned long l
     func->size = size;
     func->context = *context;
     func->body = *body;
-    func->running = 0;
 
     return func;
 }

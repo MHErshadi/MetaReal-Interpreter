@@ -7,7 +7,7 @@
 #include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <structure/function.h>
+#include <struct/func.h>
 #include <setting.h>
 #include <stdlib.h>
 #include <string.h>

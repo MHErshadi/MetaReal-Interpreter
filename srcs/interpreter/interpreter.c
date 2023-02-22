@@ -222,6 +222,7 @@ ires_t interpret_body(body_p body, context_p context, char properties)
         value_free(ires.value);
 
         ires.value = ires_merge(&ires, interpret_node(body->nodes + i++, context, properties));
+
         if (IRES_HAS_ERROR(ires.response))
         {
             if (!IPROP_NOT_FREE(properties))
@@ -1599,10 +1600,10 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
 
     if (func->type == TYPE_V)
     {
-        min_size = 0;
-        max_size = 0;
+        min_size = type_call_min_sizes[func->value.chr];
+        max_size = type_call_max_sizes[func->value.chr];
 
-        name = "object";
+        name = value_labels[func->value.chr];
     }
     else if (func->type == BI_FUNC_V)
     {
@@ -1667,9 +1668,9 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
     }
 
     if (func->type == TYPE_V)
-        ires = handle_type_call(func->value.chr, args);
+        ires = handle_type_call(func->value.chr, args, node->size);
     else
-        ires = handle_bi_func(func->value.chr, args);
+        ires = handle_bi_func(func->value.chr, args, node->size);
 
     while (node->size--)
         value_free(args[node->size]);
@@ -3355,8 +3356,8 @@ ires_t handle_func_call(value_p func, func_call_np node,
                     i++;
                     while (node->size > i)
                     {
-                        node_free(&node->args[node->size].value);
-                        free(node->args[--node->size].name);
+                        node_free(&node->args[--node->size].value);
+                        free(node->args[node->size].name);
                     }
                     free(node->args);
 

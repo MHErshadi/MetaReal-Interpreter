@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 
         setting_init();
 
-        table_t table = table_set(TABLE_SIZE);
+        table_t table = table_set_def();
         context_t context = context_set2(ROOT_CONTEXT, &table, first);
 
         run_code(code, size, &context);

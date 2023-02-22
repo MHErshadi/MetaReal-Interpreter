@@ -19,7 +19,7 @@ runtime_t invalid_access_object(unsigned char type,
 runtime_t invalid_access_statement(const char* statement,
     pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = malloc(44 + strlen(statement));
+    char* detail = malloc(47 + strlen(statement));
     sprintf(detail, "Result of %s can not be accessed like a variable",
         statement);
 
@@ -29,7 +29,7 @@ runtime_t invalid_access_statement(const char* statement,
 runtime_t type_match(unsigned char type1, unsigned char type2,
     pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = malloc(59 + value_label_lens[type1] + value_label_lens[type2]);
+    char* detail = malloc(60 + value_label_lens[type1] + value_label_lens[type2]);
     sprintf(detail, "Type of variable and type of value do not match (<%s> and <%s>)",
         value_labels[type1], value_labels[type2]);
 
@@ -69,7 +69,7 @@ runtime_t assign_type_specified_variable(unsigned char type1, unsigned char type
 runtime_t not_defined(const char* name,
     pos_p poss, pos_p pose, context_p context)
 {
-    char* detail = malloc(45 + strlen(name));
+    char* detail = malloc(18 + strlen(name));
     sprintf(detail, "'%s' is not defined", name);
 
     return runtime_set(NOT_DEFINED_E, detail, poss, pose, context);

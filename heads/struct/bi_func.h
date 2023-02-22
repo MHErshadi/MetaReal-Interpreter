@@ -11,30 +11,21 @@ enum _bi_func_types_
 {
     PRINT_BI,
     INPUT_BI,
-    TYPEOF_BI
+    TYPEOF_BI,
+    EXIT_BI
 };
 
-static const char* bi_func_names[3] =
+static const char* bi_func_names[4] =
 {
     "print",
     "input",
-    "typeof"
+    "typeof",
+    "exit"
 };
 
-static const unsigned long long bi_func_min_sizes[3] =
-{
-    1,
-    0,
-    1
-};
+static const unsigned long long bi_func_min_sizes[4] = { 1, 0, 1, 0 };
+static const unsigned long long bi_func_max_sizes[4] = { 1, 1, 1, 0 };
 
-static const unsigned long long bi_func_max_sizes[3] =
-{
-    1,
-    1,
-    1
-};
-
-ires_t handle_bi_func(unsigned char id, value_p* args);
+ires_t handle_bi_func(unsigned char id, value_p* args, unsigned long long size);
 
 #endif /* __M_BI_FUNCTION__ */

@@ -160,6 +160,58 @@ void value_label(value_p value, const char* end)
     }
 }
 
+void value_print(value_p value, const char* end)
+{
+    if (!value)
+    {
+        fputs(end, setting.output);
+        return;
+    }
+
+    switch (value->type)
+    {
+    case OBJECT_V:
+        fprintf(setting.output, "<object at 0x%p>%s", value->value.ptr, end);
+        return;
+    case INT_V:
+        int_print(setting.output, value->value.ptr, end);
+        return;
+    case FLOAT_V:
+        float_print(setting.output, value->value.ptr, end);
+        return;
+    case COMPLEX_V:
+        complex_print(setting.output, value->value.ptr, end);
+        return;
+    case BOOL_V:
+        fprintf(setting.output, value->value.chr ? "true%s" : "false%s", end);
+        return;
+    case CHAR_V:
+        fprintf(setting.output, "%c%s", value->value.chr, end);
+        return;
+    case STR_V:
+        str_print(setting.output, value->value.ptr, end);
+        return;
+    case LIST_V:
+        list_print(setting.output, value->value.ptr, end);
+        return;
+    case TUPLE_V:
+        tuple_print(setting.output, value->value.ptr, end);
+        return;
+    case TYPE_V:
+        fprintf(setting.output, "<type %s>%s", value_labels[value->value.chr], end);
+        return;
+    case FUNC_V:
+        context_print(setting.output, "function", &func_context(value->value.ptr), end);
+        return;
+    case BI_FUNC_V:
+        fprintf(setting.output, "<built-in function %s>%s", bi_func_names[value->value.chr], end);
+        return;
+    case STRUCT_V:
+        context_print(setting.output, "struct", value->value.ptr, end);
+        return;
+    }
+}
+
 char value_is_true(value_p value)
 {
     if (!value)

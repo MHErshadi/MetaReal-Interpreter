@@ -121,6 +121,7 @@ value_p value_set2(unsigned char type, char chr);
 void value_free(value_p value);
 
 void value_label(value_p value, const char* end);
+void value_print(value_p value, const char* end);
 
 char value_is_true(value_p value);
 

@@ -8,8 +8,9 @@
 #include "interpreter.h"
 
 static const unsigned long long type_call_min_sizes[13] = { 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
-static const unsigned long long type_call_max_sizes[13] = { 0, 0, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, 0 };
+static const unsigned long long type_call_max_sizes[13] = { 0, 0, 2, 1, 1, 1, 1, 1, -1, -1, -1, -1, 0 };
 
-ires_t handle_type_call(unsigned char id, value_p* args, unsigned long long size);
+ires_t handle_type_call(unsigned char id, value_p* args, unsigned long long size,
+    pos_p poss, pos_p pose, context_p context);
 
 #endif /* __M_TYPE_CALL__ */

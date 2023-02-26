@@ -1557,6 +1557,7 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
     ires.response = 0;
 
     value_p func = ires_merge(&ires, interpret_node(&node->func, context, properties & IPROP_MASK));
+
     if (IRES_HAS_ERROR(ires.response))
     {
         if (!IPROP_NOT_FREE(properties))
@@ -1668,12 +1669,12 @@ ires_t interpret_func_call(func_call_np node, pos_p poss, pos_p pose, context_p 
     }
 
     if (func->type == TYPE_V)
-        ires = handle_type_call(func->value.chr, args, node->size);
+        ires = handle_type_call(func->value.chr, args, node->size, poss, pose, context);
     else
-        ires = handle_bi_func(func->value.chr, args, node->size);
+        ires = handle_bi_func(func->value.chr, args, node->size, poss, pose, context);
 
-    while (node->size--)
-        value_free(args[node->size]);
+    for (i = 0; i < node->size; i++)
+        value_free(args[i]);
     free(args);
 
     if (!IPROP_NOT_FREE(properties))
@@ -2334,7 +2335,10 @@ ires_t interpret_for(for_np node, pos_p poss, pos_p pose, context_p context, cha
                 goto success;
 
             if (IRES_LOOP_BREAK(ires.response))
+            {
+                value_free(value);
                 break;
+            }
 
             if (VAR_CONST(var->properties))
             {
@@ -2412,7 +2416,10 @@ success:
                 goto regress;
 
             if (IRES_LOOP_BREAK(ires.response))
+            {
+                value_free(value);
                 break;
+            }
 
             if (VAR_CONST(var->properties))
             {

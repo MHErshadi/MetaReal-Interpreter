@@ -115,7 +115,7 @@ table_t table_set_def()
 
     table.vars = malloc(TABLE_SIZE * sizeof(var_t));
     table.alloc = TABLE_SIZE;
-    table.size = 5;
+    table.size = 7;
 
     *table.vars = (var_t){
         DEF_VAR, "null",
@@ -136,6 +136,14 @@ table_t table_set_def()
     table.vars[4] = (var_t){
         DEF_VAR, "exit",
         BI_FUNC_V, value_set2(BI_FUNC_V, EXIT_BI)
+    };
+    table.vars[5] = (var_t){
+        DEF_VAR, "len",
+        BI_FUNC_V, value_set2(BI_FUNC_V, LEN_BI)
+    };
+    table.vars[6] = (var_t){
+        DEF_VAR, "ptr",
+        BI_FUNC_V, value_set2(BI_FUNC_V, PTR_BI)
     };
 
     return table;

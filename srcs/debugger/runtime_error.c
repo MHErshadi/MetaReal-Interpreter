@@ -75,6 +75,15 @@ runtime_t not_defined(const char* name,
     return runtime_set(NOT_DEFINED_E, detail, poss, pose, context);
 }
 
+runtime_t invalid_type_constructor(unsigned char type,
+    pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(31 + value_label_lens[type]);
+    sprintf(detail, "<%s> does not have a constructor", value_labels[type]);
+
+    return runtime_set(INVALID_CONSTRUCTOR_E, detail, poss, pose, context);
+}
+
 runtime_t invalid_type(const char* name, const char* types, unsigned char type,
     pos_p poss, pos_p pose, context_p context)
 {
@@ -128,6 +137,16 @@ runtime_t invalid_arg_number_function(const char* name, unsigned long long min, 
     char* detail = malloc(96 + strlen(name) + number_length(min) + number_length(max) + number_length(size));
     sprintf(detail, "Invalid argument count for function '%s' (argument count must be between %llu and %llu (inclusive), not %llu)",
         name, min, max, size);
+
+    return runtime_set(INVALID_ARG_COUNT_E, detail, poss, pose, context);
+}
+
+runtime_t invalid_arg_number_type_constructor(unsigned char type, unsigned long long min, unsigned long long max, unsigned long long size,
+    pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(99 + value_label_lens[type] + number_length(min) + number_length(max) + number_length(size));
+    sprintf(detail, "Invalid argument count for <%s> constructor (argument count must be between %llu and %llu (inclusive), not %llu)",
+        value_labels[type], min, max, size);
 
     return runtime_set(INVALID_ARG_COUNT_E, detail, poss, pose, context);
 }

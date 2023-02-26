@@ -39,7 +39,7 @@ struct __runtime__
 typedef struct __runtime__ runtime_t;
 typedef struct __runtime__* runtime_p;
 
-#define ERROR_CODE_COUNT 13
+#define ERROR_CODE_COUNT 14
 
 enum _runtime_types_
 {
@@ -49,6 +49,7 @@ enum _runtime_types_
     OUT_OF_RANGE_E,
     DIVISION_BY_ZERO_E,
     NOT_DEFINED_E,
+    INVALID_CONSTRUCTOR_E,
     CONST_E,
     ACCESS_E,
     OUTSIDE_LOOP_E,
@@ -67,6 +68,7 @@ static const char* runtime_labels[ERROR_CODE_COUNT + 1] =
     "OutRangeError",
     "DivByZeroError",
     "NotDefinedError",
+    "InvalidConstructor",
     "ConstError",
     "AccessError",
     "OutsideLoopError",

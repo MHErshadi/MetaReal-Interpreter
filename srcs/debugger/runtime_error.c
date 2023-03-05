@@ -230,3 +230,11 @@ runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context)
 
     return runtime_set(DIVISION_BY_ZERO_E, detail, poss, pose, context);
 }
+
+runtime_t file_open(char* name, pos_p poss, pos_p pose, context_p context)
+{
+    char* detail = malloc(21 + strlen(name));
+    sprintf(detail, "Can not open file \"%s\"", name);
+
+    return runtime_set(FILE_OPEN_E, detail, poss, pose, context);
+}

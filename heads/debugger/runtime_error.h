@@ -58,4 +58,6 @@ runtime_t out_of_range(pos_p poss, pos_p pose, context_p context);
 runtime_t division_by_zero(pos_p poss, pos_p pose, context_p context);
 runtime_t modulo_by_zero(pos_p poss, pos_p pose, context_p context);
 
+runtime_t file_open(char* name, pos_p poss, pos_p pose, context_p context);
+
 #endif /* __M_RUNTIME_ERROR__ */

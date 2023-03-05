@@ -39,7 +39,7 @@ struct __runtime__
 typedef struct __runtime__ runtime_t;
 typedef struct __runtime__* runtime_p;
 
-#define ERROR_CODE_COUNT 14
+#define ERROR_CODE_COUNT 15
 
 enum _runtime_types_
 {
@@ -57,7 +57,8 @@ enum _runtime_types_
     INVALID_ARG_COUNT_E,
     BOUNDARY_E,
     INVALID_DOLLAR_FUNCTION_E,
-    INVALID_VALUE_E
+    INVALID_VALUE_E,
+    FILE_OPEN_E
 };
 
 static const char* runtime_labels[ERROR_CODE_COUNT + 1] =
@@ -76,7 +77,8 @@ static const char* runtime_labels[ERROR_CODE_COUNT + 1] =
     "InvalidArgCountError",
     "BoundaryError",
     "InvalidDollarFunctionError",
-    "InvalidValueError"
+    "InvalidValueError",
+    "FileOpenError"
 };
 
 illegal_char_t illegal_char_set(char chr, pos_p pos);

@@ -3,6 +3,8 @@
 /*/
 
 #include <interpreter/operation.h>
+#include <lexer/lexer.h>
+#include <parser/parser.h>
 #include <interpreter/dollar_func.h>
 #include <interpreter/type_call.h>
 #include <debugger/runtime_error.h>
@@ -73,6 +75,8 @@ ires_t interpret_break(pos_p poss, pos_p pose, context_p context, char propertie
 
 ires_t handle_func_call(value_p func, func_call_np node,
     pos_p poss, pos_p pose, context_p context, char properties);
+
+ires_t eval_code(const char* code, unsigned long long size, context_p context);
 
 ires_t interpret(node_p nodes, context_p context)
 {
@@ -195,6 +199,8 @@ ires_t interpret_node(node_p node, context_p context, char properties)
         return interpret_while(node->value.ptr, &node->poss, &node->pose, context, properties);
     case TRY_N:
         return interpret_try(node->value.ptr, &node->poss, &node->pose, context, properties);
+    case IMPORT_N:
+        return interpret_import(node->value.ptr, &node->poss, &node->pose, context, properties);
     case RETURN_N:
         return interpret_return(node->value.ptr, &node->poss, &node->pose, context, properties);
     case CONTINUE_N:
@@ -3222,7 +3228,78 @@ ires_t interpret_try(try_np node, pos_p poss, pos_p pose, context_p context, cha
 
 ires_t interpret_import(char* node, pos_p poss, pos_p pose, context_p context, char properties)
 {
+    if (IPROP_PTR(properties))
+    {
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
 
+        return ires_fail(invalid_access_statement("import statement", poss, pose, context));
+    }
+
+    FILE* file = fopen(node, "r");
+    if (!file)
+    {
+        runtime_t error = file_open(node, poss, pose, context);
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires_fail(error);
+    }
+
+    char* code = malloc(FILE_INPUT_SIZE);
+    unsigned long long alloc = FILE_INPUT_SIZE;
+    unsigned long long size = 0;
+
+    char chr;
+    for (chr = getc(file); chr != EOF; chr = getc(file), size++)
+    {
+        if (size == alloc)
+            code = realloc(code, alloc += FILE_INPUT_SIZE);
+
+        code[size] = chr;
+    }
+
+    fclose(file);
+
+    if (!size)
+    {
+        free(code);
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires_success(NULL);
+    }
+
+    if (size + 1 != alloc)
+        code = realloc(code, size + 1);
+
+    code[size++] = '\0';
+    char* code_copy = code;
+
+    for (; *code == ' ' || *code == '\t' || *code == '\n'; code++, size--);
+    if (!*code)
+    {
+        free(code_copy);
+
+        if (!IPROP_NOT_FREE(properties))
+            free(node);
+
+        return ires_success(NULL);
+    }
+
+    table_t table = table_set(TABLE_SIZE);
+
+    context_p lib_context = malloc(sizeof(context_t));
+    *lib_context = context_set1(node, context, poss, &table, node);
+
+    ires_t ires = eval_code(code, size, lib_context);
+
+    table_var_set(&context->table, 0, node, NONE_V, value_set1(STRUCT_V, lib_context));
+
+    free(code_copy);
+    return ires;
 }
 
 ires_t interpret_include(char* node, pos_p poss, pos_p pose, context_p context, char properties)
@@ -3510,5 +3587,35 @@ ires_t handle_func_call(value_p func, func_call_np node,
         value_free_type(func, func);
 
     ires.response = 0;
+    return ires;
+}
+
+ires_t eval_code(const char* code, unsigned long long size, context_p context)
+{
+    ires_t ires;
+    ires.response = 0;
+    ires.value = NULL;
+
+    lres_t lres = lex(code, '\0');
+    if (lres.has_error)
+    {
+        illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
+        return ires;
+    }
+
+    pres_t pres = parse(lres.tokens);
+    if (pres.has_error)
+    {
+        invalid_syntax_print(&pres.error, code, size, CMD_FILE_NAME);
+        return ires;
+    }
+
+    ires = interpret(pres.nodes, context);
+    if (IRES_HAS_ERROR(ires.response))
+    {
+        runtime_print(&ires.error, code, size);
+        return ires;
+    }
+
     return ires;
 }

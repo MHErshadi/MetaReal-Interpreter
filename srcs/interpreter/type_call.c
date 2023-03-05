@@ -3,17 +3,22 @@
 /*/
 
 #include <interpreter/type_call.h>
-#include <int.h>
+#include <debugger/runtime_error.h>
+#include <complex.h>
 #include <str.h>
 #include <array/list.h>
-#include <debugger/runtime_error.h>
 #include <stdlib.h>
+#include <string.h>
 
 ires_t object_call();
 ires_t int_call(value_p* args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context);
+ires_t bool_call(value_p value);
+ires_t char_call(value_p value);
+ires_t str_call(value_p value);
 ires_t list_call(value_p* args, unsigned long long size);
 ires_t tuple_call(value_p* args, unsigned long long size);
+ires_t type_call(value_p value);
 
 ires_t handle_type_call(unsigned char id, value_p* args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context)
@@ -26,10 +31,18 @@ ires_t handle_type_call(unsigned char id, value_p* args, unsigned long long size
         return object_call();
     case INT_V:
         return int_call(args, size, poss, pose, context);
+    case BOOL_V:
+        return bool_call(*args);
+    case CHAR_V:
+        return char_call(*args);
+    case STR_V:
+        return str_call(*args);
     case LIST_V:
         return list_call(args, size);
     case TUPLE_V:
         return tuple_call(args, size);
+    case TYPE_V:
+        return type_call(*args);
     }
 
     return ires_fail(invalid_type_constructor(id, poss, pose, context));
@@ -88,6 +101,72 @@ ires_t int_call(value_p* args, unsigned long long size,
     }
 }
 
+ires_t bool_call(value_p value)
+{
+    return ires_success(value_set2(BOOL_V, value_is_true(value)));
+}
+
+ires_t char_call(value_p value)
+{
+    switch (value->type)
+    {
+    case INT_V:
+        return ires_success(value_set2(CHAR_V, int_get_ull(value->value.ptr)));
+    case BOOL_V:
+        return ires_success(value_set2(CHAR_V, value->value.chr));
+    case CHAR_V:
+        value_copy(value);
+        return ires_success(value);
+    }
+}
+
+ires_t str_call(value_p value)
+{
+    if (!value)
+        return ires_success(value_set1(STR_V, str_set_str("none", 4)));
+
+    str_p str;
+    switch (value->type)
+    {
+    case OBJECT_V:
+        return ires_success(value_set1(STR_V, str_set_str("object", 6)));
+    case INT_V:
+        str = malloc(sizeof(str_t));
+        str->str = int_get_str(value->value.ptr, 10);
+        str->size = strlen(str->str);
+
+        return ires_success(value_set1(STR_V, str));
+    case FLOAT_V:
+        str = malloc(sizeof(str_t));
+        str->str = float_get_str(value->value.ptr, 10);
+        str->size = strlen(str->str);
+
+        return ires_success(value_set1(STR_V, str));
+    case COMPLEX_V:
+        str = malloc(sizeof(str_t));
+        str->str = complex_get_str(value->value.ptr, 10);
+        str->size = strlen(str->str);
+
+        return ires_success(value_set1(STR_V, str));
+    case BOOL_V:
+        if (value->value.chr)
+            return ires_success(value_set1(STR_V, str_set_str("true", 4)));
+        else
+            return ires_success(value_set1(STR_V, str_set_str("false", 5)));
+    case CHAR_V:
+        str = malloc(sizeof(str_t));
+        str->str = malloc(2);
+        *str->str = value->value.chr;
+        str->str[1] = '\0';
+        str->size = 1;
+
+        return ires_success(value_set1(STR_V, str));
+    case STR_V:
+        value_copy(value);
+        return ires_success(value);
+    }
+}
+
 ires_t list_call(value_p* args, unsigned long long size)
 {
     value_p* elements = malloc(size * sizeof(value_p));
@@ -114,4 +193,9 @@ ires_t tuple_call(value_p* args, unsigned long long size)
     }
 
     return ires_success(value_set1(TUPLE_V, tuple_set(elements, size)));
+}
+
+ires_t type_call(value_p value)
+{
+    return ires_success(value_set2(TYPE_V, value->type));
 }

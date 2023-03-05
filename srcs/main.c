@@ -90,27 +90,27 @@ int main(int argc, char** argv)
         }
         if (!strcmp(first, "--dump-ver"))
         {
-            puts(LANG_VER);
+            fputs(LANG_VER, stdout);
             return 0;
         }
         if (!strcmp(first, "--dump-core"))
         {
-            puts(DEF_CORE);
+            fputs(DEF_CORE, stdout);
             return 0;
         }
         if (!strcmp(first, "--dump-core-ver"))
         {
-            puts(CORE_VER);
+            fputs(CORE_VER, stdout);
             return 0;
         }
         if (!strcmp(first, "--dump-port"))
         {
-            puts(DEF_PORT);
+            fputs(DEF_PORT, stdout);
             return 0;
         }
         if (!strcmp(first, "--dump-port-ver"))
         {
-            puts(PORT_VER);
+            fputs(PORT_VER, stdout);
             return 0;
         }
     }

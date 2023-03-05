@@ -17,6 +17,7 @@ ires_t bi_input(value_p* args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context);
 ires_t bi_typeof(value_p value);
 ires_t bi_exit();
+ires_t bi_clear();
 ires_t bi_len(value_p value);
 ires_t bi_ptr(value_p value);
 
@@ -33,6 +34,8 @@ ires_t handle_bi_func(unsigned char id, value_p* args, unsigned long long size,
         return bi_typeof(*args);
     case EXIT_BI:
         return bi_exit();
+    case CLEAR_BI:
+        return bi_clear();
     case LEN_BI:
         return bi_len(*args);
     case PTR_BI:
@@ -99,6 +102,13 @@ ires_t bi_typeof(value_p value)
 ires_t bi_exit()
 {
     exit(0);
+}
+
+ires_t bi_clear()
+{
+    system("cls");
+
+    return ires_success(NULL);
 }
 
 ires_t bi_len(value_p value)

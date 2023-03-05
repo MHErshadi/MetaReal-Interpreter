@@ -15,7 +15,7 @@ true                # bool
 float               # type
 ```
 # Binary Operators
-#### Arithmetic Operators
+### Arithmetic Operators
 ```
 3 + 2.1 # res: 5.1, add
 7 - 4   # res: 3  , subtract

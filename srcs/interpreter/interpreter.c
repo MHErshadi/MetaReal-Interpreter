@@ -76,8 +76,6 @@ ires_t interpret_break(pos_p poss, pos_p pose, context_p context, char propertie
 ires_t handle_func_call(value_p func, func_call_np node,
     pos_p poss, pos_p pose, context_p context, char properties);
 
-ires_t eval_code(const char* code, unsigned long long size, context_p context);
-
 ires_t interpret(node_p nodes, context_p context)
 {
     ires_t ires;
@@ -119,6 +117,37 @@ ires_t ires_fail(runtime_t error)
 
     ires.error = error;
     ires.response = 1;
+
+    return ires;
+}
+
+
+ires_t eval_code(const char* code, unsigned long long size, context_p context)
+{
+    ires_t ires;
+    ires.response = 0;
+    ires.value = NULL;
+
+    lres_t lres = lex(code, '\0');
+    if (lres.has_error)
+    {
+        illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
+        return ires;
+    }
+
+    pres_t pres = parse(lres.tokens);
+    if (pres.has_error)
+    {
+        invalid_syntax_print(&pres.error, code, size, CMD_FILE_NAME);
+        return ires;
+    }
+
+    ires = interpret(pres.nodes, context);
+    if (IRES_HAS_ERROR(ires.response))
+    {
+        runtime_print(&ires.error, code, size);
+        return ires;
+    }
 
     return ires;
 }
@@ -3587,35 +3616,5 @@ ires_t handle_func_call(value_p func, func_call_np node,
         value_free_type(func, func);
 
     ires.response = 0;
-    return ires;
-}
-
-ires_t eval_code(const char* code, unsigned long long size, context_p context)
-{
-    ires_t ires;
-    ires.response = 0;
-    ires.value = NULL;
-
-    lres_t lres = lex(code, '\0');
-    if (lres.has_error)
-    {
-        illegal_char_print(&lres.error, code, size, CMD_FILE_NAME);
-        return ires;
-    }
-
-    pres_t pres = parse(lres.tokens);
-    if (pres.has_error)
-    {
-        invalid_syntax_print(&pres.error, code, size, CMD_FILE_NAME);
-        return ires;
-    }
-
-    ires = interpret(pres.nodes, context);
-    if (IRES_HAS_ERROR(ires.response))
-    {
-        runtime_print(&ires.error, code, size);
-        return ires;
-    }
-
     return ires;
 }

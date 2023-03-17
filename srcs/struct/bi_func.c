@@ -20,6 +20,7 @@ ires_t bi_exit();
 ires_t bi_clear();
 ires_t bi_len(value_p value);
 ires_t bi_ptr(value_p value);
+ires_t bi_eval(value_p value, context_p context);
 
 ires_t handle_bi_func(unsigned char id, value_p* args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context)
@@ -40,6 +41,8 @@ ires_t handle_bi_func(unsigned char id, value_p* args, unsigned long long size,
         return bi_len(*args);
     case PTR_BI:
         return bi_ptr(*args);
+    case EVAL_BI:
+        return bi_eval(*args, context);
     default:
         fprintf(stderr, "handle_bi_func function: invalid node type (#%u)\n", id);
         abort();
@@ -129,4 +132,9 @@ ires_t bi_len(value_p value)
 ires_t bi_ptr(value_p value)
 {
     return ires_success(value_set1(INT_V, int_set_ull((unsigned long)value)));
+}
+
+ires_t bi_eval(value_p value, context_p context)
+{
+    return eval_code(str_str(value->value.ptr), str_size(value->value.ptr), context);
 }

@@ -115,7 +115,7 @@ table_t table_set_def()
 
     table.vars = malloc(TABLE_SIZE * sizeof(var_t));
     table.alloc = TABLE_SIZE;
-    table.size = 8;
+    table.size = 9;
 
     *table.vars = (var_t){
         DEF_VAR, "null",
@@ -148,6 +148,10 @@ table_t table_set_def()
     table.vars[7] = (var_t){
         DEF_VAR, "ptr",
         BI_FUNC_V, value_set2(BI_FUNC_V, PTR_BI)
+    };
+    table.vars[8] = (var_t){
+        DEF_VAR, "eval",
+        BI_FUNC_V, value_set2(BI_FUNC_V, EVAL_BI)
     };
 
     return table;

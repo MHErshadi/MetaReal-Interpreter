@@ -15,10 +15,11 @@ enum _bi_func_types_
     EXIT_BI,
     CLEAR_BI,
     LEN_BI,
-    PTR_BI
+    PTR_BI,
+    EVAL_BI
 };
 
-static const char* bi_func_names[7] =
+static const char* bi_func_names[8] =
 {
     "print",
     "input",
@@ -26,11 +27,12 @@ static const char* bi_func_names[7] =
     "exit",
     "clear",
     "len",
-    "ptr"
+    "ptr",
+    "eval"
 };
 
-static const unsigned long long bi_func_min_sizes[7] = { 0, 0, 1, 0, 0, 1, 1 };
-static const unsigned long long bi_func_max_sizes[7] = { 2, 1, 1, 0, 0, 1, 1 };
+static const unsigned long long bi_func_min_sizes[8] = { 0, 0, 1, 0, 0, 1, 1, 1 };
+static const unsigned long long bi_func_max_sizes[8] = { 2, 1, 1, 0, 0, 1, 1, 1 };
 
 ires_t handle_bi_func(unsigned char id, value_p* args, unsigned long long size,
     pos_p poss, pos_p pose, context_p context);

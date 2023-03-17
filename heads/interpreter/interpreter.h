@@ -35,4 +35,6 @@ ires_t interpret(node_p nodes, context_p context);
 ires_t ires_success(value_p value);
 ires_t ires_fail(runtime_t error);
 
+ires_t eval_code(const char* code, unsigned long long size, context_p context);
+
 #endif /* __M_INTERPRETER__ */
